@@ -1,3 +1,4 @@
+import { Fan, Lightbulb } from "lucide-react";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import { openAlerts } from "@/lib/van";
 import DashHeader from "./DashHeader";
@@ -6,6 +7,7 @@ import VanStage from "./VanStage";
 import LocksPanel from "./LocksPanel";
 import QuickDock from "./QuickDock";
 import StatStrip from "./StatStrip";
+import PhysicalToggle from "./PhysicalToggle";
 
 export default function HomeScreen() {
   const van = useVanDashboard();
@@ -27,6 +29,8 @@ export default function HomeScreen() {
   }
 
   const faultCount = openAlerts(alerts).length;
+  const lightsOn = status.lights_on !== false;
+  const ventOn = (status.climate_mode ?? "auto") !== "off";
 
   return (
     <div className="flex h-[100dvh] flex-col overflow-hidden bg-background">
@@ -46,6 +50,24 @@ export default function HomeScreen() {
             onPhoto={(uri) => van.update({ van_photo_uri: uri })}
           />
           <StatStrip status={status} faultCount={faultCount} />
+
+          <div className="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-2">
+            <PhysicalToggle
+              icon={Lightbulb}
+              label="Cabin lights"
+              sub={lightsOn ? `On · ${Math.round(status.light_level ?? 70)}% brightness` : "All zones off"}
+              checked={lightsOn}
+              onChange={(value) => van.update({ lights_on: value })}
+            />
+            <PhysicalToggle
+              icon={Fan}
+              label="Ventilation"
+              sub={ventOn ? "Fan running · auto" : "Fan stopped"}
+              checked={ventOn}
+              onChange={(value) => van.update({ climate_mode: value ? "auto" : "off" })}
+              tone="green"
+            />
+          </div>
         </div>
 
         <LocksPanel locked={status.locks_locked} />
