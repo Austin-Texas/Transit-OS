@@ -81,6 +81,10 @@
       "type": "number",
       "description": "Solar input currently produced, in watts."
     },
+    "load_w": {
+      "type": "number",
+      "description": "House loads drawing power right now, in watts."
+    },
     "climate_temp": {
       "type": "number",
       "description": "Current cabin temperature in Fahrenheit."

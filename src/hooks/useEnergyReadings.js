@@ -1,0 +1,56 @@
+import { useCallback, useEffect, useState } from "react";
+import { base44 } from "@/api/base44Client";
+
+const pad = (value) => String(value).padStart(2, "0");
+
+const timeLabel = (date, range) => {
+  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (range > 48) {
+    return date.toLocaleDateString("en-US", { weekday: "short", hour: "numeric", timeZone: zone });
+  }
+  return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: false, timeZone: zone });
+};
+
+// Power history pushed by the van hub, charted for the selected window.
+export default function useEnergyReadings(range = 24) {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const since = new Date(Date.now() - range * 3600 * 1000).toISOString();
+    try {
+      const page = await base44.entities.EnergyReading.filter(
+        { recorded_at: { $gte: since } },
+        { sort: "recorded_at", limit: 500 }
+      );
+      setItems(page.items ?? []);
+    } finally {
+      setLoading(false);
+    }
+  }, [range]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const points = items.map((reading) => {
+    const at = new Date(reading.recorded_at);
+    return {
+      label: timeLabel(at, range),
+      battery: Math.round(Number(reading.battery_percent ?? 0)),
+      solar: Math.round(Number(reading.solar_w ?? 0)),
+      load: Math.round(Number(reading.load_w ?? 0)),
+    };
+  });
+
+  const last = items[items.length - 1];
+  const solarPeak = items.reduce((max, r) => Math.max(max, Number(r.solar_w ?? 0)), 0);
+  const avgLoad = items.length
+    ? Math.round(items.reduce((sum, r) => sum + Number(r.load_w ?? 0), 0) / items.length)
+    : 0;
+
+  return { points, loading, last, solarPeak, avgLoad, count: items.length, refresh: load };
+}
+
+export { pad };

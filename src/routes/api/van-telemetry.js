@@ -5,6 +5,7 @@ const NUMERIC = [
   "battery_voltage",
   "battery_percent",
   "solar_w",
+  "load_w",
   "climate_temp",
   "climate_set",
   "cabin_temp",
@@ -99,7 +100,17 @@ export const Route = createFileRoute("/api/van-telemetry")({
           ? await base44.asServiceRole.entities.VanStatus.update(van.id, patch)
           : await base44.asServiceRole.entities.VanStatus.create(patch);
 
-        return Response.json({ ok: true, id: saved.id, updated: Object.keys(patch) });
+        // Every reading that carries power data also lands in the history the charts draw.
+        const reading = { recorded_at: new Date().toISOString() };
+        for (const key of ["battery_percent", "battery_voltage", "solar_w", "load_w"]) {
+          if (patch[key] !== undefined) reading[key] = patch[key];
+        }
+        const hasHistory = Object.keys(reading).length > 1;
+        if (hasHistory) {
+          await base44.asServiceRole.entities.EnergyReading.create(reading);
+        }
+
+        return Response.json({ ok: true, id: saved.id, updated: Object.keys(patch), history: hasHistory });
       },
     },
   },

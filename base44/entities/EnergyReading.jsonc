@@ -1,0 +1,79 @@
+{
+  "name": "EnergyReading",
+  "type": "object",
+  "properties": {
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the van hub sampled these readings."
+    },
+    "battery_percent": {
+      "type": "number",
+      "description": "House battery state of charge at that moment, in percent."
+    },
+    "battery_voltage": {
+      "type": "number",
+      "description": "Starter battery voltage at that moment."
+    },
+    "solar_w": {
+      "type": "number",
+      "description": "Solar input produced, in watts."
+    },
+    "load_w": {
+      "type": "number",
+      "description": "House loads drawing power at that moment, in watts."
+    }
+  },
+  "required": [
+    "recorded_at"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
