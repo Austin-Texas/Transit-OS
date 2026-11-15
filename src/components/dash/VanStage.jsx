@@ -15,7 +15,7 @@ function Marker({ className, tone, label }) {
   );
 }
 
-export default function VanStage({ cabinTemp }) {
+export default function VanStage({ cabinTemp, vehicleName, trim }) {
   return (
     <section className="relative min-h-[260px] flex-1 overflow-hidden rounded-2xl border border-line/80 bg-surface">
       <span className="pointer-events-none absolute left-1/2 top-1/2 h-[380px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sys-blue/[0.08] blur-3xl" />
@@ -33,6 +33,11 @@ export default function VanStage({ cabinTemp }) {
       <div className="absolute left-4 top-3.5 flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-white/35">
         <span className="h-1.5 w-1.5 rounded-full bg-sys-blue" />
         Live 3D · Interior {Math.round(cabinTemp)}°F
+      </div>
+
+      <div className="absolute bottom-3.5 left-4">
+        <p className="text-[14px] font-semibold leading-tight tracking-tight text-white">{vehicleName}</p>
+        <p className="text-[9.5px] uppercase tracking-[0.18em] text-white/40">{trim}</p>
       </div>
     </section>
   );

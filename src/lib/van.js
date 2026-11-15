@@ -12,8 +12,8 @@ export const MODES = [
 
 // Local sample snapshot, used until the live van records are wired in.
 export const SAMPLE_STATUS = {
-  vehicle_name: "2023 Transit",
-  trim: "High Roof",
+  vehicle_name: "2026 Ford Transit",
+  trim: "Full Extended High Roof",
   vin: "1FTBR1C8XPK104482",
   active_mode: "camping",
   battery_voltage: 12.6,

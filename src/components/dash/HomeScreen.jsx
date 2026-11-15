@@ -51,7 +51,11 @@ export default function HomeScreen() {
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-3">
-          <VanStage cabinTemp={status.cabin_temp} />
+          <VanStage
+            cabinTemp={status.cabin_temp}
+            vehicleName={status.vehicle_name}
+            trim={status.trim}
+          />
           <StatStrip status={status} faultCount={faultCount} />
         </div>
 
