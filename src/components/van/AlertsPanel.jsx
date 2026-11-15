@@ -1,25 +1,28 @@
-import { Activity, Check, X } from "lucide-react";
+import { Activity, Bell, Check, Gauge, X, TriangleAlert } from "lucide-react";
 import { clockTime, openAlerts } from "@/lib/van";
 
+const iconFor = (alert) => (/misfire|engine|p0\d/i.test(alert.title) ? Gauge : TriangleAlert);
+
 function AlertRow({ alert, onResolve }) {
+  const Icon = iconFor(alert);
   return (
-    <li className="group relative overflow-hidden rounded-xl border border-alert/25 bg-alert/[0.07] p-2.5 pl-3 transition hover:border-alert/50">
-      <span className="absolute inset-y-2 left-0 w-[2px] rounded-full bg-alert" />
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="truncate text-[11px] font-medium leading-snug text-alert">{alert.title}</p>
-          {alert.detail ? <p className="mt-0.5 truncate text-[9.5px] text-white/45">{alert.detail}</p> : null}
-        </div>
-        <button
-          type="button"
-          onClick={() => onResolve(alert)}
-          aria-label={`Resolve ${alert.title}`}
-          className="shrink-0 rounded p-1 text-white/25 transition hover:text-white"
-        >
-          <X className="h-3 w-3" strokeWidth={2.4} />
-        </button>
+    <li className="group flex items-start gap-2.5 rounded-xl border border-alert/35 bg-alert/[0.07] p-2.5 transition hover:border-alert/60">
+      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-alert/30 bg-alert/10 text-alert">
+        <Icon className="h-3.5 w-3.5" strokeWidth={2} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[11px] font-medium leading-snug text-alert">{alert.title}</p>
+        {alert.detail ? <p className="mt-0.5 truncate text-[9.5px] text-white/45">{alert.detail}</p> : null}
+        <p className="mt-1 font-mono text-[9px] text-white/30">{clockTime(alert.occurred_at)}</p>
       </div>
-      <p className="mt-1.5 font-mono text-[9px] text-white/30">{clockTime(alert.occurred_at)}</p>
+      <button
+        type="button"
+        onClick={() => onResolve(alert)}
+        aria-label={`Resolve ${alert.title}`}
+        className="shrink-0 rounded p-1 text-white/25 transition hover:text-white"
+      >
+        <X className="h-3 w-3" strokeWidth={2.4} />
+      </button>
     </li>
   );
 }
@@ -27,9 +30,12 @@ function AlertRow({ alert, onResolve }) {
 export default function AlertsPanel({ alerts, onResolve, onDiagnostics }) {
   const active = openAlerts(alerts);
   return (
-    <aside className="panel-surface flex flex-col rounded-2xl border border-neon/15 p-4">
+    <aside className="panel-surface flex flex-col rounded-2xl border border-neon/25 p-4">
       <header className="flex items-center justify-between gap-2">
-        <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45">Alerts ({active.length})</h2>
+        <div className="flex items-center gap-2">
+          <Bell className="h-3.5 w-3.5 text-alert/80" strokeWidth={1.8} />
+          <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">Alerts ({active.length})</h2>
+        </div>
         <span className={active.length ? "h-1.5 w-1.5 animate-soft-pulse rounded-full bg-alert" : "h-1.5 w-1.5 rounded-full bg-ok"} />
       </header>
 
@@ -49,7 +55,7 @@ export default function AlertsPanel({ alerts, onResolve, onDiagnostics }) {
       <button
         type="button"
         onClick={onDiagnostics}
-        className="mt-auto flex w-full items-center justify-center gap-2 rounded-xl border border-neon/40 bg-neon/10 px-3 py-2.5 pt-2.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-neon transition hover:bg-neon/20"
+        className="mt-auto flex w-full items-center justify-center gap-2 rounded-xl border border-neon/50 bg-neon/10 px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-neon shadow-[0_0_28px_-12px_rgba(0,240,255,1)] transition hover:bg-neon/20"
       >
         <Activity className="h-3.5 w-3.5" strokeWidth={2} />
         Run Diagnostics

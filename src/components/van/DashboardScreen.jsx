@@ -78,7 +78,6 @@ export default function DashboardScreen() {
                 onDiagnostics={() => setDiagnosticsOpen(true)}
               />
             </div>
-            <QuickModes active={status.active_mode} onSelect={van.setMode} />
           </div>
 
           <AlertsPanel
@@ -87,6 +86,8 @@ export default function DashboardScreen() {
             onDiagnostics={() => setDiagnosticsOpen(true)}
           />
         </div>
+
+        <QuickModes active={status.active_mode} onSelect={van.setMode} />
       </main>
 
       <BottomNav active={navActive} onSelect={handleNav} />

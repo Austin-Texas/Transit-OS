@@ -1,7 +1,5 @@
-import { Bluetooth, Car, CloudSun, Home, Settings } from "lucide-react";
+import { Bluetooth, Car, CloudSun, Home, Settings, Wifi } from "lucide-react";
 import Clock from "./Clock";
-
-const BARS = [3, 5, 7, 9, 11];
 
 export default function TopBar({ onOpenSettings }) {
   return (
@@ -12,10 +10,10 @@ export default function TopBar({ onOpenSettings }) {
             <Car className="h-4 w-4 text-neon" strokeWidth={1.6} />
           </div>
           <div className="leading-tight">
-            <p className="text-[13px] font-semibold tracking-tight text-white">
+            <p className="text-[14px] font-semibold tracking-tight text-white">
               TransitOS<span className="text-neon">™</span>
             </p>
-            <p className="text-[8.5px] uppercase tracking-[0.26em] text-white/35">Smart Camper</p>
+            <p className="text-[8.5px] uppercase tracking-[0.24em] text-white/35">Smart Camper Platform</p>
           </div>
         </div>
 
@@ -25,11 +23,7 @@ export default function TopBar({ onOpenSettings }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="hidden items-end gap-[3px] sm:flex">
-            {BARS.map((height) => (
-              <span key={height} className="w-[3px] rounded-full bg-ok" style={{ height, opacity: height > 6 ? 1 : 0.45 }} />
-            ))}
-          </div>
+          <Wifi className="hidden h-4 w-4 text-ok sm:block" strokeWidth={1.8} />
           <Bluetooth className="hidden h-3.5 w-3.5 text-neon sm:block" strokeWidth={1.8} />
           <div className="hidden items-center gap-1 sm:flex">
             <CloudSun className="h-4 w-4 text-ok" strokeWidth={1.6} />

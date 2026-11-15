@@ -29,14 +29,14 @@ export default function BottomNav({ active, onSelect }) {
               aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex min-w-[62px] flex-1 flex-col items-center gap-1.5 rounded-xl px-1.5 py-1.5 transition-colors duration-200",
-                isActive ? "text-neon" : "text-white/35 hover:text-white/70"
+                isActive ? "bg-neon/10 text-neon" : "text-white/35 hover:text-white/70"
               )}
             >
               <span
                 className={cn(
                   "grid h-8 w-8 place-items-center rounded-full border transition-all duration-300",
                   isActive
-                    ? "border-neon/60 bg-neon/15 shadow-[0_0_20px_-6px_rgba(0,240,255,1)]"
+                    ? "border-neon bg-neon text-ink-950 shadow-[0_0_26px_-4px_rgba(0,240,255,1)]"
                     : "border-white/10 bg-white/[0.03]"
                 )}
               >

@@ -6,7 +6,7 @@ export default function LpgCard({ percent, gallons }) {
   return (
     <Panel id="card-lpg" title="LPG / Propane" icon={Flame}>
       <div className="flex items-center justify-between gap-2">
-        <ArcGauge mode="ring" value={percent} size={78} thickness={6} color="#ff9500">
+        <ArcGauge value={percent} size={110} thickness={9} color="#ff8a1f">
           <p className="font-mono text-[15px] font-semibold leading-none text-white">{percent}%</p>
         </ArcGauge>
         <div className="text-right">

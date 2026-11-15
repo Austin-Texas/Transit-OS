@@ -4,7 +4,7 @@ import Panel from "./Panel";
 const LEVELS = [
   { key: "fresh_water", label: "Fresh", color: "#00f0ff" },
   { key: "gray_water", label: "Gray", color: "#8aa0b4" },
-  { key: "black_water", label: "Black", color: "#5f6f80" },
+  { key: "black_water", label: "Black", color: "#ff9500" },
 ];
 
 export default function WaterCard({ status }) {

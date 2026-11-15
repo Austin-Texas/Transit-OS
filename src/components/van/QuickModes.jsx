@@ -3,8 +3,8 @@ import { MODES } from "@/lib/van";
 
 export default function QuickModes({ active, onSelect }) {
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="mr-1 text-[9px] uppercase tracking-[0.22em] text-white/30">Quick Modes</span>
+    <div className="panel-surface flex flex-wrap items-center gap-2 rounded-2xl border border-neon/25 px-4 py-3">
+      <span className="mr-1 text-[9px] uppercase tracking-[0.22em] text-white/40">Quick Modes</span>
       {MODES.map((mode) => {
         const isActive = active === mode.id;
         return (
