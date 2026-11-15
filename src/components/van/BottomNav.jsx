@@ -17,7 +17,7 @@ export const NAV_ITEMS = [
 export default function BottomNav({ active, onSelect }) {
   return (
     <nav className="sticky bottom-0 z-30 border-t border-neon/15 bg-ink-950/90 backdrop-blur-xl">
-      <div className="no-scrollbar mx-auto flex w-full max-w-[1560px] items-stretch gap-1 overflow-x-auto px-2 py-2 lg:px-6">
+      <div className="no-scrollbar mx-auto flex w-full max-w-[1800px] items-stretch gap-1 overflow-x-auto px-2 py-2 lg:px-6">
         {NAV_ITEMS.map((item) => {
           const isActive = active === item.id;
           const Icon = item.icon;
@@ -28,21 +28,21 @@ export default function BottomNav({ active, onSelect }) {
               onClick={() => onSelect(item)}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "flex min-w-[62px] flex-1 flex-col items-center gap-1.5 rounded-xl px-1.5 py-1.5 transition-colors duration-200",
+                "flex min-w-[78px] flex-1 flex-col items-center gap-1.5 rounded-xl px-2 py-2 transition-colors duration-200",
                 isActive ? "bg-neon/10 text-neon" : "text-white/35 hover:text-white/70"
               )}
             >
               <span
                 className={cn(
-                  "grid h-8 w-8 place-items-center rounded-full border transition-all duration-300",
+                  "grid h-10 w-10 place-items-center rounded-full border transition-all duration-300",
                   isActive
-                    ? "border-neon bg-neon text-ink-950 shadow-[0_0_26px_-4px_rgba(0,240,255,1)]"
+                    ? "border-neon bg-neon/20 text-neon shadow-[0_0_26px_-4px_rgba(0,240,255,1)]"
                     : "border-white/10 bg-white/[0.03]"
                 )}
               >
-                <Icon className="h-[15px] w-[15px]" strokeWidth={1.8} />
+                <Icon className="h-[21px] w-[21px]" strokeWidth={1.8} />
               </span>
-              <span className="text-[8.5px] font-medium uppercase tracking-[0.12em]">{item.label}</span>
+              <span className="text-[11px] font-medium uppercase tracking-[0.12em]">{item.label}</span>
             </button>
           );
         })}

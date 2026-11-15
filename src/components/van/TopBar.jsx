@@ -4,16 +4,16 @@ import Clock from "./Clock";
 export default function TopBar({ onOpenSettings }) {
   return (
     <header className="sticky top-0 z-30 border-b border-neon/15 bg-ink-950/85 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-[1560px] items-center justify-between gap-3 px-3 py-2.5 lg:px-6">
+      <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-3 px-3 py-2.5 lg:px-6">
         <div className="flex items-center gap-2.5">
-          <div className="grid h-9 w-9 place-items-center rounded-xl border border-neon/35 bg-neon/10 shadow-[0_0_22px_-8px_rgba(0,240,255,1)]">
+          <div className="grid h-11 w-11 place-items-center rounded-xl border border-neon/35 bg-neon/10 shadow-[0_0_22px_-8px_rgba(0,240,255,1)]">
             <Car className="h-4 w-4 text-neon" strokeWidth={1.6} />
           </div>
           <div className="leading-tight">
-            <p className="text-[14px] font-semibold tracking-tight text-white">
+            <p className="text-[22px] font-semibold tracking-tight text-white">
               TransitOS<span className="text-neon">™</span>
             </p>
-            <p className="text-[8.5px] uppercase tracking-[0.24em] text-white/35">Smart Camper Platform</p>
+            <p className="text-[10px] uppercase tracking-[0.24em] text-white/35">Smart Camper Platform</p>
           </div>
         </div>
 
@@ -34,7 +34,7 @@ export default function TopBar({ onOpenSettings }) {
             type="button"
             onClick={onOpenSettings}
             aria-label="Settings"
-            className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/55 transition hover:border-neon/40 hover:text-neon"
+            className="grid h-11 w-11 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/55 transition hover:border-neon/40 hover:text-neon"
           >
             <Settings className="h-4 w-4" strokeWidth={1.7} />
           </button>

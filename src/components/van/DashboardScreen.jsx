@@ -61,12 +61,12 @@ export default function DashboardScreen() {
     <div className="flex min-h-screen flex-col">
       <TopBar onOpenSettings={() => setSettingsOpen(true)} />
 
-      <main className="mx-auto flex w-full max-w-[1560px] flex-1 flex-col gap-4 px-3 py-4 lg:px-6 lg:py-5">
-        <div className="grid gap-4 xl:grid-cols-[minmax(230px,0.95fr)_minmax(430px,1.75fr)_minmax(258px,1fr)]">
+      <main className="mx-auto flex w-full max-w-[1800px] flex-1 flex-col gap-4 px-3 py-4 lg:px-5 lg:py-5">
+        <div className="grid items-stretch gap-4 xl:grid-cols-[minmax(300px,1.05fr)_minmax(570px,1.85fr)_minmax(285px,0.95fr)]">
           <VanPanel status={status} />
 
-          <div className="flex flex-col gap-4">
-            <div className="grid gap-4 sm:grid-cols-2">
+          <div className="flex min-w-0 flex-col gap-4">
+            <div className="grid flex-1 auto-rows-fr gap-4 sm:grid-cols-2">
               <ClimateCard temp={status.climate_temp} set={status.climate_set} onAdjust={van.adjustClimate} />
               <WaterCard status={status} />
               <LpgCard percent={Number(status.lpg_percent)} gallons={status.lpg_gallons} />
@@ -78,6 +78,7 @@ export default function DashboardScreen() {
                 onDiagnostics={() => setDiagnosticsOpen(true)}
               />
             </div>
+            <QuickModes active={status.active_mode} onSelect={van.setMode} />
           </div>
 
           <AlertsPanel
@@ -87,7 +88,6 @@ export default function DashboardScreen() {
           />
         </div>
 
-        <QuickModes active={status.active_mode} onSelect={van.setMode} />
       </main>
 
       <BottomNav active={navActive} onSelect={handleNav} />

@@ -68,8 +68,8 @@
 
 @layer utilities {
   .panel-surface {
-    background-image: linear-gradient(160deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.012));
-    box-shadow: 0 24px 48px -32px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    background-image: linear-gradient(160deg, rgba(12, 39, 66, 0.88), rgba(4, 16, 32, 0.94));
+    box-shadow: 0 16px 40px -25px rgba(0, 240, 255, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .hairline-top {
@@ -85,3 +85,6 @@
     scrollbar-width: none;
   }
 }
+/* Touchscreen-first dashboard sizing and clear neon card edges */
+.panel-surface { border-color: rgba(0, 220, 255, .38) !important; }
+@media (min-width:1280px) { main > .grid { min-height: min(665px, calc(100vh - 205px)); } }
