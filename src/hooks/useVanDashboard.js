@@ -1,26 +1,24 @@
 import { useCallback, useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { SAMPLE_ALERTS, SAMPLE_STATUS, buildDiagnostics } from "@/lib/van";
+import { buildDiagnostics } from "@/lib/van";
 
 // Live dashboard state backed by the VanStatus and Alert records.
 export default function useVanDashboard() {
   const [status, setStatus] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [offline, setOffline] = useState(false);
 
   const load = useCallback(async () => {
     try {
       const vanPage = await base44.entities.VanStatus.filter({}, { sort: "-created_date", limit: 1 });
-      let van = vanPage.items?.[0];
-      if (!van) van = await base44.entities.VanStatus.create({ ...SAMPLE_STATUS });
       const alertPage = await base44.entities.Alert.filter({ status: "open" }, { sort: "-created_date", limit: 20 });
-      setStatus(van);
+      setStatus(vanPage.items?.[0] ?? null);
       setAlerts(alertPage.items ?? []);
+      setOffline(false);
     } catch (error) {
-      // Keep the dashboard usable from the last known values if the hub is unreachable.
       console.error(error);
-      setStatus((prev) => prev ?? { ...SAMPLE_STATUS });
-      setAlerts((prev) => (prev.length ? prev : SAMPLE_ALERTS));
+      setOffline(true);
     } finally {
       setLoading(false);
     }
@@ -30,9 +28,32 @@ export default function useVanDashboard() {
     load();
   }, [load]);
 
+  // Live telemetry: the dashboard follows new readings as the van hub writes them.
+  useEffect(() => {
+    const unsubscribeStatus = base44.entities.VanStatus.subscribe((event) => {
+      if (event.type === "delete") return;
+      setStatus((prev) => (prev && prev.id !== event.data.id ? prev : event.data));
+    });
+    const unsubscribeAlerts = base44.entities.Alert.subscribe((event) => {
+      if (event.type === "delete") {
+        setAlerts((prev) => prev.filter((alert) => alert.id !== event.data.id));
+        return;
+      }
+      if (event.data.status === "resolved") {
+        setAlerts((prev) => prev.filter((alert) => alert.id !== event.data.id));
+        return;
+      }
+      setAlerts((prev) => [event.data, ...prev.filter((alert) => alert.id !== event.data.id)]);
+    });
+    return () => {
+      unsubscribeStatus();
+      unsubscribeAlerts();
+    };
+  }, []);
+
   // Applies a change everywhere at once and saves it to the van record.
   const update = async (patch) => {
-    setStatus((prev) => ({ ...(prev ?? SAMPLE_STATUS), ...patch }));
+    setStatus((prev) => (prev ? { ...prev, ...patch } : prev));
     if (status?.id) await base44.entities.VanStatus.update(status.id, patch);
   };
 
@@ -45,18 +66,19 @@ export default function useVanDashboard() {
 
   const resolveAlert = async (alertId) => {
     setAlerts((prev) => prev.filter((alert) => alert.id !== alertId));
-    if (!String(alertId).startsWith("sample-")) await base44.entities.Alert.update(alertId, { status: "resolved" });
+    await base44.entities.Alert.update(alertId, { status: "resolved" });
   };
 
   return {
     status,
     alerts,
     loading,
+    offline,
     setMode,
     adjustClimate,
     update,
     resolveAlert,
     refresh: load,
-    diagnostics: buildDiagnostics(status ?? SAMPLE_STATUS, alerts),
+    diagnostics: status ? buildDiagnostics(status, alerts) : [],
   };
 }

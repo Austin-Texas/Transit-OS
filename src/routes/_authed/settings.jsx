@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { LogOut, RefreshCw, Save, Settings as SettingsIcon, Truck } from "lucide-react";
+import { LogOut, Radio, RefreshCw, Save, Settings as SettingsIcon, Truck } from "lucide-react";
 import { toast } from "sonner";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import { useAuth } from "@/lib/AuthContext";
@@ -115,6 +115,15 @@ function SettingsPage() {
               <RefreshCw className={syncing ? "h-3.5 w-3.5 animate-spin" : "h-3.5 w-3.5"} strokeWidth={2} />
               {syncing ? "Syncing" : "Re-sync status"}
             </button>
+          </ModuleCard>
+
+          <ModuleCard title="Live telemetry" icon={Radio}>
+            <p className="rounded-xl border border-line/80 bg-surface-raised px-3 py-3 text-[11px] leading-relaxed text-white/45">
+              Point your van hub at{" "}
+              <code className="font-mono text-[11px] text-sys-blue">POST /api/van-telemetry</code> and send the{" "}
+              <code className="font-mono text-[11px] text-white/70">x-van-token</code> header. Every reading it posts
+              appears on the dashboard instantly.
+            </p>
           </ModuleCard>
 
           <ModuleCard title="Account" icon={LogOut}>

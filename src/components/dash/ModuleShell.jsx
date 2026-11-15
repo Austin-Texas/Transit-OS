@@ -24,7 +24,7 @@ export default function ModuleShell({ title, subtitle, meta, status, children })
           {children ?? (
             <div className="flex items-center gap-3 self-start rounded-full border border-line bg-surface px-5 py-2.5">
               <span className="h-1.5 w-1.5 animate-soft-pulse rounded-full bg-sys-blue" />
-              <span className="text-[10px] uppercase tracking-[0.22em] text-white/55">Connecting to van</span>
+              <span className="text-[10px] uppercase tracking-[0.22em] text-white/55">Waiting for telemetry</span>
             </div>
           )}
         </div>
