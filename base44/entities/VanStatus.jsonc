@@ -1,0 +1,132 @@
+{
+  "name": "VanStatus",
+  "type": "object",
+  "properties": {
+    "vehicle_name": {
+      "type": "string",
+      "description": "Model shown on the dashboard, e.g. 2023 Transit."
+    },
+    "trim": {
+      "type": "string",
+      "description": "Trim or build, e.g. High Roof."
+    },
+    "vin": {
+      "type": "string",
+      "description": "Vehicle identification number."
+    },
+    "active_mode": {
+      "type": "string",
+      "enum": [
+        "camping",
+        "sleeping",
+        "driving",
+        "away",
+        "custom"
+      ],
+      "enumColors": [
+        "green",
+        "blue",
+        "purple",
+        "gray",
+        "yellow"
+      ],
+      "description": "Quick mode the van is currently in."
+    },
+    "battery_voltage": {
+      "type": "number",
+      "description": "Starter battery voltage in volts."
+    },
+    "battery_percent": {
+      "type": "number",
+      "description": "House battery state of charge in percent."
+    },
+    "climate_temp": {
+      "type": "number",
+      "description": "Current cabin temperature in Fahrenheit."
+    },
+    "climate_set": {
+      "type": "number",
+      "description": "Climate set point in Fahrenheit."
+    },
+    "cabin_temp": {
+      "type": "number",
+      "description": "Sleeping cabin temperature in Fahrenheit."
+    },
+    "fresh_water": {
+      "type": "number",
+      "description": "Fresh water tank level in percent."
+    },
+    "gray_water": {
+      "type": "number",
+      "description": "Gray water tank level in percent."
+    },
+    "black_water": {
+      "type": "number",
+      "description": "Black water tank level in percent."
+    },
+    "lpg_percent": {
+      "type": "number",
+      "description": "Propane level in percent."
+    },
+    "lpg_gallons": {
+      "type": "number",
+      "description": "Propane remaining in gallons."
+    },
+    "odometer": {
+      "type": "number",
+      "description": "Odometer reading in miles."
+    }
+  },
+  "required": [
+    "vehicle_name"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

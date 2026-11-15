@@ -13,6 +13,19 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+  			ink: {
+  				950: '#020a14',
+  				900: '#050f1d',
+  				800: '#081525',
+  				700: '#0b1c31'
+  			},
+  			neon: {
+  				DEFAULT: '#00f0ff',
+  				dim: '#0b8b96'
+  			},
+  			ok: '#00ff41',
+  			alert: '#ff3b30',
+  			warn: '#ff9500',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -86,11 +99,16 @@ export default {
   				to: {
   					height: '0'
   				}
+  			},
+  			'soft-pulse': {
+  				'0%, 100%': { opacity: '1' },
+  				'50%': { opacity: '0.35' }
   			}
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+  			'soft-pulse': 'soft-pulse 2.4s ease-in-out infinite'
   		}
   	}
   },

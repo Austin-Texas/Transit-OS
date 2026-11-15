@@ -1,0 +1,98 @@
+{
+  "name": "Alert",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Short alert headline, e.g. P0301 Cylinder 1 Misfire."
+    },
+    "detail": {
+      "type": "string",
+      "description": "Supporting line shown under the headline."
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "warning",
+        "info"
+      ],
+      "enumColors": [
+        "red",
+        "yellow",
+        "blue"
+      ],
+      "description": "How urgent the alert is."
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the van hub reported the alert."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "resolved"
+      ],
+      "enumColors": [
+        "red",
+        "green"
+      ],
+      "default": "open",
+      "description": "Whether the alert still needs attention."
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
