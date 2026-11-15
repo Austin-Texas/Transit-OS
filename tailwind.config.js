@@ -13,6 +13,16 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+  			sys: {
+  				blue: 'hsl(var(--sys-blue))',
+  				green: 'hsl(var(--sys-green))',
+  				red: 'hsl(var(--sys-red))'
+  			},
+  			surface: {
+  				DEFAULT: 'hsl(var(--surface))',
+  				raised: 'hsl(var(--surface-raised))'
+  			},
+  			line: 'hsl(var(--line))',
   			ink: {
   				950: '#020a14',
   				900: '#050f1d',

@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import DashboardScreen from "@/components/van/DashboardScreen";
+import HomeScreen from "@/components/dash/HomeScreen";
 
 export const Route = createFileRoute("/_authed/")({
   head: () => ({
     meta: [
       { title: "TransitOS — Main Dashboard" },
-      { name: "description", content: "Live status for power, water, propane, climate, cabin and vehicle diagnostics." },
+      { name: "description", content: "Live vehicle, cabin, lock and utility status for your camper." },
     ],
   }),
-  component: DashboardScreen,
+  component: HomeScreen,
 });

@@ -40,6 +40,10 @@
       "type": "number",
       "description": "House battery state of charge in percent."
     },
+    "solar_w": {
+      "type": "number",
+      "description": "Solar input currently produced, in watts."
+    },
     "climate_temp": {
       "type": "number",
       "description": "Current cabin temperature in Fahrenheit."
@@ -51,6 +55,14 @@
     "cabin_temp": {
       "type": "number",
       "description": "Sleeping cabin temperature in Fahrenheit."
+    },
+    "exterior_temp": {
+      "type": "number",
+      "description": "Outside temperature in Fahrenheit."
+    },
+    "humidity": {
+      "type": "number",
+      "description": "Interior relative humidity in percent."
     },
     "fresh_water": {
       "type": "number",
