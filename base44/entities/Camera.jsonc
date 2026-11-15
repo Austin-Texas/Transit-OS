@@ -1,0 +1,102 @@
+{
+  "name": "Camera",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Camera name shown in the feed selector, e.g. Rear camera."
+    },
+    "location": {
+      "type": "string",
+      "description": "Where the camera is mounted, e.g. Passenger side."
+    },
+    "snapshot_url": {
+      "type": "string",
+      "description": "Latest still the van hub pushed from this camera."
+    },
+    "resolution": {
+      "type": "string",
+      "description": "Feed resolution, e.g. 1080p."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "live",
+        "offline"
+      ],
+      "enumColors": [
+        "green",
+        "gray"
+      ],
+      "default": "live",
+      "description": "Whether the hub is currently streaming this camera."
+    },
+    "night_vision": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to render the feed in infrared mode."
+    },
+    "motion_alerts": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether motion on this camera raises an alert."
+    },
+    "last_motion": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When motion was last detected on this camera."
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

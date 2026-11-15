@@ -10,7 +10,7 @@ const DOCK = [
   { id: "power", label: "Power", icon: Zap, to: "/electrical" },
   { id: "water", label: "Water", icon: Droplets, to: "/water" },
   { id: "diagnose", label: "Diagnose", icon: Activity, to: "/vehicle" },
-  { id: "cameras", label: "Cameras", icon: Camera, to: "/security" },
+  { id: "cameras", label: "Cameras", icon: Camera, to: "/cameras" },
 ];
 
 export default function QuickDock() {
