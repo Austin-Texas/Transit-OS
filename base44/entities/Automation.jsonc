@@ -1,0 +1,128 @@
+{
+  "name": "Automation",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "What the automation is called, e.g. Night watch."
+    },
+    "trigger": {
+      "type": "string",
+      "enum": [
+        "schedule",
+        "battery_below",
+        "fresh_water_below",
+        "propane_below",
+        "temp_above",
+        "temp_below",
+        "mode_change"
+      ],
+      "enumColors": [
+        "blue",
+        "yellow",
+        "blue",
+        "purple",
+        "red",
+        "blue",
+        "purple"
+      ],
+      "description": "What starts the automation."
+    },
+    "run_time": {
+      "type": "string",
+      "description": "Local time in HH:MM for schedule triggers."
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "camping",
+        "sleeping",
+        "driving",
+        "away",
+        "custom"
+      ],
+      "enumColors": [
+        "green",
+        "blue",
+        "purple",
+        "gray",
+        "yellow"
+      ],
+      "description": "Van mode that triggers a mode_change automation."
+    },
+    "threshold": {
+      "type": "number",
+      "description": "Sensor threshold: percent for tank or battery triggers, Fahrenheit for temperature triggers."
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Actions the hub runs when the automation fires."
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the automation is active."
+    },
+    "last_run": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the automation last fired."
+    }
+  },
+  "required": [
+    "name",
+    "trigger"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
