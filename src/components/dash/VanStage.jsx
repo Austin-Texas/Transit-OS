@@ -1,4 +1,4 @@
-import { Image } from "@/components/ui/image";
+import VanPhoto from "@/components/van/VanPhoto";
 import { VAN_STAGE_IMAGE } from "@/lib/van";
 
 function Marker({ className, tone, label }) {
@@ -15,16 +15,17 @@ function Marker({ className, tone, label }) {
   );
 }
 
-export default function VanStage({ cabinTemp, vehicleName, trim }) {
+export default function VanStage({ cabinTemp, vehicleName, trim, photoUri, onPhoto }) {
   return (
     <section className="relative min-h-[260px] flex-1 overflow-hidden rounded-2xl border border-line/80 bg-surface">
       <span className="pointer-events-none absolute left-1/2 top-1/2 h-[380px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sys-blue/[0.08] blur-3xl" />
 
-      <Image
-        src={VAN_STAGE_IMAGE}
-        alt="Transparent cutaway view of the camper van layout"
-        fittingType="fit"
-        className="absolute inset-0 h-full w-full object-contain"
+      <VanPhoto
+        uri={photoUri}
+        fallback={VAN_STAGE_IMAGE}
+        alt="Your camper van"
+        className="absolute inset-0 h-full w-full object-cover"
+        onPhoto={onPhoto}
       />
 
       <Marker className="absolute left-[64%] top-[38%]" tone="bg-sys-red" label="Rear cabin" />

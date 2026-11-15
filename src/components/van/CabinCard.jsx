@@ -1,19 +1,20 @@
 import { BedDouble } from "lucide-react";
-import { Image } from "@/components/ui/image";
+import VanPhoto from "@/components/van/VanPhoto";
 import { CABIN_IMAGE } from "@/lib/van";
 
-export default function CabinCard({ temp }) {
+export default function CabinCard({ temp, photoUri, onPhoto }) {
   return (
     <section
       id="card-cabin"
       className="panel-surface relative overflow-hidden rounded-2xl border border-neon/15 transition-colors duration-300 hover:border-neon/35"
     >
       <div className="relative h-[132px] w-full">
-        <Image
-          src={CABIN_IMAGE}
-          alt="Camper van cabin interior with warm lighting"
-          fittingType="fill"
+        <VanPhoto
+          uri={photoUri}
+          fallback={CABIN_IMAGE}
+          alt="Camper van cabin interior"
           className="absolute inset-0 h-full w-full object-cover"
+          onPhoto={onPhoto}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/35 to-ink-950/55" />
         <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-2 p-3">

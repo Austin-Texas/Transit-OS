@@ -1,15 +1,15 @@
 import { BatteryMedium } from "lucide-react";
-import { Image } from "@/components/ui/image";
+import VanPhoto from "@/components/van/VanPhoto";
 import { VAN_IMAGE } from "@/lib/van";
 
 export default function VanPanel({ status }) {
   return (
     <section className="panel-surface flex flex-col overflow-hidden rounded-2xl border border-neon/15">
       <div className="relative h-full w-full flex-1">
-        <Image
-          src={VAN_IMAGE}
-          alt="Camper van parked in the mountains"
-          fittingType="fill"
+        <VanPhoto
+          uri={status.van_photo_uri}
+          fallback={VAN_IMAGE}
+          alt="Your camper van"
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/15 to-transparent" />

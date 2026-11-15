@@ -42,6 +42,8 @@ export default function HomeScreen() {
             cabinTemp={status.cabin_temp}
             vehicleName={status.vehicle_name}
             trim={status.trim}
+            photoUri={status.van_photo_uri}
+            onPhoto={(uri) => van.update({ van_photo_uri: uri })}
           />
           <StatStrip status={status} faultCount={faultCount} />
         </div>

@@ -14,6 +14,14 @@
       "type": "string",
       "description": "Vehicle identification number."
     },
+    "van_photo_uri": {
+      "type": "string",
+      "description": "Owner's exterior photo of the van, shown on the home stage instead of the default render."
+    },
+    "cabin_photo_uri": {
+      "type": "string",
+      "description": "Owner's interior photo of the living space, shown on the cabin views."
+    },
     "active_mode": {
       "type": "string",
       "enum": [

@@ -6,8 +6,8 @@ import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
 import Metric from "@/components/dash/Metric";
 import ToggleRow from "@/components/dash/ToggleRow";
-import { Image } from "@/components/ui/image";
 import { Slider } from "@/components/ui/slider";
+import VanPhoto from "@/components/van/VanPhoto";
 import { CABIN_IMAGE } from "@/lib/van";
 
 export const Route = createFileRoute("/_authed/camper")({
@@ -37,12 +37,14 @@ function CamperPage() {
       <div className="grid gap-3 lg:grid-cols-3">
         <section className="relative overflow-hidden rounded-2xl border border-line/80 bg-surface lg:col-span-2">
           <div className="relative h-[240px] w-full">
-            <Image
-              src={CABIN_IMAGE}
-              alt="Camper van cabin interior with warm lighting"
-              fittingType="fill"
+            <VanPhoto
+              uri={status.cabin_photo_uri}
+              fallback={CABIN_IMAGE}
+              alt="Camper van cabin interior"
               className="absolute inset-0 h-full w-full object-cover"
               style={{ filter: `brightness(${luminance})`, transition: "filter 140ms linear" }}
+              onPhoto={(uri) => van.update({ cabin_photo_uri: uri })}
+              buttonPosition="top"
             />
             <div
               className="pointer-events-none absolute inset-0 bg-warn mix-blend-soft-light"
