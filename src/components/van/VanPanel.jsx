@@ -5,7 +5,7 @@ import { VAN_IMAGE } from "@/lib/van";
 export default function VanPanel({ status }) {
   return (
     <section className="panel-surface flex flex-col overflow-hidden rounded-2xl border border-neon/15">
-      <div className="relative h-[280px] w-full xl:h-full xl:min-h-[520px] xl:flex-1">
+      <div className="relative h-full w-full flex-1">
         <Image
           src={VAN_IMAGE}
           alt="Camper van parked in the mountains"

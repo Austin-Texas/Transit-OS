@@ -85,6 +85,5 @@
     scrollbar-width: none;
   }
 }
-/* Touchscreen-first dashboard sizing and clear neon card edges */
-.panel-surface { border-color: rgba(0, 220, 255, .38) !important; }
-@media (min-width:1280px) { main > .grid { min-height: min(665px, calc(100vh - 205px)); } }
+/* Reference screenshot styling: subtle borders, dark cards, no additional navigation. */
+.panel-surface { border-color: rgba(0, 220, 255, .19) !important; }
