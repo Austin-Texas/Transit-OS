@@ -71,7 +71,7 @@ function CamerasPage() {
               ))}
             </ul>
             <p className="mt-3 text-[9.5px] leading-relaxed text-white/30">
-              Pick a camera to open its feed. Stills are pushed by the van hub.
+              Pick a camera to open its feed. Use Photo on a feed to drop in your own still — the van hub keeps pushing new ones over it.
             </p>
           </ModuleCard>
         </div>

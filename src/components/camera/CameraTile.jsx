@@ -1,4 +1,4 @@
-import { Image } from "@/components/ui/image";
+import CameraSnapshot from "./CameraSnapshot";
 import { cn } from "@/lib/utils";
 
 export default function CameraTile({ camera, active, onSelect }) {
@@ -18,16 +18,7 @@ export default function CameraTile({ camera, active, onSelect }) {
         )}
       >
         <span className="relative h-11 w-16 shrink-0 overflow-hidden rounded-md border border-line/80 bg-black">
-          <Image
-            src={camera.snapshot_url}
-            alt=""
-            fittingType="fill"
-            className={cn(
-              "h-full w-full",
-              camera.night_vision && "contrast-125 grayscale",
-              !live && "opacity-40"
-            )}
-          />
+          <CameraSnapshot camera={camera} compact />
         </span>
 
         <span className="min-w-0 flex-1">
