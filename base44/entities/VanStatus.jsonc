@@ -4,11 +4,11 @@
   "properties": {
     "vehicle_name": {
       "type": "string",
-      "description": "Model shown on the dashboard, e.g. 2023 Transit."
+      "description": "Model shown on the dashboard, e.g. 2026 Ford Transit."
     },
     "trim": {
       "type": "string",
-      "description": "Trim or build, e.g. High Roof."
+      "description": "Trim or build, e.g. Full Extended High Roof."
     },
     "vin": {
       "type": "string",
@@ -31,6 +31,43 @@
         "yellow"
       ],
       "description": "Quick mode the van is currently in."
+    },
+    "climate_mode": {
+      "type": "string",
+      "enum": [
+        "auto",
+        "eco",
+        "boost",
+        "off"
+      ],
+      "enumColors": [
+        "blue",
+        "green",
+        "yellow",
+        "gray"
+      ],
+      "default": "auto",
+      "description": "How the climate system is running."
+    },
+    "lights_on": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the cabin lighting is on."
+    },
+    "light_level": {
+      "type": "number",
+      "default": 70,
+      "description": "Cabin lighting brightness in percent."
+    },
+    "locks_locked": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the lockers, doors and drawers are locked."
+    },
+    "water_pump_on": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the water pump is running."
     },
     "battery_voltage": {
       "type": "number",

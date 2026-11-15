@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { toast } from "sonner";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import { openAlerts } from "@/lib/van";
 import DashHeader from "./DashHeader";
@@ -8,25 +6,10 @@ import VanStage from "./VanStage";
 import LocksPanel from "./LocksPanel";
 import QuickDock from "./QuickDock";
 import StatStrip from "./StatStrip";
-import DiagnosticsDialog from "@/components/van/DiagnosticsDialog";
 
 export default function HomeScreen() {
   const van = useVanDashboard();
-  const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const { status, alerts } = van;
-
-  const handleNav = (item) => {
-    if (item.id === "home") return;
-    toast(`${item.label} isn't connected yet`, { description: "This module is planned for the next TransitOS release." });
-  };
-
-  const handleDock = (item) => {
-    if (item.id === "diagnose") {
-      setDiagnosticsOpen(true);
-      return;
-    }
-    toast(`${item.label} isn't connected yet`, { description: "This module is planned for the next TransitOS release." });
-  };
 
   if (!status) {
     return (
@@ -47,7 +30,7 @@ export default function HomeScreen() {
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-3 xl:flex-row xl:overflow-hidden">
         <div className="hidden xl:block">
-          <SideRail active="home" onSelect={handleNav} />
+          <SideRail />
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -59,12 +42,10 @@ export default function HomeScreen() {
           <StatStrip status={status} faultCount={faultCount} />
         </div>
 
-        <LocksPanel />
+        <LocksPanel locked={status.locks_locked} />
       </div>
 
-      <QuickDock onSelect={handleDock} />
-
-      <DiagnosticsDialog open={diagnosticsOpen} onOpenChange={setDiagnosticsOpen} results={van.diagnostics} />
+      <QuickDock />
     </div>
   );
 }

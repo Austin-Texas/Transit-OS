@@ -30,15 +30,17 @@ export default function useVanDashboard() {
     load();
   }, [load]);
 
-  const setMode = async (mode) => {
-    setStatus((prev) => ({ ...prev, active_mode: mode }));
-    if (status?.id) await base44.entities.VanStatus.update(status.id, { active_mode: mode });
+  // Applies a change everywhere at once and saves it to the van record.
+  const update = async (patch) => {
+    setStatus((prev) => ({ ...(prev ?? SAMPLE_STATUS), ...patch }));
+    if (status?.id) await base44.entities.VanStatus.update(status.id, patch);
   };
 
-  const adjustClimate = async (delta) => {
+  const setMode = (mode) => update({ active_mode: mode });
+
+  const adjustClimate = (delta) => {
     const next = Math.min(90, Math.max(50, Number(status?.climate_set ?? 72) + delta));
-    setStatus((prev) => ({ ...prev, climate_set: next, climate_temp: next }));
-    if (status?.id) await base44.entities.VanStatus.update(status.id, { climate_set: next, climate_temp: next });
+    update({ climate_set: next, climate_temp: next });
   };
 
   const resolveAlert = async (alertId) => {
@@ -52,6 +54,7 @@ export default function useVanDashboard() {
     loading,
     setMode,
     adjustClimate,
+    update,
     resolveAlert,
     refresh: load,
     diagnostics: buildDiagnostics(status ?? SAMPLE_STATUS, alerts),
