@@ -5,8 +5,8 @@ import "./StartupPremium.css";
 
 const initial = Object.fromEntries(STARTUP_CHECKS.map(check => [check.id, "pending"]));
 const settled = status => ["ready", "offline", "simulated", "error"].includes(status);
-const BEATS = [0, 1300, 2800, 4300, 6000];
-const PROGRESS_START = 6000;
+const BEATS = [0, 3300, 5100, 6800, 8800];
+const PROGRESS_START = 8800;
 const PROGRESS_DURATION = 6500;
 const MIN_DURATION = PROGRESS_START + PROGRESS_DURATION + 1100;
 const EXIT_DURATION = 1200;
