@@ -1,4 +1,5 @@
-import { ArrowLeft, ArrowRight, BellRing, ShieldAlert, TriangleAlert, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, BellRing, ChevronRight, ShieldAlert, TriangleAlert, X } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { clockTime } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
@@ -11,17 +12,25 @@ function AlertItem({ alert, onResolve, onFocus }) {
   const side = alert.side === "left" || alert.side === "right" ? alert.side : null;
   const canFocus = Boolean(side && onFocus);
   const SideIcon = side === "left" ? ArrowLeft : ArrowRight;
+  const navigate = useNavigate();
+  const serviceLink = (alert.alert_key ?? "").includes("maintenance");
 
   return (
     <li className={cn("flex items-center gap-1 px-1.5 py-1.5", critical ? "bg-alert/[0.06]" : "bg-warn/[0.05]")}>
       <button
         type="button"
-        onClick={() => canFocus && onFocus(alert)}
-        disabled={!canFocus}
-        aria-label={canFocus ? `Turn the van to the ${side} side: ${alert.title}` : alert.title}
+        onClick={() => (serviceLink ? navigate({ to: "/maintenance" }) : canFocus && onFocus(alert))}
+        disabled={!serviceLink && !canFocus}
+        aria-label={
+          serviceLink
+            ? `Open the maintenance page: ${alert.title}`
+            : canFocus
+              ? `Turn the van to the ${side} side: ${alert.title}`
+              : alert.title
+        }
         className={cn(
           "flex min-w-0 flex-1 items-center gap-2.5 rounded-lg px-1.5 py-1 text-left transition",
-          canFocus ? "hover:bg-white/[0.05]" : "cursor-default"
+          serviceLink || canFocus ? "hover:bg-white/[0.05]" : "cursor-default"
         )}
       >
         <span
@@ -47,7 +56,17 @@ function AlertItem({ alert, onResolve, onFocus }) {
           ) : null}
         </span>
 
-        {canFocus ? (
+        {serviceLink ? (
+          <span
+            className={cn(
+              "inline-flex shrink-0 items-center gap-0.5 rounded border px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-[0.12em]",
+              critical ? "border-alert/40 text-alert/85" : "border-warn/40 text-warn/85"
+            )}
+          >
+            Service
+            <ChevronRight className="h-2.5 w-2.5" strokeWidth={2.6} />
+          </span>
+        ) : canFocus ? (
           <span
             className={cn(
               "inline-flex shrink-0 items-center gap-1 rounded border px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-[0.12em]",

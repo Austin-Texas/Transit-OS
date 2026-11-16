@@ -1,0 +1,45 @@
+{
+  "name": "Maintenance Watch",
+  "description": "Checks every tracked part against the odometer and service dates each morning, raises an alert when a part reaches its service limit and pushes it to the owner's phone with a link to the Maintenance page.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 7 * * *",
+      "one_time_date": null,
+      "timezone": "America/New_York",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "maintenance_watch",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "check_service_limits": {
+          "call": "invoke_server_route",
+          "with": {
+            "path": "/api/maintenance-watch",
+            "method": "POST"
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Check service limits",
+            "description": "Raises and pushes parts that came due"
+          }
+        }
+      }
+    ]
+  }
+}

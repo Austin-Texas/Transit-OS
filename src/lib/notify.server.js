@@ -6,6 +6,7 @@ const MAX_PER_CYCLE = 5;
 
 // Tapping the notification lands on the screen that explains the reading.
 const actionPath = (alertKey = "") => {
+  if (alertKey.includes("maintenance")) return { action_label: "Maintenance", action_url: "/maintenance" };
   if (alertKey.includes("battery")) return { action_label: "Battery", action_url: "/electrical" };
   if (alertKey.includes("water") || alertKey.includes("tank")) return { action_label: "Tanks", action_url: "/water" };
   if (alertKey.includes("propane") || alertKey.includes("lpg")) return { action_label: "Power", action_url: "/electrical" };
