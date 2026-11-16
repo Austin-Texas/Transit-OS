@@ -12,7 +12,8 @@ export const prepareSimulationModules=createServerFn({method:'POST'}).middleware
   const existing=rows(await e.Module.list({limit:500}));
   let created=0;
   for(const sample of MODULE_CATALOG){
-    const found=existing.find(m=>m.module_id===sample.module_id);
+    const fingerprint=value=>String(value??'').toLowerCase().replace(/[^a-z0-9]/g,'');
+    const found=existing.find(m=>m.module_id===sample.module_id||fingerprint(m.model)===fingerprint(sample.model));
     if(found){if(found.environment==='simulation')await e.Module.update(found.id,{last_seen:new Date().toISOString()});continue;}
     const saved=await e.Module.create({...sample,environment:'simulation',connection_status:sample.module_id==='aux-01'?'offline':'online',last_seen:new Date().toISOString(),firmware:'0.1.0-sim',approved:true,rssi:-55,notes:'Simulated registry node. No physical hardware is connected.'});
     existing.push(saved);created++;
