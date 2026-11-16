@@ -14,11 +14,12 @@ export default function useCameraSources(cameras = []) {
 
     const resolve = async (camera) => {
       const value = camera.snapshot_url;
+      const meta = { id: camera.id, name: camera.name, location: camera.location, side: camera.side };
       if (!value) return null;
-      if (isRemote(value)) return { id: camera.id, name: camera.name, side: camera.side, url: value };
+      if (isRemote(value)) return { ...meta, url: value };
       try {
         const { signed_url } = await base44.integrations.Core.CreateFileSignedUrl({ file_uri: value, expires_in: 3600 });
-        return { id: camera.id, name: camera.name, side: camera.side, url: signed_url };
+        return { ...meta, url: signed_url };
       } catch {
         return null;
       }

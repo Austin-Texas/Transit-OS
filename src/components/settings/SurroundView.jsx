@@ -1,59 +1,91 @@
-import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, MoveHorizontal } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Loader2, MoveHorizontal } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import PhotoGrade from "@/components/van/PhotoGrade";
+import useSurroundPanorama from "@/hooks/useSurroundPanorama";
 import { cn } from "@/lib/utils";
 
 const COMPASS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
-const compass = (angle) => COMPASS[Math.round((angle % 360) / 45) % 8];
+const FEATHER = "linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%)";
 
-// Drag-to-look 360° surround: every camera still laid around one ring, panned
-// across the viewport the same way the recorded clip sweeps it.
-export default function SurroundView({ sources, children }) {
+const normalize = (value) => ((value % 360) + 360) % 360;
+const compass = (angle) => COMPASS[Math.round(normalize(angle) / 45) % 8];
+
+// Tesla-style surround: the camera stills are stitched into one panorama and
+// panned as a seamless ring, so dragging sweeps the whole van without a seam.
+export default function SurroundView({ sources = [], children }) {
+  const { panorama, ordered, loading } = useSurroundPanorama(sources);
   const [heading, setHeading] = useState(0);
-  const drag = useRef(null);
+  const [dragging, setDragging] = useState(false);
+  const [size, setSize] = useState({ width: 0, height: 0 });
   const box = useRef(null);
-  const count = sources.length;
+  const drag = useRef(null);
 
-  const turn = (delta) => setHeading((value) => (value + delta + 360) % 360);
+  useEffect(() => {
+    const element = box.current;
+    if (!element) return;
+    const measure = () => setSize({ width: element.clientWidth, height: element.clientHeight });
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  const count = ordered.length;
+  const ring = panorama && size.height
+    ? (panorama.width / panorama.height) * size.height
+    : Math.max(size.width, 1) * Math.max(count, 1);
+  const offset = ((((heading / 360) * ring) % ring) + ring) % ring;
+
+  const turn = (delta) => setHeading((value) => value + delta);
 
   const onPointerDown = (event) => {
     drag.current = { x: event.clientX, heading };
+    setDragging(true);
     event.currentTarget.setPointerCapture?.(event.pointerId);
   };
 
   const onPointerMove = (event) => {
     if (!drag.current) return;
-    const width = box.current?.clientWidth || 1;
-    const delta = ((event.clientX - drag.current.x) / width) * 360;
-    setHeading((((drag.current.heading - delta) % 360) + 360) % 360);
+    const delta = ((event.clientX - drag.current.x) / ring) * 360;
+    setHeading(drag.current.heading - delta);
   };
 
   const endDrag = () => {
     drag.current = null;
+    setDragging(false);
   };
 
   return (
     <div
       ref={box}
-      onClickCapture={(event) => {
-        if (event.target.closest("button")) event.stopPropagation();
-      }}
       className="photo-slot relative aspect-[21/9] w-full touch-none select-none overflow-hidden rounded-xl border bg-ink-950"
     >
-      {count ? (
+      {panorama && size.height ? (
         <div
-          className="flex h-full transition-transform duration-200 ease-out"
-          style={{ width: `${count * 100}%`, transform: `translateX(-${(heading / 360) * 100}%)` }}
-        >
-          {sources.map((source) => (
-            <div key={source.id} className="h-full" style={{ width: `${100 / count}%` }}>
-              <Image
-                src={source.url}
-                alt={`${source.name} surround panel`}
-                fittingType="fill"
-                className="pointer-events-none h-full w-full object-cover"
-              />
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url(${panorama.url})`,
+            backgroundRepeat: "repeat-x",
+            backgroundSize: "auto 100%",
+            backgroundPosition: `${-offset}px center`,
+            transition: dragging ? "none" : "background-position 300ms ease-out",
+          }}
+        />
+      ) : count ? (
+        <div className="absolute inset-0 overflow-hidden">
+          {[...ordered, ...ordered].map((source, index) => (
+            <div
+              key={`${source.id}-${index}`}
+              className="absolute inset-y-0"
+              style={{
+                left: index * (size.width || 1) - offset - (size.width || 1) * 0.1,
+                width: (size.width || 1) * 1.2,
+                maskImage: FEATHER,
+                WebkitMaskImage: FEATHER,
+              }}
+            >
+              <Image src={source.url} alt={source.name} className="h-full w-full object-cover" />
             </div>
           ))}
         </div>
@@ -72,15 +104,16 @@ export default function SurroundView({ sources, children }) {
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
-        className="absolute inset-0 cursor-grab active:cursor-grabbing"
+        className={cn("absolute inset-0", dragging ? "cursor-grabbing" : "cursor-grab")}
       />
 
       <div className="pointer-events-none absolute inset-x-0 top-3 flex items-center justify-between px-3">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-neon/40 bg-ink-950/70 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-neon backdrop-blur">
-          360° surround
+          {loading ? <Loader2 className="h-2.5 w-2.5 animate-spin" strokeWidth={2.4} /> : null}
+          {loading ? "Stitching" : "360° surround"}
         </span>
         <span className="rounded-full border border-white/15 bg-ink-950/70 px-2.5 py-1 font-mono text-[10px] text-white/70 backdrop-blur">
-          {compass(heading)} · {Math.round(heading)}°
+          {compass(heading)} · {Math.round(normalize(heading))}°
         </span>
       </div>
 
