@@ -62,7 +62,7 @@ jobs:
           }
           trap rollback ERR
           docker run -d --name "$CONTAINER" --restart unless-stopped \
-            --network trade-app_default \
+            --network trade-app_default --network-alias transitos-web \
             -p "127.0.0.1:${PORT}:80" "$IMAGE"
           healthy=0
           for i in $(seq 1 40); do
