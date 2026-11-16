@@ -54,8 +54,8 @@ export async function syncAlerts(entities) {
     resolved += 1;
   }
 
-  if (creates.length) await entities.Alert.bulkCreate(creates);
+  const created = creates.length ? await entities.Alert.bulkCreate(creates) : [];
   if (updates.length) await entities.Alert.bulkUpdate(updates);
 
-  return { raised: creates.length, resolved, open: conditions.length };
+  return { raised: creates.length, created, resolved, open: conditions.length };
 }

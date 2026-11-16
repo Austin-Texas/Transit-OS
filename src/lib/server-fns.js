@@ -7,4 +7,7 @@ import { syncAlerts } from "@/lib/alert-engine.server";
 // manual changes are picked up immediately).
 export const syncVanAlerts = createServerFn({ method: "POST" })
   .middleware([requireUser])
-  .handler(({ context }) => syncAlerts(context.getBase44().entities));
+  .handler(async ({ context }) => {
+    const result = await syncAlerts(context.getBase44().entities);
+    return { raised: result.raised, resolved: result.resolved, open: result.open };
+  });

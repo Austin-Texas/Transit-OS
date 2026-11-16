@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { secrets } from "base44:runtime";
 import { syncAlerts } from "@/lib/alert-engine.server";
+import { pushRaisedAlerts } from "@/lib/notify.server";
 
 const NUMERIC = [
   "battery_voltage",
@@ -123,13 +124,23 @@ export const Route = createFileRoute("/api/van-telemetry")({
         // Every reading re-runs the alert rules, so a critical value is flagged
         // even when nobody has the dashboard open.
         let alerts = null;
+        let push = null;
         try {
           alerts = await syncAlerts(base44.asServiceRole.entities);
+          // New critical and warning alerts go straight to the owner's phone.
+          push = await pushRaisedAlerts(base44.asServiceRole, alerts.created ?? []);
         } catch (error) {
           console.error("alert sync failed", error);
         }
 
-        return Response.json({ ok: true, id: saved.id, updated: Object.keys(patch), history: hasHistory, alerts });
+        return Response.json({
+          ok: true,
+          id: saved.id,
+          updated: Object.keys(patch),
+          history: hasHistory,
+          alerts: alerts ? { raised: alerts.raised, resolved: alerts.resolved, open: alerts.open } : null,
+          push,
+        });
       },
     },
   },

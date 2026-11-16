@@ -57,6 +57,11 @@
     "alert_key": {
       "type": "string",
       "description": "Rule that raised the alert, so the watcher keeps one open alert per condition and closes it when the reading recovers."
+    },
+    "notified_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When a push notification for this alert was sent to the owner's phone, so each alert is pushed only once."
     }
   },
   "required": [
