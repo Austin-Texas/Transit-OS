@@ -17,7 +17,6 @@ export default function ReferenceFrames() {
     let interval;
     let index = 0;
     const image = new Image();
-    image.crossOrigin = "anonymous";
 
     const render = () => {
       if (!active || !image.complete || !image.naturalWidth) return;
