@@ -1,4 +1,5 @@
-import { Droplets, Power } from "lucide-react";
+import { Droplets, Power, Thermometer } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { TANK_CAPACITY_GAL } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
@@ -62,6 +63,7 @@ export default function WaterLevels({ status }) {
   const gray = clamp(status.gray_water);
   const black = clamp(status.black_water);
   const pump = Boolean(status.water_pump_on);
+  const padFault = status.tank_heater_fault === true;
   const total = { fresh: fresh, gray, black };
 
   return (
@@ -90,6 +92,21 @@ export default function WaterLevels({ status }) {
         Total on board · {(total.fresh / 100 * TANK_CAPACITY_GAL.fresh_water).toFixed(1)} gal fresh ·{" "}
         {(gray / 100 * TANK_CAPACITY_GAL.gray_water).toFixed(1)} gal gray
       </p>
+
+      <Link
+        to="/water"
+        hash="diagnostics"
+        className={cn(
+          "mt-2 flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[8.5px] font-semibold uppercase tracking-[0.12em] transition",
+          padFault
+            ? "border-alert/55 bg-alert/10 text-alert hover:bg-alert/20"
+            : "border-line/70 bg-surface-raised text-white/40 hover:text-white/70"
+        )}
+      >
+        <Thermometer className="h-3 w-3 shrink-0" strokeWidth={2.4} />
+        Heat pad {padFault ? "fault · underbody" : "nominal"}
+        <span className="ml-auto text-[8px] tracking-[0.1em] text-white/25">Diagnostics</span>
+      </Link>
     </section>
   );
 }

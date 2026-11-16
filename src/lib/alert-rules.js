@@ -117,6 +117,17 @@ export function evaluateAlertConditions(status, cameras = [], now = Date.now()) 
     }
   }
 
+  // The heat pad under the spare-tire fresh tank stopped answering.
+  if (status.tank_heater_fault === true) {
+    conditions.push({
+      key: `${PREFIX}tank_heater_fault`,
+      severity: "warning",
+      title: "Fresh water heat pad fault",
+      detail: "Pad under the spare-tire tank · sensor not responding",
+      side: "left",
+    });
+  }
+
   // Motion the van hub stamped on a camera in the last few minutes.
   for (const camera of cameras) {
     if (!camera?.last_motion || camera.motion_alerts === false) continue;

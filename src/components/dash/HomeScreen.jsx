@@ -17,6 +17,10 @@ import VehicleAlertToast from "./VehicleAlertToast";
 
 const RANK = { critical: 0, warning: 1, info: 2 };
 
+// The heat pad alert has no zone on the record, but it lives under the van.
+const zoneOf = (item) =>
+  item.zone ?? (item.alert_key === "auto:tank_heater_fault" ? "underbody" : undefined);
+
 export default function HomeScreen() {
   const van = useVanDashboard();
   const { status, alerts } = van;
@@ -27,12 +31,12 @@ export default function HomeScreen() {
 
   // The stage turns itself to whichever side raised a new problem.
   useEffect(() => {
-    // Underbody faults stay findable by touch instead of hijacking the view.
+    // Sided faults turn the van; the heat pad also drops the camera underbody.
     const sided = [
       ...alerts.filter(
         (alert) => alert.status !== "resolved" && (alert.side === "left" || alert.side === "right")
       ),
-      ...warnings.filter((warning) => warning.zone !== "underbody"),
+      ...warnings.filter((warning) => warning.zone !== "underbody" || warning.id === "tank_heater"),
     ];
 
     if (!sided.length) {
@@ -43,13 +47,13 @@ export default function HomeScreen() {
     if (seen.current === null) {
       seen.current = new Set(sided.map((item) => item.id));
       const urgent = [...sided].sort((a, b) => (RANK[a.severity] ?? 3) - (RANK[b.severity] ?? 3))[0];
-      setFocus({ id: urgent.id, side: urgent.side, zone: urgent.zone, title: urgent.title });
+      setFocus({ id: urgent.id, side: urgent.side, zone: zoneOf(urgent), title: urgent.title });
       return;
     }
 
     const fresh = sided.find((item) => !seen.current.has(item.id));
     sided.forEach((item) => seen.current.add(item.id));
-    if (fresh) setFocus({ id: fresh.id, side: fresh.side, zone: fresh.zone, title: fresh.title });
+    if (fresh) setFocus({ id: fresh.id, side: fresh.side, zone: zoneOf(fresh), title: fresh.title });
   }, [alerts, warnings]);
 
   // Once the fault is gone the van swings back to its open view.
@@ -78,7 +82,7 @@ export default function HomeScreen() {
 
   const faultCount = openAlerts(alerts).length;
   const lightsOn = status.lights_on !== false;
-  const locate = (item) => setFocus({ id: item.id, side: item.side, zone: item.zone, title: item.title });
+  const locate = (item) => setFocus({ id: item.id, side: item.side, zone: zoneOf(item), title: item.title });
 
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-background">

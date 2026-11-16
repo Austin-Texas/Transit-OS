@@ -22,7 +22,7 @@ const NUMERIC = [
   "light_level",
 ];
 
-const BOOLEAN = ["lights_on", "locks_locked", "water_pump_on"];
+const BOOLEAN = ["lights_on", "locks_locked", "water_pump_on", "tank_heater_fault"];
 const TEXT = ["vehicle_name", "trim", "vin"];
 
 // Camera motion the hub detected, so the dashcam can save a clip of the moment.

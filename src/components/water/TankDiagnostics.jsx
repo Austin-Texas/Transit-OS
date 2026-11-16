@@ -26,6 +26,7 @@ export default function TankDiagnostics({ status }) {
   const freshGal = gallonsFrom(fresh, TANK_CAPACITY_GAL.fresh_water);
 
   return (
+    <div id="diagnostics" className="lg:col-span-3">
     <ModuleCard
       title="Tank diagnostics"
       icon={Thermometer}
@@ -111,5 +112,6 @@ export default function TankDiagnostics({ status }) {
 
       <HeatPadDetails open={open} onOpenChange={setOpen} status={status} />
     </ModuleCard>
+    </div>
   );
 }

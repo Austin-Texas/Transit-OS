@@ -307,6 +307,10 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
         diff = ((diff + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
         state.yaw += diff * Math.min(1, dt * 3.6);
         state.pitch += (state.pitchTarget - state.pitch) * Math.min(1, dt * 3.2);
+        // Returning from an underbody view: once level again, wander freely.
+        if (!focusHeld && Math.abs(diff) < 0.01 && Math.abs(state.pitchTarget - state.pitch) < 0.01) {
+          state.snap = false;
+        }
       } else if (!dragging) {
         if (Math.abs(state.velocity) > 0.0006) {
           state.yaw += state.velocity;
@@ -347,12 +351,20 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     };
     frame = requestAnimationFrame(tick);
 
+    let focusHeld = false;
+
     const applyFocus = (next) => {
       const sided = next?.side === "left" || next?.side === "right";
       if (!sided) {
-        state.snap = false;
+        // Leaving a fault view: climb back to the normal eye line.
+        if (!focusHeld) return;
+        focusHeld = false;
+        state.yawTarget = state.yaw;
+        state.pitchTarget = 0.2;
+        state.snap = true;
         return;
       }
+      focusHeld = true;
       state.yawTarget = targetYawFor(next);
       state.pitchTarget = next.zone === "underbody" ? -0.62 : 0.2;
       state.snap = true;
