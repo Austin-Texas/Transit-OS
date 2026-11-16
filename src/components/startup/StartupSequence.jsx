@@ -69,7 +69,7 @@ export default function StartupSequence({ onDone }) {
   }, [checks.controller, checks.sensors]);
 
   return (
-    <motion.section className="transit-live" role="status" aria-label="TransitOS startup"
+    <motion.section className={"transit-live transit-live--stage-" + stage} role="status" aria-label="TransitOS startup"
       initial={false} animate={{ opacity: closing ? 0 : 1 }}
       transition={{ duration: EXIT_MS / 1000 }}>
       <div className="transit-live__halo" aria-hidden="true" />
