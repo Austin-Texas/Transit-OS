@@ -61,3 +61,44 @@
 @media(max-height:650px){.tp-cinema__brand{top:7%}.tp-cinema__symbol{height:23vh;width:15vh}.tp-cinema__presentation{top:10%}.tp-cinema--3 .tp-cinema__presentation{top:5%}.tp-cinema__presentation h1{font-size:clamp(42px,8vw,75px)}.tp-cinema__initialize{top:5%}.tp-cinema__initialize h2{font-size:clamp(42px,7vw,65px)}.tp-cinema__initialize>p{margin:6px 0 14px}.tp-cinema__init-panel{padding:12px 18px}.tp-cinema__checks>div{padding:2px 0}.tp-cinema__ring{top:84%}}
 @media(max-width:550px){.tp-cinema__checks{grid-template-columns:1fr}.tp-cinema__footer{font-size:8px;letter-spacing:.08em}.tp-cinema__presentation h1{font-size:clamp(48px,13vw,78px)}.tp-cinema__presentation{top:23%}.tp-cinema--3 .tp-cinema__presentation{top:18%}}
 @media(prefers-reduced-motion:reduce){.tp-cinema *{animation:none!important;transition:none!important}}
+
+/* Reference fidelity: company reveal and system initialization panels.
+   Centered composition at 16:9; adaptive at small mobile resolutions. */
+.tp-cinema--1 .tp-cinema__brand{top:50%;transform:translate(-50%,-50%);gap:clamp(8px,2vh,20px)}
+.tp-cinema--1 .tp-cinema__symbol{height:clamp(140px,30vh,250px);width:clamp(120px,25vh,210px);animation:none;filter:drop-shadow(0 0 13px #00caff38)}
+.tp-cinema--1 .tp-cinema__company{opacity:1;font-size:clamp(31px,5vw,62px);font-weight:800;letter-spacing:.24em;margin-left:.24em;text-shadow:0 2px 15px #fff3}
+.tp-cinema--1 .tp-cinema__ring{top:82%;height:85px;width:min(74vw,740px)}
+.tp-cinema--1 .tp-cinema__beams{top:82%}
+.tp-cinema--1 .tp-cinema__streak{opacity:.55}
+.tp-cinema--4 .tp-cinema__initialize{top:50%;transform:translate(-50%,-50%);width:min(90vw,920px)}
+.tp-cinema--4 .tp-cinema__initialize h2{font-size:clamp(50px,8vw,105px);font-style:italic;letter-spacing:-.065em;text-shadow:0 0 20px #fff5}
+.tp-cinema--4 .tp-cinema__initialize>p{font-size:clamp(13px,1.7vw,21px);font-weight:550;letter-spacing:.22em;margin:12px 0 clamp(22px,5vh,58px);color:#f3f7ff}
+.tp-cinema--4 .tp-cinema__init-panel{max-width:650px;width:min(78vw,650px);padding:clamp(17px,2.5vw,30px);background:linear-gradient(115deg,#102d48ed,#051b34eb);border:1px solid #3da8d6b3;border-radius:20px;box-shadow:inset 0 1px 0 #91eaff33,0 12px 50px #0007,0 0 26px #0073e638}
+.tp-cinema--4 .tp-cinema__init-label{font-size:clamp(16px,2vw,23px);gap:16px}
+.tp-cinema--4 .tp-cinema__gear{font-size:clamp(29px,3.8vw,43px)}
+.tp-cinema--4 .tp-cinema__progress-track{height:19px;background:#102a44;border-color:#2a5777}
+.tp-cinema--4 .tp-cinema__progress-track>div{background:linear-gradient(90deg,#09bafa,#0bfff1);box-shadow:0 0 16px #00ffff}
+.tp-cinema--4 .tp-cinema__progress-row{margin:16px 0 8px}
+.tp-cinema--4 .tp-cinema__progress-row strong{font-size:clamp(18px,2.4vw,25px)}
+.tp-cinema--4 .tp-cinema__floor{inset:63% -15% -25%;background:radial-gradient(ellipse at 50% 0%,#0073ff2e,transparent 60%),repeating-radial-gradient(ellipse at 50% 0%,#008cfe00 0 12px,#00baff88 13px,#008cfe00 15px,#008cfe00 32px);transform:perspective(720px) rotateX(66deg);mask-image:linear-gradient(transparent,#000 30%,transparent)}
+.tp-cinema--4 .tp-cinema__ring{opacity:0}
+.tp-cinema--4 .tp-cinema__beams{opacity:.18}
+@media(max-height:650px){
+ .tp-cinema--1 .tp-cinema__brand{top:49%}
+ .tp-cinema--1 .tp-cinema__symbol{height:26vh;width:20vh}
+ .tp-cinema--1 .tp-cinema__company{font-size:clamp(22px,4vw,42px)}
+ .tp-cinema--4 .tp-cinema__initialize{top:49%}
+ .tp-cinema--4 .tp-cinema__initialize h2{font-size:clamp(38px,7vw,70px)}
+ .tp-cinema--4 .tp-cinema__initialize>p{margin:5px 0 12px}
+ .tp-cinema--4 .tp-cinema__init-panel{padding:11px 18px}
+ .tp-cinema--4 .tp-cinema__checks{gap:2px 12px}
+ .tp-cinema--4 .tp-cinema__checks>div{font-size:9px;padding:1px 0}
+ .tp-cinema--4 .tp-cinema__init-panel small{margin-top:6px}
+}
+@media(max-width:550px){
+ .tp-cinema--1 .tp-cinema__brand{top:46%}
+ .tp-cinema--1 .tp-cinema__symbol{height:25vh;width:21vh}
+ .tp-cinema--4 .tp-cinema__initialize{top:47%}
+ .tp-cinema--4 .tp-cinema__init-panel{width:90vw}
+ .tp-cinema--4 .tp-cinema__checks{grid-template-columns:1fr 1fr}
+}
