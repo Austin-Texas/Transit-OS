@@ -1,6 +1,6 @@
 # TransitOS — Unified Master Project Prompt
 
-**Version 2.4 — owner-approved preferred-app consolidation and source handover**  
+**Version 2.5 — project-only AGENTS.md startup and live browser testing policy**  
 **Reference date: November 16, 2026 (UTC)**  
 **Status: the preferred Base44 app contains the consolidated prototype tools. The owner approved this reviewed batch for GitHub and documentation finalization. Hardware commissioning remains under development.**
 
@@ -325,6 +325,8 @@ Access to these files may require my signed-in account or attachment in the new 
 
 ## 20. Starting point for the next chat
 
+**Before working in a new TransitOS chat, read root AGENTS.md, this complete document and TransitOS_Master_Project_Prompt.md, then check current Base44 and GitHub.** These files carry the project-specific procedure across chats when the new chat has access to them. For a fresh chat outside this project, provide the repository link and say: "Continue TransitOS. Read AGENTS.md, document.md and TransitOS_Master_Project_Prompt.md first, then follow the project policy."
+
 If I paste this prompt without an additional task, begin with a **read-only review of the existing project**. Inspect the accessible Base44 app/source, GitHub repository, and relevant private Sites prototype; determine which is the source of truth for the next task. Check access, repository visibility, synchronization, available components/checkpoint, current layout, and known test results. Confirm screen resolution from available evidence or identify it as still unknown. Do not require every optional service to be connected before reviewing accessible work.
 
 Report the actual current state and the next practical priorities: preserve the approved dashboard, fix relevant layout/interaction problems, establish a clean baseline, and prepare the MQTT simulator/backend as needed. If I provide a specific immediate request, use that request to focus the work rather than restarting the whole roadmap.
@@ -340,6 +342,32 @@ This policy is my explicit instruction for the TransitOS / Ford-TrainstOs projec
 > Are you satisfied with the result? Should I push to GitHub and update document.md?
 
 Use that clear English wording for my original request. When the target repository is public, make that visibility and the resulting publication clear before I answer. Present the completed work and relevant checks before asking; I should be approving a concrete result.
+
+### Project-only scope and new-chat startup
+
+This procedure applies only to **TransitOS / Ford-TrainstOs**, repository **Austin-Texas/TransitOS**, and its identified app/prototypes. Do not apply it as a global preference to unrelated projects.
+
+At the start of every new chat or agent session for this project:
+
+1. Read the repository root **AGENTS.md** first, plus applicable nested AGENTS.md files for the paths being changed.
+2. Read the current **document.md** and **TransitOS_Master_Project_Prompt.md** in full. Read relevant README/Markdown handovers, including docs/CONSOLIDATION.md when the task concerns consolidation. Use current file contents rather than remembered snippets.
+3. Check the latest preferred Base44 app `6afa3d27af32e7eb7d4b7f76`, relevant source and revision; compare them with the current GitHub branch and handover before editing.
+4. Preserve newer owner work, the preferred layout and stable record identities. Resume the actual current task without restarting completed phases or creating duplicate controls/features.
+5. Follow the same review, No/Yes, validation, documentation and approved-push procedure below. Keep these three instruction documents consistent when the owner changes the policy.
+
+**AGENTS.md is the main entry point; the Markdown files are the durable project memory.** A new chat needs access to this project/repository or these files to load them. Do not claim that a file was read, an account was connected, or a separate global ChatGPT memory was saved unless that actually happened. If essential files are unavailable, identify the missing access/file rather than inventing the prior state.
+
+### Required live browser testing for app changes
+
+Live browser testing, also called **end-to-end (E2E) testing**, is the default required verification for application implementation in this project; the owner should not have to request it again.
+
+- After an app feature, UI change or functional fix, open the correct current app in the authorized live browser and interact with the real rendered controls: click, type, select, submit and navigate through the affected workflows. Also check core navigation and relevant existing functionality for regressions.
+- Cover changed pages and their buttons, forms, dialogs, tabs, validation, error states, state updates and persistence/reload behavior where applicable. When a full-app test is requested, inventory every page and test every accessible control and workflow within the authorized scope. Identify planned, unavailable or hardware-dependent actions explicitly.
+- Fix failures within the requested scope, then retest the failed path and affected regressions before declaring the work complete. Use meaningful automated tests, lint and build checks where appropriate; they supplement live browser verification.
+- Record the tested app/revision, tested flows, pass/fail/blocked results and relevant remaining gaps. Provide a useful screenshot or other direct evidence. Never claim that everything is functional based only on source inspection, static screenshots, successful compilation or simulated confirmation.
+- Exercise physical-control behavior in the simulator/test environment unless real hardware operation is specifically authorized. Browser testing does not prove that appliances, cameras, radios, sensors, OTA or vehicle integrations work physically.
+- If browser access or sign-in blocks a required check, report exactly what remains untested and request only the necessary handoff; continue other useful authorized work. Do not silently label the blocked check as passed.
+- A documentation-only or policy-only edit does not require rerunning the app's live browser suite. Validate the changed files, links, consistency and version guards instead, and do not report a new browser test for that edit.
 
 ### Mandatory Base44 check before every update
 
@@ -376,6 +404,7 @@ A Yes applies to the reviewed batch of work, not every future session. If that b
 
 ### Documentation arrangement and initial setup
 
+- **AGENTS.md** is the primary entry point for future agents. Keep its project-only startup, live browser testing and review instructions aligned with these complete master documents. Preserve the technical repository instructions below its project policy.
 - **`document.md`** is the repository's consolidated project documentation and handover, containing the master prompt in full plus this policy.
 - **`TransitOS_Master_Project_Prompt.md`** is the portable new-chat master prompt. Keep its project facts and owner policy synchronized with `document.md` whenever I approve finalization with Yes.
 - Prepare draft changes while working; update the approved handover as part of Yes finalization. An explicit request to edit the policy or the documentation itself authorizes that specific document edit immediately; it does not authorize a GitHub push before my review answer.
@@ -502,5 +531,14 @@ Keep both older apps until the owner reviews the preferred app and consolidation
 
 Next priorities are real hardware/protocol selection and commissioning; the requested-versus-measured command contract in existing main controls; local/offline service operation; real camera/NVR pipelines; supported tracker adapters and offline navigation; signed plugin/update infrastructure; and confirming the physical van/display specifications. Preserve the preferred layout while implementing them gradually.
 
+## 25. Project instruction update — November 16, 2026
+
+The owner explicitly requested that live browser testing and the existing project procedure be saved for future TransitOS chats, scoped only to this project, and chose **AGENTS.md** as the primary instruction file. Section 21 now defines the required new-chat reading order and live browser verification procedure. Both complete master documents contain the same policy.
+
+The pre-edit check found preferred Base44 revision `a37ff6026785009b770a356695ad7de08b49a7b7` ready. The document contents in Base44 matched the saved master documents. GitHub main was `470a5d78007810116b99d5bdf925877751a10bcc`; the existing snapshot-versus-newer-Base44 distinction in section 24 remains in force.
+
+This update changes project instructions and documentation only. No new app/browser/hardware test or application feature is claimed. The owner directly authorized saving this policy; publication of this new policy batch to GitHub remains pending the review answer required above.
+
 **My immediate request for this new chat:** [Replace this line with the next change, question, or build task, or leave it blank for the read-only project review above.]
+
 
