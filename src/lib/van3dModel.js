@@ -101,6 +101,30 @@ export function buildVanModel() {
     return holder;
   };
 
+  // Photo skins: flat panels that carry the owner's own photos once they have
+  // uploaded them. Hidden until a photo exists, so the model shows its plain
+  // materials until then.
+  const photoPlane = (width, height, x, y, z, flip) => {
+    const material = new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+    plane.position.set(x, y, z);
+    if (flip) plane.rotation.y = Math.PI;
+    plane.visible = false;
+    plane.userData.slot = { width, height };
+    group.add(plane);
+    return plane;
+  };
+
+  const skins = {
+    exterior: [photoPlane(6.2, 2.2, 0, 1.75, -1.07, true), photoPlane(6.2, 2.2, 0, 1.75, 1.07, false)],
+    cabin: [photoPlane(3.8, 1.75, -0.6, 1.72, -0.99, true), photoPlane(3.8, 1.75, -0.6, 1.72, 0.99, false)],
+  };
+
   // Shell: high-roof Transit, extrudes across the width.
   const shell = new THREE.ExtrudeGeometry(bodyShape(), {
     depth: 2.02,
@@ -215,6 +239,7 @@ export function buildVanModel() {
     padDotMaterial: materials.padDot,
     padDot,
     textured,
+    skins,
   };
 }
 

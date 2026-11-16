@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { applyVanTextures, buildVanModel } from "@/lib/van3dModel";
 import { loadVanTextures } from "@/lib/vanTextures";
+import useVanPhotos from "@/hooks/useVanPhotos";
 import { heatPad, heatPadLine } from "@/lib/heatPad";
 
 const RED = 0xff3131;
@@ -88,8 +89,9 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
   tipRef.current = onTip;
   const pickRef = useRef(onPick);
   pickRef.current = onPick;
-  const latest = useRef({ focus, warnings, status });
-  latest.current = { focus, warnings, status };
+  const photos = useVanPhotos(status);
+  const latest = useRef({ focus, warnings, status, photos });
+  latest.current = { focus, warnings, status, photos };
 
   useEffect(() => {
     const host = hostRef.current;
@@ -114,7 +116,7 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
 
-    const { group: van, hotspots, padMaterial, padDotMaterial, padDot, textured } = buildVanModel();
+    const { group: van, hotspots, padMaterial, padDotMaterial, padDot, textured, skins } = buildVanModel();
     scene.add(van);
 
     // Light for the textured panels: a soft sky fill, a warm key from the front
@@ -138,6 +140,50 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       Object.values(textures).forEach((texture) => loadedMaps.push(texture));
       applyVanTextures(textured, textures);
     });
+
+    // The owner's photos skin the panels: the exterior shot on both flanks, the
+    // cabin shot along the living space. Each panel stays hidden until its photo
+    // is available, so an empty slot simply shows the real materials.
+    const photoLoader = new THREE.TextureLoader();
+    photoLoader.setCrossOrigin("anonymous");
+    const photoAnisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+
+    const applyPhoto = (config) => {
+      Object.entries(skins).forEach(([slot, planes]) => {
+        const url = config?.[slot];
+        planes.forEach((plane) => {
+          if (!url) {
+            plane.visible = false;
+            return;
+          }
+          if (plane.userData.url === url) {
+            plane.visible = true;
+            return;
+          }
+          photoLoader
+            .loadAsync(url)
+            .then((texture) => {
+              if (disposed) {
+                texture.dispose();
+                return;
+              }
+              texture.colorSpace = THREE.SRGBColorSpace;
+              texture.anisotropy = photoAnisotropy;
+              const aspect = (texture.image?.width || 16) / (texture.image?.height || 9);
+              const slot = plane.userData.slot;
+              const height = Math.min(slot.height, slot.width / aspect);
+              plane.scale.set(height * aspect, height, 1);
+              if (plane.material.map) plane.material.map.dispose();
+              plane.material.map = texture;
+              plane.material.opacity = slot === "cabin" ? 0.74 : 0.82;
+              plane.material.needsUpdate = true;
+              plane.userData.url = url;
+              plane.visible = true;
+            })
+            .catch(() => {});
+        });
+      });
+    };
 
     // Status callouts, as in the reference: one on the rear cabin, one on the
     // habitation panel.
@@ -410,6 +456,7 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     applyHeat(heatPad(latest.current.status).key);
     applyFocus(latest.current.focus);
     rebuildPins(latest.current.warnings);
+    applyPhoto(latest.current.photos);
 
     api.current = {
       focus: applyFocus,
@@ -419,6 +466,7 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       },
       tags: updateTags,
       heat: applyHeat,
+      photo: applyPhoto,
     };
 
     return () => {
@@ -452,6 +500,7 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
 
   const warningKey = warnings.map((warning) => warning.id).join("|");
   const padKey = heatPad(status).key;
+  const photoKey = `${photos.exterior ?? ""}|${photos.cabin ?? ""}`;
 
   useEffect(() => {
     api.current?.focus(focus);
@@ -468,6 +517,10 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
   useEffect(() => {
     api.current?.heat(padKey);
   }, [padKey]);
+
+  useEffect(() => {
+    api.current?.photo(latest.current.photos);
+  }, [photoKey]);
 
   return <div ref={hostRef} className={className} style={{ touchAction: "none" }} />;
 }
