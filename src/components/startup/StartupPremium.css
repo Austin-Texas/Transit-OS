@@ -154,3 +154,38 @@
 .tp-cinema--1 .tp-cinema__symbol{filter:drop-shadow(0 0 18px #00dfff8c)}
 .tp-cinema--1 .tp-cinema__company{text-shadow:0 0 16px #fff5,0 2px 22px #3d9fff55}
 @media(prefers-reduced-motion:reduce){.tp-cinema__streak{animation:none!important}}
+
+/* Fix first-logo hitch: stage 0 and stage 1 use identical positioning.
+   The approach animation runs ONCE on the element, never resets at stage 1.
+   This also avoids mixing a top/transform jump with a CSS keyframe reset. */
+.tp-cinema--0 .tp-cinema__brand,
+.tp-cinema--1 .tp-cinema__brand{
+  top:50%;
+  transform:translate(-50%,-50%);
+  gap:clamp(8px,2vh,20px);
+}
+.tp-cinema--0 .tp-cinema__symbol,
+.tp-cinema--1 .tp-cinema__symbol{
+  width:clamp(120px,25vh,210px);
+  height:clamp(140px,30vh,250px);
+  animation:tp-cinema-deep-arrival 3.1s cubic-bezier(.22,.6,.24,1) both!important;
+  transform-origin:center;
+  backface-visibility:hidden;
+  will-change:transform,opacity;
+}
+.tp-cinema--0 .tp-cinema__company{opacity:0;transform:translateY(12px)}
+.tp-cinema--1 .tp-cinema__company{opacity:1;transform:translateY(0)}
+.tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{filter:none;translate:0 0;opacity:1}
+.tp-cinema__brand{will-change:opacity,transform}
+.tp-cinema__presentation{will-change:opacity,transform}
+@media(max-height:650px){
+ .tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{top:49%}
+ .tp-cinema--0 .tp-cinema__symbol,.tp-cinema--1 .tp-cinema__symbol{height:26vh;width:20vh}
+}
+@media(max-width:550px){
+ .tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{top:46%}
+ .tp-cinema--0 .tp-cinema__symbol,.tp-cinema--1 .tp-cinema__symbol{height:25vh;width:21vh}
+}
+@media(prefers-reduced-motion:reduce){
+ .tp-cinema--0 .tp-cinema__symbol,.tp-cinema--1 .tp-cinema__symbol{animation:none!important;transform:none!important}
+}
