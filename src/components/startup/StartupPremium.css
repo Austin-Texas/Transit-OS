@@ -189,3 +189,19 @@
 @media(prefers-reduced-motion:reduce){
  .tp-cinema--0 .tp-cinema__symbol,.tp-cinema--1 .tp-cinema__symbol{animation:none!important;transform:none!important}
 }
+
+/* Near-black cinematic studio: retain dimensional cyan/violet illumination. */
+.tp-cinema{
+ background:radial-gradient(ellipse at 50% 79%,#031124 0%,#010711 30%,#000207 61%,#000 100%)!important;
+}
+.tp-cinema__atmosphere{
+ opacity:.23;
+ background:conic-gradient(from 140deg at 50% 65%,transparent 0deg,#00185a55 55deg,transparent 130deg,#4210a955 190deg,transparent 265deg,#0074ac55 330deg,transparent 360deg);
+ filter:blur(105px);
+}
+.tp-cinema__floor{opacity:.13}
+.tp-cinema__streak{opacity:.18}
+.tp-cinema__streak--violet{opacity:.12}
+.tp-cinema__grain{opacity:.065}
+.tp-cinema__symbol{filter:drop-shadow(0 0 16px #009dff65)}
+.tp-cinema__light-field{filter:contrast(1.15) saturate(1.16)}
