@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Bell, BellOff, Moon } from "lucide-react";
+import { Bell, BellOff, Moon, PanelLeft, PanelRight } from "lucide-react";
 import CameraSnapshot from "./CameraSnapshot";
 import FeedToggle from "./FeedToggle";
 import UploadStillButton from "./UploadStillButton";
@@ -106,6 +106,18 @@ export default function CameraFeed({ camera, onUpdate }) {
           {camera.last_motion ? `Motion · ${since(camera.last_motion)}` : "No motion detected"}
         </span>
         <div className="flex items-center gap-1.5">
+          <FeedToggle
+            icon={PanelLeft}
+            label="Left"
+            active={camera.side === "left"}
+            onClick={() => onUpdate({ side: "left" })}
+          />
+          <FeedToggle
+            icon={PanelRight}
+            label="Right"
+            active={camera.side === "right"}
+            onClick={() => onUpdate({ side: "right" })}
+          />
           <UploadStillButton onUploaded={(fileUri) => onUpdate({ snapshot_url: fileUri })} />
           <FeedToggle
             icon={Moon}

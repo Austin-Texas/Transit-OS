@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Lightbulb } from "lucide-react";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import { openAlerts } from "@/lib/van";
@@ -14,6 +15,7 @@ import AlertStrip from "./AlertStrip";
 export default function HomeScreen() {
   const van = useVanDashboard();
   const { status, alerts } = van;
+  const [focus, setFocus] = useState(null);
 
   if (!status) {
     return (
@@ -43,13 +45,19 @@ export default function HomeScreen() {
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-2.5 lg:min-h-0 lg:gap-3 lg:overflow-y-auto">
-          <AlertStrip alerts={alerts} onResolve={van.resolveAlert} />
+          <AlertStrip
+            alerts={alerts}
+            onResolve={van.resolveAlert}
+            onFocus={(alert) => setFocus({ side: alert.side, title: alert.title })}
+          />
           <VanStage
             cabinTemp={status.cabin_temp}
             vehicleName={status.vehicle_name}
             trim={status.trim}
             photoUri={status.van_photo_uri}
             onPhoto={(uri) => van.update({ van_photo_uri: uri })}
+            focus={focus}
+            onClearFocus={() => setFocus(null)}
           />
           <StatStrip status={status} faultCount={faultCount} />
 

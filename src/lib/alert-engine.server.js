@@ -28,12 +28,22 @@ export async function syncAlerts(entities) {
         severity: condition.severity,
         status: "open",
         occurred_at: new Date().toISOString(),
+        ...(condition.side ? { side: condition.side } : {}),
       });
       continue;
     }
     pending.delete(condition.key);
-    if (existing.detail !== condition.detail || existing.severity !== condition.severity) {
-      updates.push({ id: existing.id, detail: condition.detail, severity: condition.severity });
+    if (
+      existing.detail !== condition.detail ||
+      existing.severity !== condition.severity ||
+      (condition.side && existing.side !== condition.side)
+    ) {
+      updates.push({
+        id: existing.id,
+        detail: condition.detail,
+        severity: condition.severity,
+        ...(condition.side ? { side: condition.side } : {}),
+      });
     }
   }
 

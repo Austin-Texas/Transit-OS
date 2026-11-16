@@ -40,6 +40,7 @@ export const SAMPLE_ALERTS = [
     detail: "Engine · OBD-II",
     occurred_at: "2026-11-15T10:18:00Z",
     status: "open",
+    side: "left",
   },
   {
     id: "sample-2",
@@ -48,6 +49,7 @@ export const SAMPLE_ALERTS = [
     detail: "Rear Right · 28 PSI",
     occurred_at: "2026-11-15T10:19:00Z",
     status: "open",
+    side: "right",
   },
 ];
 

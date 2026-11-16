@@ -10,6 +10,18 @@
       "type": "string",
       "description": "Where the camera is mounted, e.g. Passenger side."
     },
+    "side": {
+      "type": "string",
+      "enum": [
+        "left",
+        "right"
+      ],
+      "enumColors": [
+        "blue",
+        "purple"
+      ],
+      "description": "Side of the van the device is installed on, so alerts from it turn the 3D view that way."
+    },
     "snapshot_url": {
       "type": "string",
       "description": "Latest still the van hub pushed from this camera."

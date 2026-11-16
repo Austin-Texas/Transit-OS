@@ -84,6 +84,7 @@ export function evaluateAlertConditions(status, cameras = [], now = Date.now()) 
       severity: "critical",
       title: `Motion detected · ${camera.name}`,
       detail: `${camera.location ?? "Camera"} · open the live feed`,
+      ...(camera.side === "left" || camera.side === "right" ? { side: camera.side } : {}),
     });
   }
 

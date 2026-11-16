@@ -24,6 +24,18 @@
       ],
       "description": "How urgent the alert is."
     },
+    "side": {
+      "type": "string",
+      "enum": [
+        "left",
+        "right"
+      ],
+      "enumColors": [
+        "blue",
+        "purple"
+      ],
+      "description": "Side of the van the fault or device sits on; tapping the alert turns the 3D view to it."
+    },
     "occurred_at": {
       "type": "string",
       "format": "date-time",
