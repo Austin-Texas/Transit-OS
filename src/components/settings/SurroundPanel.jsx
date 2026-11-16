@@ -5,6 +5,7 @@ import useSurroundClips from "@/hooks/useSurroundClips";
 import SurroundView from "./SurroundView";
 import SurroundRecorder from "./SurroundRecorder";
 import SurroundClips from "./SurroundClips";
+import ClipRetention from "./ClipRetention";
 
 // Tesla-style surround: pan around the van and keep recorded 360° clips.
 export default function SurroundPanel({ cameras = [] }) {
@@ -37,6 +38,7 @@ export default function SurroundPanel({ cameras = [] }) {
         <div className="min-w-0">
           <p className="mb-1.5 text-[10px] uppercase tracking-[0.16em] text-white/40">Clip library</p>
           <SurroundClips clips={clips} />
+          <ClipRetention onPurged={clips.reload} />
         </div>
       </div>
     </ModuleCard>

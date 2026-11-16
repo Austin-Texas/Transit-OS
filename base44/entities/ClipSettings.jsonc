@@ -1,0 +1,63 @@
+{
+  "name": "ClipSettings",
+  "type": "object",
+  "properties": {
+    "retention_days": {
+      "type": "number",
+      "default": 30,
+      "description": "How many days of 360\u00b0 dashcam clips to keep. Anything older is cleared by the nightly cleanup and by the Clear old clips button."
+    }
+  },
+  "required": [
+    "retention_days"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
