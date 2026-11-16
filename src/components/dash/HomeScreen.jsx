@@ -77,7 +77,7 @@ export default function HomeScreen() {
       <HomeHeader status={status} offline={van.offline} />
       <VehicleAlertToast alerts={alerts} warnings={warnings} onLocate={() => navigate({ to: "/diagnostics" })} />
 
-      <main className="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-4 px-3 pb-5 pt-4 sm:px-4">
+      <main className="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-4 px-3 pb-[156px] pt-4 sm:px-4">
         <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,352px)]">
           <div className="flex min-w-0 flex-col gap-4">
             <VanPanel status={status} offline={van.offline} className="h-[240px] sm:h-[310px] lg:h-[340px]" />
@@ -135,7 +135,7 @@ export default function HomeScreen() {
         </div>
       </main>
 
-      <div className="sticky bottom-0 z-30 px-3 pb-3 pt-2 sm:px-4">
+      <div className="fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-background via-background/92 to-transparent px-3 pb-2 pt-3 sm:px-4">
         <AppDock status={status} onVoice={() => setVoiceSignal((value) => value + 1)} />
       </div>
       <VoiceControl onSubmit={handleCommand} startSignal={voiceSignal} />

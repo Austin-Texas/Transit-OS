@@ -32,7 +32,7 @@ export default function ModuleShell({ title, subtitle, meta, status, voiceHandle
     <div className="flex h-[100dvh] flex-col overflow-hidden">
       <DashHeader interiorTemp={status?.climate_temp ?? 72} />
 
-      <div className="flex min-h-0 flex-1 gap-3 overflow-y-auto px-3 py-2.5 lg:overflow-hidden lg:px-4 lg:py-3">
+      <div className="flex min-h-0 flex-1 gap-3 overflow-y-auto px-3 pb-[156px] pt-2.5 lg:overflow-hidden lg:px-4 lg:pb-[156px] lg:pt-3">
         <div className="hidden lg:block">
           <SideRail />
         </div>
@@ -55,7 +55,8 @@ export default function ModuleShell({ title, subtitle, meta, status, voiceHandle
         </div>
       </div>
 
-      <div className="shrink-0 px-3 pb-2 pt-2">
+      {/* Pinned to the viewport, so it never moves while the page scrolls. */}
+      <div className="fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-background via-background/92 to-transparent px-3 pb-2 pt-3 sm:px-4">
         <AppDock status={status} onVoice={status ? () => setVoiceSignal((value) => value + 1) : undefined} />
       </div>
 
