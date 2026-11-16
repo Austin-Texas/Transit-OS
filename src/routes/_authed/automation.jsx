@@ -65,11 +65,11 @@ function AutomationPage() {
         </span>
       }
     >
-      <div className="grid gap-3 xl:grid-cols-3">
+      <div className="grid gap-3 lg:grid-cols-3">
         <ModuleCard
           title="Schedules & rules"
           icon={Workflow}
-          className="xl:col-span-2"
+          className="lg:col-span-2"
           action={
             <span className="font-mono text-[10px] text-white/35">
               {automations.items.length} total

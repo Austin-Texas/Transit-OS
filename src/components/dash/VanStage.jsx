@@ -17,7 +17,7 @@ function Marker({ className, tone, label }) {
 
 export default function VanStage({ cabinTemp, vehicleName, trim, photoUri, onPhoto }) {
   return (
-    <section className="relative min-h-[260px] flex-1 overflow-hidden rounded-2xl border border-line/80 bg-surface">
+    <section className="relative min-h-[220px] flex-1 overflow-hidden rounded-2xl border border-line/80 bg-surface lg:min-h-[190px]">
       <span className="pointer-events-none absolute left-1/2 top-1/2 h-[380px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sys-blue/[0.08] blur-3xl" />
 
       <VanPhoto

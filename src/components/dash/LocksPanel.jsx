@@ -13,7 +13,7 @@ const LOCKERS = [
 export default function LocksPanel({ locked = true }) {
   const Icon = locked ? Lock : Unlock;
   return (
-    <aside className="flex w-full shrink-0 flex-col gap-2.5 rounded-2xl border border-line/80 bg-surface p-3 xl:w-[258px]">
+    <aside className="flex w-full shrink-0 flex-col gap-2.5 rounded-2xl border border-line/80 bg-surface p-3 lg:w-[228px] lg:overflow-y-auto xl:w-[258px]">
       <div
         className={cn(
           "flex items-center gap-2.5 rounded-xl px-3 py-2.5",

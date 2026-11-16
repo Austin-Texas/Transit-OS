@@ -36,12 +36,12 @@ export default function HomeScreen() {
     <div className="flex h-[100dvh] flex-col overflow-hidden bg-background">
       <DashHeader interiorTemp={status.climate_temp} />
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-3 xl:flex-row xl:overflow-hidden">
-        <div className="hidden xl:block">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 py-2.5 lg:flex-row lg:overflow-hidden lg:px-4 lg:py-3">
+        <div className="hidden lg:block">
           <SideRail />
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-3">
+        <div className="flex min-w-0 flex-1 flex-col gap-2.5 lg:min-h-0 lg:gap-3 lg:overflow-y-auto">
           <VanStage
             cabinTemp={status.cabin_temp}
             vehicleName={status.vehicle_name}

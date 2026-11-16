@@ -40,11 +40,11 @@ function CamerasPage() {
       }
     >
       {selected ? (
-        <div className="grid gap-3 xl:grid-cols-3">
+        <div className="grid gap-3 lg:grid-cols-3">
           <ModuleCard
             title={selected.name}
             icon={Video}
-            className="xl:col-span-2"
+            className="lg:col-span-2"
             action={
               <span className="font-mono text-[10px] text-white/35">{selected.resolution ?? "1080p"}</span>
             }
