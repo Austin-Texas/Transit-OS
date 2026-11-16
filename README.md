@@ -1,12 +1,20 @@
-# Base44 App — TanStack Start
+# TransitOS — Smart camper platform
 
 A full-stack Base44 app: [TanStack Start](https://tanstack.com/start) (React 19, plain JavaScript) with file-based routes, server functions and server routes, server-rendered and hosted by Base44.
 
-## What is in the starter
+## Current application
 
-| Route | File |
+The preferred app is Base44 `6afa3d27af32e7eb7d4b7f76`. Its existing dashboard layout is retained; additional tools are reached through **Settings → Platform tools**. The repository is a reviewed source snapshot and does not automatically synchronize with the Base44 builder.
+
+| Area | Location |
 | --- | --- |
-| `/` | `src/routes/index.jsx` — a placeholder home page, replaced by the app's own |
+| Existing dashboard and systems | `src/routes/_authed/` and `src/components/dash/` |
+| Consolidated tools | `/platform`: devices, tracking, LPG, leveling, integrations, updates, project records, alerts and simulation |
+| Complete project context and owner workflow | [document.md](document.md) and [TransitOS_Master_Project_Prompt.md](TransitOS_Master_Project_Prompt.md) |
+| Coverage, migration and validation | [docs/CONSOLIDATION.md](docs/CONSOLIDATION.md) |
+| Meaningful behavior checks | `node --test tests/platform.test.mjs tests/simulation.test.mjs` |
+
+The current tools include simulations and explicit integration plans. Real device transport, physical OTA, tracker adapters and hardware commissioning remain future work. Live entity data, credentials and private media are not part of this repository. Read AGENTS.md and recheck current Base44 before making changes.
 
 ## Run locally
 
@@ -34,6 +42,6 @@ There is no `index.html`: the HTML document is rendered on the server from `src/
 - **Server routes** (`src/routes/api/*.js`) are raw HTTP endpoints for URLs something other than the app's own code requests (webhooks, downloads, feeds); the app's pages call server functions. `src/start.js` runs every request through `base44RequestMiddleware`, so their `server.handlers` receive the same `context.getBase44()` (`({ request, params, context }) => …`).
 - **Server-only code** lives in `*.server.js` files (TanStack refuses to bundle them for the browser).
 - **Auth** is resolved client-side after hydration (`useAuth()`); the server is anonymous on a document request, so give per-user pages `ssr: false`.
-- **Sign-in and gated pages** are not wired in the starter: `src/components/auth/` holds the pages (login, register, password reset, MCP consent) and a login gate for `src/routes/_authed/`, to add when the app needs them. See **Adding Authentication** in `AGENTS.md`.
+- **Sign-in and gated pages** are wired through the app's auth routes and the gate for `src/routes/_authed/`. New platform records also have entity access rules; module changes and simulated command dispatch require an authenticated admin. See **Adding Authentication** and **Server Security** in `AGENTS.md`.
 - **AI**: TanStack AI is installed and runs on the Base44 AI gateway, with no API key and usage billed to the app's AI credits. `gatewayModel(context.getBase44())` in `src/lib/ai.server.js` builds the adapter; `AGENTS.md` has a streaming chat example (a server function plus `useChat`).
 - **Caching**: the platform caches only what a route opts into via `headers()` (`Cache-Control: public, s-maxage=…`). Everything else is served fresh.
