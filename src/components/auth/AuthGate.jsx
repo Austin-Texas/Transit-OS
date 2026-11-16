@@ -20,7 +20,7 @@ class NotRegisteredError extends Error {}
  */
 export async function requireSignedIn({ context, location }) {
   // Public, simulated preview on the dedicated review domain only.
-  if (typeof window !== "undefined" && window.location.hostname === "transit.hastenload.com") {
+  if (import.meta.env.VITE_PUBLIC_DEMO === "true") {
     return { user: { id: "public-demo", role: "viewer", name: "Demo Viewer" } };
   }
   // A /me outage (429, 503) is not a sign-out: it rejects here and reaches the error
