@@ -1,0 +1,105 @@
+{
+  "name": "Module",
+  "type": "object",
+  "properties": {
+    "module_id": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "environment": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "simulation",
+        "live"
+      ],
+      "default": "planned"
+    },
+    "connection_status": {
+      "type": "string",
+      "enum": [
+        "online",
+        "degraded",
+        "offline"
+      ],
+      "default": "offline"
+    },
+    "last_seen": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "firmware": {
+      "type": "string"
+    },
+    "previous_firmware": {
+      "type": "string"
+    },
+    "rssi": {
+      "type": "number"
+    },
+    "approved": {
+      "type": "boolean",
+      "default": false
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "source_app_id": {
+      "type": "string"
+    },
+    "source_record_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "module_id",
+    "model",
+    "name",
+    "environment"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
