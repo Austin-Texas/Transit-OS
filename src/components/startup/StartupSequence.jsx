@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import CinematicLightField from "./CinematicLightField";
 import { STARTUP_CHECKS, runStartupChecks } from "@/lib/startupReadiness";
 import "./StartupPremium.css";
 
@@ -61,6 +62,7 @@ export default function StartupSequence({ onDone }) {
     <motion.div className={`tp-cinema tp-cinema--${stage}`} initial={false}
       animate={{ opacity: closing ? 0 : 1 }} transition={{ duration: EXIT_DURATION / 1000, ease: "easeInOut" }}
       role="status" aria-label="TPMCS TransitOS cinematic startup">
+      <CinematicLightField stage={stage} />
       <div className="tp-cinema__grain" aria-hidden="true" />
       <div className="tp-cinema__atmosphere" aria-hidden="true" />
       <div className="tp-cinema__floor" aria-hidden="true" />
