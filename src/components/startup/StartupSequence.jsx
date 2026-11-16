@@ -5,7 +5,7 @@ import "./StartupPremium.css";
 
 const initial = Object.fromEntries(STARTUP_CHECKS.map(item => [item.id, "pending"]));
 const finished = value => ["ready", "offline", "simulated", "error"].includes(value);
-const MIN_MS = 5800;
+const MIN_MS = 6500;
 const EXIT_MS = 650;
 
 export default function StartupSequence({ onDone }) {
@@ -38,7 +38,7 @@ export default function StartupSequence({ onDone }) {
 
   const complete = STARTUP_CHECKS.every(item => finished(checks[item.id]));
   const ready = STARTUP_CHECKS.filter(item => finished(checks[item.id])).length;
-  const stage = elapsed < 1100 ? 0 : elapsed < 2200 ? 1 : elapsed < 3800 ? 2 : 3;
+  const stage = elapsed < 1100 ? 0 : elapsed < 2200 ? 1 : elapsed < 3300 ? 2 : elapsed < 4600 ? 3 : 4;
   useEffect(() => {
     if (complete && elapsed >= MIN_MS && !closing) setClosing(true);
   }, [complete, elapsed, closing]);
@@ -73,6 +73,12 @@ export default function StartupSequence({ onDone }) {
           <span className="tp-boot__eyebrow">TPMCS PRESENTS</span>
           <h1>Transit<span>OS</span></h1>
           <p>INTELLIGENT VEHICLE OPERATING SYSTEM</p>
+        </div>
+        <div className="tp-boot__vehicle" aria-hidden={stage !== 3}>
+          <div className="tp-boot__light-trail tp-boot__light-trail--cyan" />
+          <div className="tp-boot__light-trail tp-boot__light-trail--purple" />
+          <img src="/branding/transit-van.svg" alt="White high-roof cargo van" />
+          <div className="tp-boot__reflection" />
         </div>
         <div className="tp-boot__status">
           <div className="tp-boot__status-head"><span>INITIALIZING TRANSITOS</span><span>{Math.round(ready / STARTUP_CHECKS.length * 100)}%</span></div>
