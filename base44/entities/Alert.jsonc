@@ -2,6 +2,11 @@
   "name": "Alert",
   "type": "object",
   "properties": {
+    "acknowledged_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Owner acknowledgement; does not clear the underlying fault."
+    },
     "title": {
       "type": "string",
       "description": "Short alert headline, e.g. P0301 Cylinder 1 Misfire."
