@@ -14,3 +14,23 @@
 @keyframes tp-vehicle-hover{to{transform:translateY(-8px)}}
 @keyframes tp-trail{to{opacity:.55;filter:brightness(1.7)}}
 @media(max-height:650px){.tp-boot__vehicle{top:43%;height:30vh}.tp-boot--4 .tp-boot__title{translate:0 -9vh}}
+
+/* Vehicle-free cinematic brand reveal. All motion is real-time CSS. */
+.tp-boot__cinematic{position:absolute;left:50%;top:48%;width:min(95vw,940px);height:min(42vh,360px);transform:translateX(-50%);opacity:0;filter:blur(14px);transition:opacity .85s,filter 1.1s;pointer-events:none;perspective:1000px}
+.tp-boot--3 .tp-boot__cinematic{opacity:1;filter:none}
+.tp-boot__cinematic-orbit{position:absolute;inset:15% 4%;border-radius:50%;transform:rotate(-16deg) rotateX(56deg);border:3px solid transparent;box-shadow:0 0 50px #04e7ff35;animation:tp-cinema-orbit 4s ease-in-out infinite alternate}
+.tp-boot__cinematic-orbit--cyan{border-top:6px solid #13e7ff;border-bottom:2px solid #008bff9c;filter:drop-shadow(0 0 18px #00eaff)}
+.tp-boot__cinematic-orbit--violet{inset:5% 0%;transform:rotate(19deg) rotateX(58deg);border-top:5px solid #7a41ff;border-bottom:3px solid #6035ffb0;filter:drop-shadow(0 0 19px #793dff);animation-delay:.7s}
+.tp-boot__cinematic-flare{position:absolute;left:50%;top:40%;width:min(65vw,600px);height:85px;transform:translateX(-50%);background:radial-gradient(ellipse,#ffffffb5 0%,#1ce9ffad 5%,#0077ff50 20%,transparent 68%);filter:blur(15px);animation:tp-cinema-flare 3s ease-in-out infinite alternate}
+.tp-boot__cinematic-sweep{position:absolute;left:-30%;top:45%;width:40%;height:3px;transform:rotate(-12deg);background:linear-gradient(90deg,transparent,#fff,#13dfff,transparent);box-shadow:0 0 28px #00dfff;animation:tp-cinema-sweep 3.4s ease-in-out infinite}
+.tp-boot__cinematic-caption{position:absolute;top:73%;left:0;right:0;text-align:center;font-size:clamp(10px,1.6vw,15px);letter-spacing:.5em;color:#d5e9ff;text-shadow:0 0 22px #009dff}
+.tp-boot--3 .tp-boot__title{translate:0 -10vh;scale:.85}
+.tp-boot--3 .tp-boot__status{opacity:0;pointer-events:none}
+.tp-boot--4 .tp-boot__cinematic{opacity:0}
+.tp-boot--4 .tp-boot__status{opacity:1}
+.tp-boot__platform{filter:drop-shadow(0 0 30px #00bfff7c)}
+@keyframes tp-cinema-orbit{to{transform:rotate(14deg) rotateX(61deg) scale(1.07);filter:brightness(1.6)}}
+@keyframes tp-cinema-flare{to{opacity:.55;transform:translateX(-50%) scale(1.35)}}
+@keyframes tp-cinema-sweep{from{left:-40%;opacity:0}20%{opacity:1}to{left:110%;opacity:0}}
+@media(max-width:600px){.tp-boot__cinematic{top:43%;height:34vh}.tp-boot__cinematic-caption{letter-spacing:.24em}.tp-boot--3 .tp-boot__title{translate:0 -7vh;scale:.86}}
+@media(prefers-reduced-motion:reduce){.tp-boot__cinematic *{animation:none!important}}
