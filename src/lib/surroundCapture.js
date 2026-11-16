@@ -1,3 +1,5 @@
+import { base44 } from "@/api/base44Client";
+
 // Records the 360° surround view as a real video clip: the camera stills are
 // stitched into one panorama and swept past the viewport while the canvas is
 // captured with MediaRecorder.
@@ -148,4 +150,19 @@ export async function recordSurround({ urls, seconds = 10, onProgress }) {
   const blob = await finished;
   if (!blob.size) throw new Error("The clip came back empty");
   return { blob, duration_s: seconds };
+}
+
+// Stores a recorded clip on the van's private storage and in the clip library.
+export async function saveSurroundClip({ blob, duration_s, cameraCount, trigger = "manual", reason }) {
+  const file = new File([blob], `surround-${Date.now()}.webm`, { type: "video/webm" });
+  const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
+  return base44.entities.SurroundClip.create({
+    recorded_at: new Date().toISOString(),
+    duration_s,
+    file_uri,
+    camera_count: cameraCount,
+    size_kb: Math.round(blob.size / 1024),
+    trigger,
+    ...(reason ? { reason } : {}),
+  });
 }
