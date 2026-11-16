@@ -25,7 +25,7 @@ const BROWSER_PREBUNDLE = [
 
 export default defineConfig({
   // Only the production hostname is allowed when served by Vite preview behind Cloudflare.
-  preview: { allowedHosts: ["transit.hastenload.com"] },
+  preview: { allowedHosts: ["transit.hastenload.com"], proxy: { "/api/auth": { target: "http://transitos-api:3000", changeOrigin: true } } },
   optimizeDeps: { include: [...PREBUNDLE, ...BROWSER_PREBUNDLE] },
   environments: {
     ssr: {
