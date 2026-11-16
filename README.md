@@ -45,3 +45,14 @@ There is no `index.html`: the HTML document is rendered on the server from `src/
 - **Sign-in and gated pages** are wired through the app's auth routes and the gate for `src/routes/_authed/`. New platform records also have entity access rules; module changes and simulated command dispatch require an authenticated admin. See **Adding Authentication** and **Server Security** in `AGENTS.md`.
 - **AI**: TanStack AI is installed and runs on the Base44 AI gateway, with no API key and usage billed to the app's AI credits. `gatewayModel(context.getBase44())` in `src/lib/ai.server.js` builds the adapter; `AGENTS.md` has a streaming chat example (a server function plus `useChat`).
 - **Caching**: the platform caches only what a route opts into via `headers()` (`Cache-Control: public, s-maxage=…`). Everything else is served fresh.
+
+
+## TPMCS branded startup (self-hosted public demo)
+
+The reusable `src/components/startup/TransitStartup.jsx` overlay is mounted once by `src/routes/__root.jsx`. It appears on a fresh document load or browser refresh, lasts **at least five seconds**, then reveals the existing routed dashboard. Client-side navigation does not remount the root and does not replay the animation. If the browser has not completed its initial document load, the overlay remains visible. This is a visual website initialization sequence, **not** a check of vehicle controller readiness.
+
+Brand assets: `public/branding/tpmcs-logo.svg` is copied verbatim from `Austin-Texas/tpmcs-website/public/favicon.svg`; `public/branding/transit-van.svg` is a custom unbranded vehicle illustration. The animation uses CSS and React only, with no new dependency. Reduced-motion preferences disable decorative animation without disabling the timed transition.
+
+For a future Raspberry Pi/Linux kiosk, launch Chromium or Edge in kiosk mode after the local web service is reachable. A Plymouth splash may be configured separately for Linux boot, but the website animation starts only after the browser loads; it does not cover the kernel boot period. Real hardware readiness must come from authenticated local controller/service health checks before reporting a connected state.
+
+Production validation checklist: build with `VITE_PUBLIC_DEMO=true`; check a new Edge tab and hard refresh, minimum five-second duration, no login, existing dashboard unchanged, internal navigation without replay, reduced motion, mobile layout, and a real HTTP health check. Deployment must use the existing workflow and must not remove other Docker containers or volumes.
