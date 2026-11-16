@@ -459,6 +459,8 @@ The reviewed implementation snapshot was **`6a6acaa28fb5f79405d748556a02b98c5fad
 
 The nine platform destinations share the existing ModuleShell/ModuleCard style. The home page was not replaced with a second dashboard. Only a Settings access card and an imported-plan section in Automation extend existing page content.
 
+**Intervening owner update preserved:** while this Yes finalization was underway, Base44 advanced to revision **`3c3809310381d416df3b62788fe816a7c2a6059c`**, titled **Rebuild home dashboard with interactive 3D Ford Transit model**. This independent owner change is retained in the export. It adds a procedural Three.js Ford Transit view with drag/orbit and side-aware warning markers, a vehicle-alert toast, fuel/tire fields and displays, gallon-based tank displays, and a Trends navigation entry. It removes the former home TrendCard and older VanModel component. This later home arrangement comes from the owner’s Base44 update, not a duplicate dashboard introduced by consolidation. The model is procedural geometry, not a scanned or dimension-certified digital twin; the fixed tank/fuel capacities and tire-warning thresholds require confirmation against the actual vehicle. Live sensor/OBD ingestion of those new fields was not established by source inspection.
+
 ### Imported data, deduplication and privacy
 
 The source Base44 review included 11 modules, 12 plugin entries, 5 tracked items, 2 parking spots, 7 project phases, 10 checklist items, 9 decisions, 6 automations, 6 camera plans, 2 alerts, 32 telemetry rows, 13 control states, 4 commands, 1 vehicle profile and 3 automation runs.
