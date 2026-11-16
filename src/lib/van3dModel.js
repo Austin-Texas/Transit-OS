@@ -223,14 +223,37 @@ export function buildVanModel() {
   padDot.position.set(-2.35, 0.13, 0.44);
   group.add(padDot);
 
-  const hotspot = new THREE.Mesh(
-    new THREE.SphereGeometry(0.46, 10, 10),
-    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
-  );
-  hotspot.position.set(-2.35, 0.2, 0);
-  hotspot.userData.hotspot = "heat_pad";
-  group.add(hotspot);
-  hotspots.push(hotspot);
+  // House battery, strapped to the floor between the chassis rails.
+  box(0.56, 0.26, 0.72, -0.7, 0.62, 0.34, { tex: { key: "floor", repeat: [0.6, 0.4], opacity: 0.7 } });
+
+  // Invisible tap targets: each one opens its own readings on the dashboard.
+  const hotspot = (key, [x, y, z], radius) => {
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(radius, 10, 10),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })
+    );
+    mesh.position.set(x, y, z);
+    mesh.userData.hotspot = key;
+    group.add(mesh);
+    hotspots.push(mesh);
+  };
+
+  hotspot("heat_pad", [-2.35, 0.14, 0], 0.24);
+  hotspot("water_tank", [-2.35, 0.46, 0], 0.42);
+  hotspot("battery", [-0.7, 0.62, 0.34], 0.42);
+
+  // Small markers so the tank and battery are findable before the first tap.
+  [
+    [0x00f0ff, -2.35, 0.44, 0.52],
+    [0x00ff41, -0.7, 0.5, 0.74],
+  ].forEach(([color, x, y, z]) => {
+    const dot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.07, 12, 12),
+      new THREE.MeshBasicMaterial({ color })
+    );
+    dot.position.set(x, y, z);
+    group.add(dot);
+  });
 
   return {
     group,

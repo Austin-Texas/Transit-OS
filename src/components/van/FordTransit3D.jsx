@@ -4,6 +4,7 @@ import { applyVanTextures, buildVanModel } from "@/lib/van3dModel";
 import { loadVanTextures } from "@/lib/vanTextures";
 import useVanPhotos from "@/hooks/useVanPhotos";
 import { heatPad, heatPadLine } from "@/lib/heatPad";
+import { TANK_CAPACITY_GAL, gallonsFrom } from "@/lib/van";
 
 const RED = 0xff3131;
 const GREEN = 0x00ff41;
@@ -24,6 +25,47 @@ function markerPosition(warning) {
   if (warning.zone === "fuel") return [-2.62, 0.95, -1.12];
   if (warning.zone === "underbody") return [-2.35, 0.14, 0.46];
   return [0.1, 1.74, z];
+}
+
+// What hovering each tap target says, read from the latest telemetry.
+function hotspotTip(key, status) {
+  if (key === "water_tank") {
+    const level = Number(status?.fresh_water);
+    const known = Number.isFinite(level);
+    return {
+      title: known ? `Fresh tank ${Math.round(level)}%` : "Fresh tank · no reading",
+      detail: known
+        ? `${gallonsFrom(level, TANK_CAPACITY_GAL.fresh_water).toFixed(1)} gal · pump ${
+            status?.water_pump_on ? "on" : "off"
+          }`
+        : "The hub has not reported the tank level yet",
+      tone: known ? (level <= 20 ? "alert" : "ok") : "muted",
+    };
+  }
+  if (key === "battery") {
+    const percent = Number(status?.battery_percent);
+    const known = Number.isFinite(percent);
+    return {
+      title: known ? `House battery ${Math.round(percent)}%` : "House battery · no reading",
+      detail: known
+        ? `${Number(status?.battery_voltage ?? 0).toFixed(1)} V · solar ${Math.round(
+            status?.solar_w ?? 0
+          )} W · load ${Math.round(status?.load_w ?? 0)} W`
+        : "The hub has not reported the battery yet",
+      tone: known ? (percent <= 30 ? "alert" : "ok") : "muted",
+    };
+  }
+  const pad = heatPad(status);
+  return {
+    title:
+      pad.key === "fault"
+        ? "Heat pad fault"
+        : pad.key === "unknown"
+          ? "Heat pad · no report"
+          : `Heat pad ${pad.label.toLowerCase()}`,
+    detail: heatPadLine(pad) || "No heat pad readings from the hub yet",
+    tone: pad.key === "fault" ? "alert" : pad.key === "unknown" ? "muted" : "ok",
+  };
 }
 
 function roundRect(ctx, x, y, w, h, r) {
@@ -319,18 +361,10 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     const tipFor = (object, event) => {
       if (!object) return null;
       const rect = renderer.domElement.getBoundingClientRect();
-      const pad = heatPad(latest.current.status);
       return {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
-        title:
-          pad.key === "fault"
-            ? "Heat pad fault"
-            : pad.key === "unknown"
-              ? "Heat pad · no report"
-              : `Heat pad ${pad.label.toLowerCase()}`,
-        detail: heatPadLine(pad) || "No heat pad readings from the hub yet",
-        tone: pad.key === "fault" ? "alert" : pad.key === "unknown" ? "muted" : "ok",
+        ...hotspotTip(object.userData.hotspot, latest.current.status),
       };
     };
 

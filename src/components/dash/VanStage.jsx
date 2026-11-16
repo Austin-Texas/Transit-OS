@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, ArrowRight, Camera, Move } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import FordTransit3D from "@/components/van/FordTransit3D";
+import HotspotDialog from "@/components/van/HotspotDialog";
 import { cn } from "@/lib/utils";
 
 // The home stage: the neon wireframe van you can spin with a finger, plus a
@@ -17,6 +18,7 @@ export default function VanStage({
 }) {
   const side = focus?.side;
   const [tip, setTip] = useState(null);
+  const [hotspot, setHotspot] = useState(null);
 
   return (
     <section
@@ -31,6 +33,11 @@ export default function VanStage({
         warnings={warnings}
         status={status}
         onTip={setTip}
+        onPick={(key) => {
+          if (!key) return;
+          setTip(null);
+          setHotspot(key);
+        }}
       />
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(78%_68%_at_50%_44%,transparent_42%,rgba(2,6,11,0.6)_100%)]" />
@@ -101,7 +108,7 @@ export default function VanStage({
 
       <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
         <Move className="h-3 w-3" strokeWidth={2.2} />
-        Swipe to spin · under view
+        Swipe to spin · tap parts for readings
       </div>
 
       <Link
@@ -112,6 +119,8 @@ export default function VanStage({
         <Camera className="h-3.5 w-3.5" strokeWidth={2.2} />
         Cameras
       </Link>
+
+      <HotspotDialog hotspot={hotspot} status={status} onClose={() => setHotspot(null)} />
     </section>
   );
 }
