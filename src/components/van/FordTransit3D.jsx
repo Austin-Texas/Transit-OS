@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { buildVanModel } from "@/lib/van3dModel";
-import { VAN_IMAGE } from "@/lib/van";
+import { VAN_SKIN_IMAGE } from "@/lib/van";
 
 const RED = 0xff3131;
 const GREEN = 0x00ff41;
@@ -114,15 +114,13 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     const { group: van, hotspots, padMaterial, padDotMaterial, skinMaterial } = buildVanModel();
     scene.add(van);
 
-    // Wrap the imported Ford Transit photo onto the body flanks.
+    // The Transit diagnostic render is the van's look, wrapped on both flanks.
     new THREE.TextureLoader().load(
-      VAN_IMAGE,
+      VAN_SKIN_IMAGE,
       (texture) => {
         texture.colorSpace = THREE.SRGBColorSpace;
-        texture.repeat.set(1, 0.78);
-        texture.offset.set(0, 0.11);
         skinMaterial.map = texture;
-        skinMaterial.opacity = 0.82;
+        skinMaterial.opacity = 0.92;
         skinMaterial.needsUpdate = true;
       },
       undefined,
