@@ -205,3 +205,76 @@
 .tp-cinema__grain{opacity:.065}
 .tp-cinema__symbol{filter:drop-shadow(0 0 16px #009dff65)}
 .tp-cinema__light-field{filter:contrast(1.15) saturate(1.16)}
+
+/* Single continuous TPMCS identity shot. No second logo swap/cut.
+   Stage 1 holds the full logo; stages 2–3 move that SAME element to its
+   presentation position while the product title enters beneath it. */
+.tp-cinema__brand{
+  top:50%;
+  transform:translate(-50%,-50%);
+  translate:0 0;
+  transform-origin:center center;
+  transition:transform 1900ms cubic-bezier(.22,.61,.22,1),
+    opacity 1100ms ease,filter 1100ms ease!important;
+}
+.tp-cinema--0 .tp-cinema__brand,
+.tp-cinema--1 .tp-cinema__brand{
+  top:50%;
+  transform:translate(-50%,-50%) scale(1);
+  translate:0 0;
+  opacity:1;
+  filter:none;
+}
+.tp-cinema--2 .tp-cinema__brand,
+.tp-cinema--3 .tp-cinema__brand{
+  top:50%;
+  transform:translate(-50%,-50%) translateY(-30vh) scale(.39);
+  translate:0 0;
+  opacity:1;
+  filter:none;
+  pointer-events:none;
+}
+.tp-cinema--4 .tp-cinema__brand{
+  top:50%;
+  transform:translate(-50%,-50%) translateY(-36vh) scale(.32);
+  translate:0 0;
+  opacity:0;
+  filter:blur(6px);
+}
+.tp-cinema--2 .tp-cinema__symbol,
+.tp-cinema--3 .tp-cinema__symbol,
+.tp-cinema--4 .tp-cinema__symbol{
+  width:clamp(120px,25vh,210px);
+  height:clamp(140px,30vh,250px);
+  animation:tp-cinema-deep-arrival 3.1s cubic-bezier(.22,.6,.24,1) both!important;
+}
+.tp-cinema--2 .tp-cinema__company,
+.tp-cinema--3 .tp-cinema__company{opacity:1;transform:translateY(0)}
+.tp-cinema__presented-by{visibility:hidden!important}
+.tp-cinema__presentation{
+  top:39%!important;
+  translate:0 0!important;
+  transition:opacity 1600ms cubic-bezier(.22,.61,.22,1),
+    filter 1600ms ease!important;
+}
+.tp-cinema--2 .tp-cinema__presentation,
+.tp-cinema--3 .tp-cinema__presentation{
+  opacity:1;filter:none;
+}
+.tp-cinema--4 .tp-cinema__presentation{opacity:0;filter:blur(10px)}
+.tp-cinema__presents{margin-top:0}
+.tp-cinema__atmosphere{animation-duration:25s}
+@media(max-height:650px){
+ .tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{top:50%}
+ .tp-cinema--2 .tp-cinema__brand,.tp-cinema--3 .tp-cinema__brand{transform:translate(-50%,-50%) translateY(-27vh) scale(.33)}
+ .tp-cinema__presentation{top:36%!important}
+ .tp-cinema__presentation h1{font-size:clamp(38px,7vw,72px)}
+}
+@media(max-width:550px){
+ .tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{top:50%}
+ .tp-cinema--2 .tp-cinema__brand,.tp-cinema--3 .tp-cinema__brand{transform:translate(-50%,-50%) translateY(-27vh) scale(.39)}
+ .tp-cinema__presentation{top:37%!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .tp-cinema__brand,.tp-cinema__presentation{transition:none!important}
+}
