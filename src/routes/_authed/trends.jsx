@@ -75,7 +75,7 @@ function TrendsPage() {
           title={`${active.name} · ${windowLabel}`}
           icon={TrendingUp}
           action={
-            <span className="flex items-center gap-2.5">
+            <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
               {METRICS.map((item, index) => (
                 <span key={item.key} className="flex items-center gap-1">
                   <span

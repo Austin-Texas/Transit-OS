@@ -3,6 +3,7 @@ export const METRICS = [
   { key: "fresh", name: "Fresh water", short: "Fresh", color: "#00ff41" },
   { key: "gray", name: "Gray water", short: "Gray", color: "#ff9500" },
   { key: "black", name: "Black water", short: "Black", color: "#ff3b30" },
+  { key: "lpg", name: "Propane", short: "LPG", color: "#c084fc" },
 ];
 
 export const METRIC_KEYS = METRICS.map((metric) => metric.key);

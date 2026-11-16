@@ -16,6 +16,17 @@ export default function TrendChartPanel({ points, series, activeKey, loading, co
     );
   }
 
+  // The window can hold power and water samples without any of the selected
+  // metric, so say which one is missing instead of drawing an empty plot.
+  if (!points.some((point) => point[activeKey] !== null && point[activeKey] !== undefined)) {
+    const name = series.find((item) => item.key === activeKey)?.name ?? "This metric";
+    return (
+      <p className="flex h-[300px] items-center justify-center rounded-lg border border-dashed border-line/80 px-4 text-center text-[10px] leading-relaxed text-white/35">
+        No {name.toLowerCase()} readings in this window yet — the hub hasn't reported them.
+      </p>
+    );
+  }
+
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">

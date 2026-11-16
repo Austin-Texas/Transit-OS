@@ -49,6 +49,7 @@ export default function useEnergyReadings(range = 24, offsetHours = 0) {
       fresh: pct(reading.fresh_water),
       gray: pct(reading.gray_water),
       black: pct(reading.black_water),
+      lpg: pct(reading.lpg_percent),
     };
   });
 
