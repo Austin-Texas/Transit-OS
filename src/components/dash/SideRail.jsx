@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { BedDouble, Car, Droplets, Home, Layers, Settings, ShieldCheck, Snowflake, Zap } from "lucide-react";
+import { BedDouble, Car, Droplets, Home, Layers, Settings, ShieldCheck, Snowflake, TrendingUp, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const NAV_ITEMS = [
@@ -7,6 +7,7 @@ export const NAV_ITEMS = [
   { id: "vehicle", label: "Vehicle", icon: Car, to: "/vehicle" },
   { id: "camper", label: "Camper", icon: BedDouble, to: "/camper" },
   { id: "electrical", label: "Electrical", icon: Zap, to: "/electrical" },
+  { id: "trends", label: "Trends", icon: TrendingUp, to: "/trends" },
   { id: "water", label: "Water", icon: Droplets, to: "/water" },
   { id: "climate", label: "Climate", icon: Snowflake, to: "/climate" },
   { id: "security", label: "Security", icon: ShieldCheck, to: "/security" },

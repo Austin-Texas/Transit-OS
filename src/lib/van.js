@@ -1,6 +1,14 @@
-export const VAN_IMAGE = "https://media.base44.com/images/public/6afa3d27af32e7eb7d4b7f76/aee1c34a6_generated_image.png";
-export const VAN_STAGE_IMAGE = "https://media.base44.com/images/public/6afa3d27af32e7eb7d4b7f76/3451656f1_generated_image.png";
+export const VAN_IMAGE = "https://media.base44.com/images/public/6afa3d27af32e7eb7d4b7f76/745d79bfe_generated_image.png";
+export const VAN_STAGE_IMAGE = "https://media.base44.com/images/public/6afa3d27af32e7eb7d4b7f76/745d79bfe_generated_image.png";
 export const CABIN_IMAGE = "https://media.base44.com/images/public/6afa3d27af32e7eb7d4b7f76/fc43d02d0_generated_image.png";
+
+// Tank sizes of the camper build, used to show every level in gallons.
+export const TANK_CAPACITY_GAL = { fresh_water: 30, gray_water: 24, black_water: 15 };
+
+export const gallonsFrom = (percent, capacity) =>
+  Math.max(0, Math.min(100, Number(percent) || 0)) / 100 * capacity;
+
+export const gallons = (value) => `${value.toFixed(1)} gal`;
 
 export const MODES = [
   { id: "camping", label: "Camping" },
@@ -30,6 +38,11 @@ export const SAMPLE_STATUS = {
   solar_w: 426,
   exterior_temp: 68,
   humidity: 45,
+  fuel_percent: 64,
+  tire_fl: 46,
+  tire_fr: 46,
+  tire_rl: 44,
+  tire_rr: 44,
 };
 
 export const SAMPLE_ALERTS = [

@@ -133,6 +133,26 @@
       "type": "number",
       "description": "Propane remaining in gallons."
     },
+    "fuel_percent": {
+      "type": "number",
+      "description": "Engine fuel tank level in percent."
+    },
+    "tire_fl": {
+      "type": "number",
+      "description": "Front left tire pressure in PSI."
+    },
+    "tire_fr": {
+      "type": "number",
+      "description": "Front right tire pressure in PSI."
+    },
+    "tire_rl": {
+      "type": "number",
+      "description": "Rear left tire pressure in PSI."
+    },
+    "tire_rr": {
+      "type": "number",
+      "description": "Rear right tire pressure in PSI."
+    },
     "odometer": {
       "type": "number",
       "description": "Odometer reading in miles."
