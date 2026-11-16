@@ -1,31 +1,36 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { STARTUP_EXIT_MS, STARTUP_STAGES, STARTUP_TOTAL_MS } from "@/lib/startupStages";
-import StartupScene from "./StartupScene";
+import { STARTUP_EXIT_MS, STARTUP_TOTAL_MS } from "@/lib/startupStages";
+import StartupWebGL from "./StartupWebGL";
 import StageBoot from "./StageBoot";
 
-// The full cinematic startup: one continuous scene, then the initialization
-// panel, then a fade into the dashboard. Runs once per page load.
+// The cinematic startup: a WebGL scene for the symbol, the reveal and the van,
+// then the initialization interface, then a fade into the dashboard.
 export default function StartupSequence({ onDone }) {
-  const [phase, setPhase] = useState(0);
+  const [stage, setStage] = useState(0);
+  const [mode, setMode] = useState("webgl");
   const [closing, setClosing] = useState(false);
   const [gone, setGone] = useState(false);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
 
   useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const timers = reduced
-      ? []
-      : STARTUP_STAGES.slice(1).map((entry, index) =>
-          setTimeout(() => setPhase(index + 1), entry.at),
-        );
-    const closeTimer = setTimeout(() => setClosing(true), reduced ? 700 : STARTUP_TOTAL_MS);
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    if (reduced) {
+      setMode("static");
+      const timer = setTimeout(() => setClosing(true), 900);
+      return () => {
+        clearTimeout(timer);
+        document.body.style.overflow = previousOverflow;
+      };
+    }
+
+    const timer = setTimeout(() => setClosing(true), STARTUP_TOTAL_MS);
     return () => {
-      timers.forEach(clearTimeout);
-      clearTimeout(closeTimer);
+      clearTimeout(timer);
       document.body.style.overflow = previousOverflow;
     };
   }, []);
@@ -41,22 +46,43 @@ export default function StartupSequence({ onDone }) {
 
   if (gone) return null;
 
+  if (mode === "static") {
+    return (
+      <motion.div
+        className="fixed inset-0 z-[130] grid place-items-center bg-[#01040d]"
+        animate={{ opacity: closing ? 0 : 1 }}
+        transition={{ duration: STARTUP_EXIT_MS / 1000 }}
+      >
+        <div className="flex flex-col items-center gap-6">
+          <img src="/branding/tpmcs-logo.svg" alt="TPMCS" className="h-40 w-auto" />
+          <span className="text-[13px] font-semibold uppercase tracking-[0.4em] text-white/70">TransitOS</span>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       className="fixed inset-0 z-[130] overflow-hidden bg-[#01040d]"
-      initial={{ opacity: 1 }}
       animate={{ opacity: closing ? 0 : 1 }}
       transition={{ duration: STARTUP_EXIT_MS / 1000, ease: "easeInOut" }}
     >
-      <StartupScene phase={phase} />
+      <StartupWebGL
+        onStage={setStage}
+        onFail={() => {
+          setMode("static");
+          setClosing(true);
+        }}
+      />
 
       <motion.div
-        className="absolute inset-0"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: phase >= 3 ? 1 : 0 }}
-        transition={{ duration: 0.5 }}
+        className="absolute inset-0 bg-[#01040d]/92"
+        initial={false}
+        animate={{ opacity: stage >= 4 ? 1 : 0 }}
+        transition={{ duration: 0.6 }}
+        style={{ pointerEvents: stage >= 4 ? "auto" : "none" }}
       >
-        {phase >= 3 ? <StageBoot /> : null}
+        {stage >= 4 ? <StageBoot /> : null}
       </motion.div>
 
       <button

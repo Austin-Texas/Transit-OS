@@ -1,16 +1,23 @@
-// Timeline for the cinematic TransitOS boot sequence (milliseconds).
-// One continuous scene: symbol, company reveal, presents + vehicle, then the
-// initialization panel, then the dashboard.
-export const STARTUP_STAGES = [
-  { id: "symbol", at: 0 },
-  { id: "brand", at: 1400 },
-  { id: "presents", at: 2900 },
-  { id: "boot", at: 4400 },
+// Shared timing for the cinematic startup. Target timings, overlapped in the
+// scene so movement never stops between beats.
+export const STARTUP_TOTAL_MS = 8000;
+export const STARTUP_EXIT_MS = 650;
+
+export const STAGES = [
+  { id: "symbol", at: 0.0 },
+  { id: "company", at: 1.5 },
+  { id: "presents", at: 2.5 },
+  { id: "vehicle", at: 4.0 },
+  { id: "boot", at: 6.5 },
 ];
 
-export const STARTUP_TOTAL_MS = 6400;
-export const STARTUP_EXIT_MS = 700;
+export const LOGO_SVG_URL = "/branding/tpmcs-logo.svg";
 
-// Realistic rendered white high-roof cargo van (no badges).
-export const VAN_RENDER_URL =
-  "https://media.base44.com/images/public/6afa3d27af32e7eb7d4b7f76/c53e64f5f_generated_image.png";
+// Returns the stage index for a given elapsed time in seconds.
+export function stageAt(seconds) {
+  if (seconds < 1.5) return 0;
+  if (seconds < 2.5) return 1;
+  if (seconds < 4.0) return 2;
+  if (seconds < 6.5) return 3;
+  return 4;
+}
