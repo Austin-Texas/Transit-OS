@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Lightbulb } from "lucide-react";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import { openAlerts } from "@/lib/van";
@@ -13,10 +13,36 @@ import PhysicalToggle from "./PhysicalToggle";
 import ClimateControl from "./ClimateControl";
 import AlertStrip from "./AlertStrip";
 
+const RANK = { critical: 0, warning: 1, info: 2 };
+const byUrgency = (a, b) => (RANK[a.severity] ?? 3) - (RANK[b.severity] ?? 3);
+
 export default function HomeScreen() {
   const van = useVanDashboard();
   const { status, alerts } = van;
   const [focus, setFocus] = useState(null);
+  const seenAlerts = useRef(null);
+
+  // The stage turns to a side on its own whenever a side-aware alert appears.
+  useEffect(() => {
+    const sided = alerts.filter((alert) => alert.side && alert.status !== "resolved");
+
+    if (seenAlerts.current === null) {
+      seenAlerts.current = new Set(sided.map((alert) => alert.id));
+      const urgent = [...sided].sort(byUrgency)[0];
+      if (urgent) setFocus({ id: urgent.id, side: urgent.side, title: urgent.title });
+      return;
+    }
+
+    const fresh = sided.find((alert) => !seenAlerts.current.has(alert.id));
+    sided.forEach((alert) => seenAlerts.current.add(alert.id));
+    if (fresh) setFocus({ id: fresh.id, side: fresh.side, title: fresh.title });
+  }, [alerts]);
+
+  // Once the alert that pulled the view round is gone, the van returns to its photo.
+  useEffect(() => {
+    if (!focus?.id) return;
+    if (!alerts.some((alert) => alert.id === focus.id && alert.status !== "resolved")) setFocus(null);
+  }, [alerts, focus]);
 
   if (!status) {
     return (
