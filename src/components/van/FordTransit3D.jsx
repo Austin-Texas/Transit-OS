@@ -2,7 +2,15 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 const ALERT = 0xff2f2f;
-const SIDE_YAW = { left: Math.PI, right: 0 };
+
+// Camera angle that puts a fault in view: the flank it sits on, angled toward
+// the front or rear corner it belongs to.
+function targetYawFor(focus) {
+  const side = focus?.side === "left" ? "left" : "right";
+  const base = side === "left" ? Math.PI : 0;
+  const corner = focus?.zone === "front" ? 1 : focus?.zone === "rear" || focus?.zone === "fuel" ? -1 : 0;
+  return base + (side === "right" ? corner : -corner) * 0.62;
+}
 
 // Soft studio gradient used as the reflection map, so the paint reads as glossy
 // metal instead of flat colour.
@@ -190,7 +198,7 @@ function buildVan() {
   return { van, paint };
 }
 
-export default function FordTransit3D({ focus, warnings = [], className }) {
+export default function FordTransit3D({ focus, warnings = [], className, onReady }) {
   const hostRef = useRef(null);
   const api = useRef(null);
   const latest = useRef({ focus, warnings });
@@ -200,7 +208,14 @@ export default function FordTransit3D({ focus, warnings = [], className }) {
     const host = hostRef.current;
     if (!host) return undefined;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    } catch (error) {
+      // No WebGL here: the stage falls back to the parked photo.
+      onReady?.(false);
+      return undefined;
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.05;
@@ -273,7 +288,7 @@ export default function FordTransit3D({ focus, warnings = [], className }) {
       });
     };
 
-    const state = { yaw: 0.5, pitch: 0.22, target: 0.5, locked: false, alert: false };
+    const state = { yaw: 0.5, pitch: 0.22, target: 0.5, snap: false, alert: false, velocity: 0 };
     let dragging = false;
     let spun = false;
     let lastX = 0;
@@ -282,6 +297,8 @@ export default function FordTransit3D({ focus, warnings = [], className }) {
     const onDown = (event) => {
       dragging = true;
       spun = true;
+      state.snap = false;
+      state.velocity = 0;
       lastX = event.clientX;
       lastY = event.clientY;
       renderer.domElement.style.cursor = "grabbing";
@@ -294,8 +311,9 @@ export default function FordTransit3D({ focus, warnings = [], className }) {
       lastX = event.clientX;
       lastY = event.clientY;
       state.yaw -= dx * 0.0085;
+      state.velocity = -dx * 0.0085;
       state.pitch = Math.min(0.62, Math.max(-0.04, state.pitch + dy * 0.0032));
-      if (state.locked && Math.abs(dx) > 2) state.locked = false;
+      if (Math.abs(dx) > 2) state.snap = false;
     };
     const onUp = () => {
       dragging = false;
@@ -322,17 +340,23 @@ export default function FordTransit3D({ focus, warnings = [], className }) {
 
     const clock = new THREE.Clock();
     let frame = 0;
+    let reported = false;
 
     const tick = () => {
       const dt = Math.min(clock.getDelta(), 0.05);
       const time = performance.now() / 1000;
 
-      if (state.locked) {
+      if (state.snap && !dragging) {
         let diff = state.target - state.yaw;
         diff = ((diff + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
-        state.yaw += diff * Math.min(1, dt * 2.8);
-      } else if (!dragging && !spun) {
-        state.yaw += dt * 0.16;
+        state.yaw += diff * Math.min(1, dt * 3.6);
+      } else if (!dragging) {
+        if (Math.abs(state.velocity) > 0.0006) {
+          state.yaw += state.velocity;
+          state.velocity *= 0.93;
+        } else if (!spun) {
+          state.yaw += dt * 0.16;
+        }
       }
 
       const dist = Math.max(9.2, 11.4 / Math.max(0.45, camera.aspect));
@@ -353,27 +377,35 @@ export default function FordTransit3D({ focus, warnings = [], className }) {
       });
 
       renderer.render(scene, camera);
+      if (!reported) {
+        reported = true;
+        onReady?.(true);
+      }
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
 
-    const apply = (next) => {
-      const alertSide = next.focus?.side;
+    // Only a locate request moves the camera; telemetry updates just refresh pins.
+    const applyFocus = (focus) => {
+      const alertSide = focus?.side === "left" || focus?.side === "right" ? focus.side : null;
       state.alert = Boolean(alertSide);
       if (alertSide) {
-        state.target = SIDE_YAW[alertSide] ?? state.yaw;
-        state.locked = true;
+        state.target = targetYawFor(focus);
+        state.snap = true;
         alertLight.position.set(0, 1.5, alertSide === "left" ? -2.4 : 2.4);
       } else {
-        state.locked = false;
+        state.snap = false;
         alertLight.intensity = 0;
       }
-      rebuildMarkers(next.warnings);
     };
 
-    apply(latest.current);
+    applyFocus(latest.current.focus);
+    rebuildMarkers(latest.current.warnings);
 
-    api.current = { apply, reset: () => { state.locked = false; } };
+    api.current = {
+      focus: applyFocus,
+      warnings: (list) => rebuildMarkers(list),
+    };
 
     return () => {
       cancelAnimationFrame(frame);
@@ -393,9 +425,17 @@ export default function FordTransit3D({ focus, warnings = [], className }) {
     };
   }, []);
 
+  // A locate request (new alert, toast tap, pin tap) turns the van; a plain
+  // telemetry refresh only redraws the warning pins.
+  const warningKey = warnings.map((warning) => warning.id).join("|");
+
   useEffect(() => {
-    api.current?.apply({ focus, warnings });
-  }, [focus, warnings]);
+    api.current?.focus(focus);
+  }, [focus]);
+
+  useEffect(() => {
+    api.current?.warnings(latest.current.warnings);
+  }, [warningKey]);
 
   return <div ref={hostRef} className={className} style={{ touchAction: "none" }} />;
 }

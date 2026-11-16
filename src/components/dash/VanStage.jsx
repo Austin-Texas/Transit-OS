@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { ArrowLeft, ArrowRight, Camera, Move, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import FordTransit3D from "@/components/van/FordTransit3D";
-import { miles } from "@/lib/van";
+import { Image } from "@/components/ui/image";
+import { VAN_STAGE_IMAGE, miles } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
 // The home stage: a full 3D Ford Transit you can spin with a finger, with the
@@ -16,6 +18,7 @@ export default function VanStage({
   onClearFocus,
 }) {
   const side = focus?.side;
+  const [live, setLive] = useState(false);
 
   return (
     <section
@@ -24,7 +27,21 @@ export default function VanStage({
         focus ? "border-alert/55" : "border-line/80"
       )}
     >
-      <FordTransit3D className="absolute inset-0 h-full w-full" focus={focus} warnings={warnings} />
+      <Image
+        src={VAN_STAGE_IMAGE}
+        alt="Ford Transit camper van"
+        fittingType="fill"
+        className={cn(
+          "pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-700",
+          live ? "opacity-0" : "opacity-100"
+        )}
+      />
+      <FordTransit3D
+        className="absolute inset-0 h-full w-full"
+        focus={focus}
+        warnings={warnings}
+        onReady={setLive}
+      />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(72%_62%_at_50%_42%,transparent_38%,rgba(2,6,11,0.62)_100%)]" />
 
       <div className="pointer-events-none absolute left-4 top-3.5 flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-white/35">
@@ -68,7 +85,7 @@ export default function VanStage({
 
       <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/70 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/45 backdrop-blur sm:flex">
         <Move className="h-3 w-3" strokeWidth={2.2} />
-        Drag to spin the van
+        Swipe to spin · 360°
       </div>
 
       <Link
