@@ -1,0 +1,94 @@
+{
+  "name": "PlatformRecord",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "tracker",
+        "plugin",
+        "phase",
+        "checklist",
+        "decision",
+        "parking",
+        "updateplan",
+        "archive"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "properties": {
+      "type": "object"
+    },
+    "source_app_id": {
+      "type": "string"
+    },
+    "source_record_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "key",
+    "kind",
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
