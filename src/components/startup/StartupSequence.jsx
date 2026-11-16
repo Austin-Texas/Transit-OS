@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { STARTUP_EXIT_MS, STARTUP_TOTAL_MS } from "@/lib/startupStages";
 import StartupWebGL from "./StartupWebGL";
 import StageBoot from "./StageBoot";
+import ReferenceFrames from "./ReferenceFrames";
 
 // The cinematic startup: a WebGL scene for the symbol, the reveal and the van,
 // then the initialization interface, then a fade into the dashboard.
@@ -74,6 +75,8 @@ export default function StartupSequence({ onDone }) {
           setClosing(true);
         }}
       />
+
+      {stage < 4 ? <ReferenceFrames /> : null}
 
       <motion.div
         className="absolute inset-0 bg-[#01040d]/92"
