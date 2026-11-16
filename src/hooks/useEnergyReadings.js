@@ -15,16 +15,17 @@ const pct = (value) =>
   value === null || value === undefined || value === "" ? null : Math.round(Number(value));
 
 // Power and tank history pushed by the van hub, charted for the selected window.
-export default function useEnergyReadings(range = 24) {
+export default function useEnergyReadings(range = 24, offsetHours = 0) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const since = new Date(Date.now() - range * 3600 * 1000).toISOString();
+    const until = new Date(Date.now() - offsetHours * 3600 * 1000).toISOString();
+    const since = new Date(Date.now() - (range + offsetHours) * 3600 * 1000).toISOString();
     try {
       const page = await base44.entities.EnergyReading.filter(
-        { recorded_at: { $gte: since } },
+        { recorded_at: { $gte: since, $lte: until } },
         { sort: "-recorded_at", limit: 500 }
       );
       // Newest first from the server, oldest first for the charts.
@@ -32,7 +33,7 @@ export default function useEnergyReadings(range = 24) {
     } finally {
       setLoading(false);
     }
-  }, [range]);
+  }, [range, offsetHours]);
 
   useEffect(() => {
     load();

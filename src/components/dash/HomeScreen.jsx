@@ -9,7 +9,7 @@ import LocksPanel from "./LocksPanel";
 import QuickDock from "./QuickDock";
 import StatStrip from "./StatStrip";
 import WaterLevels from "./WaterLevels";
-import TrendChart from "./TrendChart";
+import TrendChartButton from "./TrendChartButton";
 import PhysicalToggle from "./PhysicalToggle";
 import ClimateControl from "./ClimateControl";
 import AlertStrip from "./AlertStrip";
@@ -88,7 +88,7 @@ export default function HomeScreen() {
           />
           <StatStrip status={status} faultCount={faultCount} />
           <WaterLevels status={status} />
-          <TrendChart />
+          <TrendChartButton />
 
           <div className="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-2">
             <PhysicalToggle
