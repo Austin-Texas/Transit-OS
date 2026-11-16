@@ -58,6 +58,23 @@ export function buildVanModel() {
   const group = new THREE.Group();
   const hotspots = [];
 
+  // Real surfaces: a lit material that starts as dark tinted teal and takes its
+  // high-resolution map once the texture has downloaded.
+  const textured = [];
+  const materialFor = (key, repeat, opacity) => {
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x0d3346,
+      roughness: 0.82,
+      metalness: 0.02,
+      transparent: true,
+      opacity,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+    textured.push({ material, key, repeat });
+    return material;
+  };
+
   const wire = (geometry, surface, edge, threshold = 24) => {
     const holder = new THREE.Group();
     if (surface) holder.add(new THREE.Mesh(geometry, surface));
@@ -66,10 +83,17 @@ export function buildVanModel() {
     return holder;
   };
 
-  const box = (w, h, d, x, y, z, { outer = false, glass = false, rotation } = {}) => {
+  const box = (w, h, d, x, y, z, { outer = false, glass = false, rotation, tex } = {}) => {
+    const surface = tex
+      ? materialFor(tex.key, tex.repeat, tex.opacity)
+      : glass
+        ? materials.glass
+        : outer
+          ? materials.shell
+          : materials.inner;
     const holder = wire(
       new THREE.BoxGeometry(w, h, d),
-      glass ? materials.glass : outer ? materials.shell : materials.inner,
+      surface,
       outer ? materials.shellEdge : materials.innerEdge
     );
     holder.position.set(x, y, z);
@@ -87,7 +111,7 @@ export function buildVanModel() {
     curveSegments: 14,
   });
   shell.translate(0, 0, -1.01);
-  wire(shell, materials.shell, materials.shellEdge, 28);
+  wire(shell, materialFor("paint", [5, 2.4], 0.16), materials.shellEdge, 28);
 
   // Glazing outlines on both flanks.
   [
@@ -109,27 +133,27 @@ export function buildVanModel() {
   });
 
   // Cab: dashboard, wheel, seats.
-  box(0.42, 0.24, 1.7, 2.5, 1.12, 0);
-  box(0.5, 0.5, 0.5, 1.95, 1.25, -0.52);
-  box(0.5, 0.5, 0.5, 1.95, 1.25, 0.52);
+  box(0.42, 0.24, 1.7, 2.5, 1.12, 0, { tex: { key: "floor", repeat: [1.4, 0.5], opacity: 0.6 } });
+  box(0.5, 0.5, 0.5, 1.95, 1.25, -0.52, { tex: { key: "fabric", repeat: [0.7, 0.7], opacity: 0.9 } });
+  box(0.5, 0.5, 0.5, 1.95, 1.25, 0.52, { tex: { key: "fabric", repeat: [0.7, 0.7], opacity: 0.9 } });
   box(0.12, 0.42, 0.12, 1.85, 1.5, -0.52);
   const wheel = wire(new THREE.TorusGeometry(0.19, 0.02, 6, 18), null, materials.innerEdge, 18);
   wheel.position.set(2.18, 1.3, -0.52);
   wheel.rotation.y = Math.PI / 2;
 
   // Living space: floor, galley, dinette, overhead lockers.
-  box(5.3, 0.04, 1.88, -0.15, 0.8, 0);
-  box(2.3, 0.82, 0.46, -0.55, 1.24, -0.72);
-  box(1.7, 0.86, 0.46, 0.72, 1.26, 0.72);
-  box(0.62, 0.46, 1.55, 0.02, 1.05, 0.05);
-  box(0.8, 0.04, 0.66, 0.58, 1.42, 0.12);
-  box(2.6, 0.3, 0.34, -0.6, 2.48, -0.78);
-  box(2.6, 0.3, 0.34, -0.6, 2.48, 0.78);
+  box(5.3, 0.04, 1.88, -0.15, 0.8, 0, { tex: { key: "floor", repeat: [4.5, 1.7], opacity: 0.92 } });
+  box(2.3, 0.82, 0.46, -0.55, 1.24, -0.72, { tex: { key: "oak", repeat: [1.7, 0.9], opacity: 0.9 } });
+  box(1.7, 0.86, 0.46, 0.72, 1.26, 0.72, { tex: { key: "fabric", repeat: [1.3, 0.7], opacity: 0.9 } });
+  box(0.62, 0.46, 1.55, 0.02, 1.05, 0.05, { tex: { key: "oak", repeat: [1.5, 0.5], opacity: 0.85 } });
+  box(0.8, 0.04, 0.66, 0.58, 1.42, 0.12, { tex: { key: "oak", repeat: [0.7, 0.55], opacity: 0.9 } });
+  box(2.6, 0.3, 0.34, -0.6, 2.48, -0.78, { tex: { key: "oak", repeat: [1.9, 0.25], opacity: 0.88 } });
+  box(2.6, 0.3, 0.34, -0.6, 2.48, 0.78, { tex: { key: "oak", repeat: [1.9, 0.25], opacity: 0.88 } });
 
   // Sleeping platform and mattress across the rear.
-  box(1.86, 0.1, 1.9, -2.0, 1.9, 0);
-  box(1.7, 0.18, 1.68, -2.0, 2.02, 0);
-  box(2.5, 0.03, 1.7, -0.9, 2.62, 0);
+  box(1.86, 0.1, 1.9, -2.0, 1.9, 0, { tex: { key: "oak", repeat: [1.4, 1.4], opacity: 0.85 } });
+  box(1.7, 0.18, 1.68, -2.0, 2.02, 0, { tex: { key: "fabric", repeat: [1.5, 1.5], opacity: 0.92 } });
+  box(2.5, 0.03, 1.7, -0.9, 2.62, 0, { tex: { key: "headliner", repeat: [2.2, 1.5], opacity: 0.8 } });
   box(0.5, 0.07, 0.5, 0.35, 2.92, 0.16, { outer: true });
 
   // Chassis rails, cross members and rear axle.
@@ -190,5 +214,29 @@ export function buildVanModel() {
     padMaterial: materials.pad,
     padDotMaterial: materials.padDot,
     padDot,
+    textured,
   };
+}
+
+// Drops the downloaded maps onto the surfaces that asked for them. Each surface
+// gets its own clone so it can repeat at its own scale without affecting the
+// others. Returns the clones, which the stage disposes with the scene.
+export function applyVanTextures(entries, textures) {
+  const applied = [];
+  entries.forEach(({ material, key, repeat }) => {
+    const base = textures[key];
+    if (!base) return;
+    const map = base.clone();
+    map.needsUpdate = true;
+    map.colorSpace = THREE.SRGBColorSpace;
+    map.wrapS = THREE.RepeatWrapping;
+    map.wrapT = THREE.RepeatWrapping;
+    map.repeat.set(repeat[0], repeat[1]);
+    map.anisotropy = base.anisotropy;
+    material.map = map;
+    material.color.set(0xffffff);
+    material.needsUpdate = true;
+    applied.push(map);
+  });
+  return applied;
 }

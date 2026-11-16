@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
-import { buildVanModel } from "@/lib/van3dModel";
+import { applyVanTextures, buildVanModel } from "@/lib/van3dModel";
+import { loadVanTextures } from "@/lib/vanTextures";
 import { heatPad, heatPadLine } from "@/lib/heatPad";
 
 const RED = 0xff3131;
@@ -113,8 +114,30 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
 
-    const { group: van, hotspots, padMaterial, padDotMaterial, padDot } = buildVanModel();
+    const { group: van, hotspots, padMaterial, padDotMaterial, padDot, textured } = buildVanModel();
     scene.add(van);
+
+    // Light for the textured panels: a soft sky fill, a warm key from the front
+    // and a cool neon rim from behind, so oak and fabric read as real surfaces.
+    scene.add(new THREE.HemisphereLight(0xcdeef8, 0x06131d, 1.25));
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.6);
+    keyLight.position.set(4.5, 6, 5);
+    const rimLight = new THREE.DirectionalLight(0x6fe2f5, 0.85);
+    rimLight.position.set(-5, 3, -4.5);
+    scene.add(keyLight, rimLight);
+
+    // The maps download in the background; the stage shows its wireframe until
+    // they land, then dresses every panel at once.
+    let disposed = false;
+    const loadedMaps = [];
+    loadVanTextures(renderer).then((textures) => {
+      if (disposed) {
+        Object.values(textures).forEach((texture) => texture.dispose());
+        return;
+      }
+      Object.values(textures).forEach((texture) => loadedMaps.push(texture));
+      applyVanTextures(textured, textures);
+    });
 
     // Status callouts, as in the reference: one on the rear cabin, one on the
     // habitation panel.
@@ -409,13 +432,15 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       host.removeEventListener("pointermove", onMove);
       api.current = null;
       tipRef.current?.(null);
-      const disposed = new Set();
+      disposed = true;
+      loadedMaps.forEach((texture) => texture.dispose());
+      const disposedMaterials = new Set();
       scene.traverse((node) => {
         if (node.geometry) node.geometry.dispose();
         const list = Array.isArray(node.material) ? node.material : node.material ? [node.material] : [];
         list.forEach((material) => {
-          if (disposed.has(material)) return;
-          disposed.add(material);
+          if (disposedMaterials.has(material)) return;
+          disposedMaterials.add(material);
           if (material.map) material.map.dispose();
           material.dispose();
         });
