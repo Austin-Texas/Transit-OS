@@ -7,7 +7,7 @@ export const Route=createFileRoute('/_authed/simulation')({head:()=>({meta:[{tit
 function Simulation(){
   const engine=useRef(null);const [state,setState]=useState(null),[selected,setSelected]=useState('clm'),[filter,setFilter]=useState('active'),[message,setMessage]=useState('');
   useEffect(()=>{engine.current=createSimulation();setState(structuredClone(engine.current.state));const timer=setInterval(()=>{engine.current.tick();setState(structuredClone(engine.current.state));},2000);return()=>clearInterval(timer);},[]);
-  const act=fn=>{if(!engine.current)return;const r=fn(engine.current);if(r?.message)setMessage(r.message);setState(structuredClone(engine.current.state));};
+  const act=fn=>{if(!engine.current)return;const r=fn(engine.current);setMessage(r?.message||engine.current.state.events[0]?.message||'');setState(structuredClone(engine.current.state));};
   const command=(id,key,value)=>act(e=>e.command(id,key,value));
   if(!state)return <PlatformPage title='Simulation lab'><Note>Preparing the isolated simulator…</Note></PlatformPage>;
   const module=MODULES.find(m=>m.id===selected),online=state.modules[selected].online;
