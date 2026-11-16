@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { buildDiagnostics } from "@/lib/van";
 import { syncVanAlerts } from "@/lib/server-fns";
 
-const PUBLIC_DEMO = typeof window !== "undefined" && window.location.hostname === "transit.hastenload.com";
+const PUBLIC_DEMO = import.meta.env.VITE_PUBLIC_DEMO === "true";
 const DEMO_STATUS = {
   id: null, climate_temp: 66, climate_set: 66, cabin_temp: 66, exterior_temp: 68,
   humidity: 45, climate_mode: "off", lpg_percent: 24, lpg_gallons: 6,
