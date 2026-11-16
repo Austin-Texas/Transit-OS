@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Activity, BatteryCharging, Droplets, Thermometer, Wifi, ShieldCheck, Truck, Gauge } from "lucide-react";
 
 // Public design preview only. No authenticated APIs, user records, cameras, or hardware commands.
@@ -11,6 +12,9 @@ const cards = [
 ];
 
 export function LoginPage() {
+  useEffect(() => {
+    if (window.location.hostname === "transit.hastenload.com") window.location.replace("/");
+  }, []);
   return (
     <main className="min-h-screen bg-[#020a14] px-4 py-8 text-white sm:px-8">
       <div className="mx-auto max-w-6xl">
