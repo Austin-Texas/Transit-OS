@@ -1,64 +1,68 @@
 import { motion } from "framer-motion";
+import TpmcsMark from "./TpmcsMark";
 
-// Stage 3 — TPMCS presents TransitOS, metallic type with a cyan OS.
+// Stage 3 — small mark, PRESENTS between two rules, then the product name.
 export default function StagePresents() {
   return (
     <motion.div
-      key="presents"
-      className="flex w-full flex-col items-center text-center"
+      className="relative flex w-full flex-col items-center text-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0, filter: "blur(12px)", scale: 1.05 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
     >
-      <motion.p
-        className="text-[11px] font-medium uppercase tracking-[0.5em] text-white/55 sm:text-[13px]"
-        initial={{ opacity: 0, letterSpacing: "0.9em" }}
-        animate={{ opacity: 1, letterSpacing: "0.5em" }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-      >
-        TPMCS Presents
-      </motion.p>
-
-      <div className="relative mt-4 flex items-center justify-center gap-4 sm:gap-6">
+      {/* purple and blue streaks arcing behind the type */}
+      <div className="pointer-events-none absolute inset-0 grid place-items-center">
         <motion.span
-          className="h-px w-10 sm:w-24"
-          style={{ background: "linear-gradient(90deg, transparent, rgba(0,240,255,0.9))" }}
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.25 }}
+          className="absolute h-[210px] w-[560px] rounded-[50%] border-t-2 border-cyan-300/45 blur-[2px] sm:w-[760px]"
+          style={{ rotate: "-7deg" }}
+          initial={{ opacity: 0, scaleX: 0.7 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ duration: 0.8 }}
         />
-        <motion.h2
-          className="relative flex items-baseline text-[46px] font-semibold leading-none tracking-[-0.03em] sm:text-[76px]"
-          initial={{ opacity: 0, y: 18, scale: 0.94 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <span className="bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-transparent">Transit</span>
-          <span
-            className="bg-gradient-to-b from-cyan-200 via-cyan-400 to-cyan-600 bg-clip-text text-transparent"
-            style={{ filter: "drop-shadow(0 0 26px rgba(0,240,255,0.55))" }}
-          >
-            OS
-          </span>
-        </motion.h2>
         <motion.span
-          className="h-px w-10 sm:w-24"
-          style={{ background: "linear-gradient(270deg, transparent, rgba(112,0,255,0.9))" }}
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.25 }}
+          className="absolute h-[230px] w-[600px] rounded-[50%] border-b-2 border-violet-400/45 blur-[2px] sm:w-[800px]"
+          style={{ rotate: "8deg" }}
+          initial={{ opacity: 0, scaleX: 0.7 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ duration: 0.9, delay: 0.1 }}
         />
       </div>
 
-      <motion.p
-        className="mt-4 text-[9px] uppercase tracking-[0.38em] text-cyan-100/45 sm:text-[10px]"
-        initial={{ opacity: 0, y: 8 }}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.45 }}
+        transition={{ duration: 0.5 }}
       >
-        Intelligent Vehicle Operating System
-      </motion.p>
+        <TpmcsMark className="h-[42px] w-[52px] sm:h-[54px] sm:w-[66px]" />
+      </motion.div>
+
+      <motion.div
+        className="relative mt-7 flex items-center gap-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.12 }}
+      >
+        <span className="h-px w-14 bg-gradient-to-r from-transparent to-cyan-200/80 sm:w-24" />
+        <span className="text-[10px] font-medium uppercase tracking-[0.62em] text-white/70 sm:text-[12px]">
+          Presents
+        </span>
+        <span className="h-px w-14 bg-gradient-to-l from-transparent to-cyan-200/80 sm:w-24" />
+      </motion.div>
+
+      <motion.h2
+        className="relative mt-4 flex items-baseline text-[54px] font-semibold leading-none tracking-[-0.03em] sm:text-[86px]"
+        initial={{ opacity: 0, y: 16, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <span className="bg-gradient-to-b from-white via-white to-white/70 bg-clip-text text-transparent">Transit</span>
+        <span
+          className="bg-gradient-to-b from-cyan-200 via-cyan-400 to-cyan-600 bg-clip-text text-transparent"
+          style={{ filter: "drop-shadow(0 0 26px rgba(0,240,255,0.6))" }}
+        >
+          OS
+        </span>
+      </motion.h2>
     </motion.div>
   );
 }

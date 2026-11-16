@@ -74,10 +74,17 @@ export default function StartupSequence({ onDone }) {
       />
 
       <div className="relative z-10 h-full w-full">
-        <AnimatePresence>
-          <div key={stage} className="absolute inset-0 flex items-center justify-center px-5 sm:px-8">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={stage}
+            className="absolute inset-0 flex items-center justify-center px-5 sm:px-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+          >
             <Stage />
-          </div>
+          </motion.div>
         </AnimatePresence>
       </div>
 

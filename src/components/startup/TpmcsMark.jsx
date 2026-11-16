@@ -1,25 +1,26 @@
-// The TPMCS chevron mark: two angular blades lit cyan into violet, with an
-// extruded edge and a soft neon bloom behind them.
+// The TPMCS mark: two interlocking angular forms that read as a stylised T —
+// the left blade cyan, the right blade royal blue, with a deep extruded edge
+// and a soft neon bloom behind them.
 export default function TpmcsMark({ className = "" }) {
   return (
     <svg viewBox="0 0 120 100" className={className} aria-hidden="true">
       <defs>
-        <linearGradient id="tpmcs-upper" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#9df9ff" />
+        <linearGradient id="tpmcs-cyan" x1="0" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stopColor="#b9fdff" />
           <stop offset="45%" stopColor="#00f0ff" />
-          <stop offset="100%" stopColor="#7000ff" />
+          <stop offset="100%" stopColor="#0bb6d6" />
         </linearGradient>
-        <linearGradient id="tpmcs-lower" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0%" stopColor="#7000ff" />
-          <stop offset="55%" stopColor="#2f8bff" />
-          <stop offset="100%" stopColor="#8ff6ff" />
+        <linearGradient id="tpmcs-blue" x1="0.2" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#8c96ff" />
+          <stop offset="50%" stopColor="#4a3aff" />
+          <stop offset="100%" stopColor="#241a9e" />
         </linearGradient>
         <linearGradient id="tpmcs-edge" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.85" />
-          <stop offset="100%" stopColor="#00f0ff" stopOpacity="0.15" />
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
         </linearGradient>
-        <filter id="tpmcs-bloom" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="6" result="blur" />
+        <filter id="tpmcs-bloom" x="-55%" y="-55%" width="210%" height="210%">
+          <feGaussianBlur stdDeviation="4.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -27,26 +28,25 @@ export default function TpmcsMark({ className = "" }) {
         </filter>
       </defs>
 
-      {/* extruded back edges */}
-      <g opacity="0.55">
-        <path d="M14 74 L54 20 L94 74 L74 74 L54 48 L34 74 Z" fill="#06121f" transform="translate(3 4)" />
-        <path d="M36 92 L60 58 L84 92 L68 92 L60 79 L52 92 Z" fill="#06121f" transform="translate(3 4)" />
+      {/* extruded depth behind both blades */}
+      <g opacity="0.55" transform="translate(4 6)">
+        <path d="M60 14 H20 L8 26 V40 H48 V82 H60 Z" fill="#040915" />
+        <path d="M60 14 H100 L112 26 V40 H72 V82 H60 Z" fill="#040915" />
       </g>
 
       <g filter="url(#tpmcs-bloom)">
-        <path d="M14 74 L54 20 L94 74 L74 74 L54 48 L34 74 Z" fill="url(#tpmcs-upper)" />
+        {/* right blade — royal blue, locked a step lower */}
+        <path d="M60 19 H100 L112 31 V45 H72 V87 H60 Z" fill="url(#tpmcs-blue)" />
+        {/* left blade — cyan, sits over the seam */}
+        <path d="M60 14 H20 L8 26 V40 H48 V82 H60 Z" fill="url(#tpmcs-cyan)" />
         <path
-          d="M14 74 L54 20 L74 20"
+          d="M20 14 H60 V40 H8"
           fill="none"
           stroke="url(#tpmcs-edge)"
-          strokeWidth="1.6"
+          strokeWidth="1.4"
           strokeLinecap="round"
-          opacity="0.9"
+          opacity="0.85"
         />
-      </g>
-
-      <g filter="url(#tpmcs-bloom)" opacity="0.95">
-        <path d="M36 92 L60 58 L84 92 L68 92 L60 79 L52 92 Z" fill="url(#tpmcs-lower)" />
       </g>
     </svg>
   );
