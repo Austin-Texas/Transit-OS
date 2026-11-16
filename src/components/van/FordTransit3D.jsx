@@ -79,11 +79,13 @@ function paintTag(sprite, text, alert) {
   texture.needsUpdate = true;
 }
 
-export default function FordTransit3D({ focus, warnings = [], status, className, onReady, onTip }) {
+export default function FordTransit3D({ focus, warnings = [], status, className, onReady, onTip, onPick }) {
   const hostRef = useRef(null);
   const api = useRef(null);
   const tipRef = useRef(onTip);
   tipRef.current = onTip;
+  const pickRef = useRef(onPick);
+  pickRef.current = onPick;
   const latest = useRef({ focus, warnings, status });
   latest.current = { focus, warnings, status };
 
@@ -110,7 +112,7 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
 
-    const { group: van, hotspots, padMaterial, padDotMaterial } = buildVanModel();
+    const { group: van, hotspots, padMaterial, padDotMaterial, padDot } = buildVanModel();
     scene.add(van);
 
     // Status callouts, as in the reference: one on the rear cabin, one on the
@@ -141,7 +143,10 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       cabinDot.material.color.set(cabinAlert ? RED : GREEN);
     };
 
+    let faulted = Boolean(latest.current.status?.tank_heater_fault);
+
     const applyHeat = (fault) => {
+      faulted = fault;
       padMaterial.color.set(fault ? 0xff2f2f : 0xff8a3d);
       padDotMaterial.color.set(fault ? 0xff2f2f : 0x00ff41);
     };
@@ -263,7 +268,10 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       if (wasDragging && moved < 8) {
         // A tap on the heat pad keeps its readout open, even on a phone.
         const object = hitTest(event);
-        if (object) tipRef.current?.(tipFor(object, event));
+        if (object) {
+          tipRef.current?.(tipFor(object, event));
+          pickRef.current?.(object.userData.hotspot);
+        }
         hovered = object;
       }
     };
@@ -327,6 +335,8 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       rearDot.scale.setScalar(1 + Math.sin(time * 2.4) * 0.18);
       cabinDot.scale.setScalar(1 + Math.sin(time * 2.4 + 1) * 0.18);
       padMaterial.opacity = 0.72 + Math.sin(time * 2) * 0.18;
+      // A faulted heat pad pulses, so the red dot is easy to find under the van.
+      padDot.scale.setScalar(faulted ? 1.5 + Math.abs(Math.sin(time * 3.4)) * 0.7 : 1);
 
       renderer.render(scene, camera);
       if (!reported) {

@@ -7,6 +7,7 @@ import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
 import ToggleRow from "@/components/dash/ToggleRow";
 import TankChart from "@/components/water/TankChart";
+import TankDiagnostics from "@/components/water/TankDiagnostics";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authed/water")({
@@ -96,6 +97,8 @@ function WaterPage() {
             The pump pressurises the fresh line. Switch it off while driving to avoid running dry.
           </p>
         </ModuleCard>
+
+        <TankDiagnostics status={status} />
 
         <ModuleCard title="Tank actions" icon={RefreshCw} className="lg:col-span-3">
           <div className="flex flex-wrap gap-2">
