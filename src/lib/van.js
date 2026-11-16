@@ -1,5 +1,5 @@
 // Imported online photo of the current Ford Transit van.
-export const VAN_IMAGE = "https://base44.app/api/apps/6afa3d27af32e7eb7d4b7f76/files/mp/public/6afa3d27af32e7eb7d4b7f76/9ab3d9b86_ford-transit-2026-online.jpg";
+export const VAN_IMAGE = "https://media.base44.com/images/public/6afa3d27af32e7eb7d4b7f76/9ab3d9b86_ford-transit-2026-online.jpg";
 // Still shown in 2D mode: the same 3D van, captured flat.
 export const VAN_STAGE_IMAGE = "https://base44.app/api/apps/6afa3d27af32e7eb7d4b7f76/files/mp/public/6afa3d27af32e7eb7d4b7f76/c143128cf_ford-transit-3d-view.png";
 export const CABIN_IMAGE = "https://media.base44.com/images/public/6afa3d27af32e7eb7d4b7f76/fc43d02d0_generated_image.png";
