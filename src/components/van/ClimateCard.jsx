@@ -15,7 +15,14 @@ function StepButton({ label, onClick, children }) {
   );
 }
 
-export default function ClimateCard({ temp, set, onAdjust }) {
+const MODES = [
+  { id: "auto", label: "Auto" },
+  { id: "eco", label: "Eco" },
+  { id: "boost", label: "Boost" },
+  { id: "off", label: "Off" },
+];
+
+export default function ClimateCard({ temp, set, mode = "auto", onAdjust, onChangeMode }) {
   return (
     <Panel id="card-climate" title="Climate" icon={Snowflake}>
       <div className="flex items-end justify-between gap-2">
@@ -30,7 +37,9 @@ export default function ClimateCard({ temp, set, onAdjust }) {
               <Plus className="h-3 w-3" strokeWidth={2.4} />
             </StepButton>
           </div>
-          <p className="mt-2 text-[10px] text-white/30">Auto · Eco</p>
+          <p className="mt-2 text-[10px] capitalize text-white/30">
+            {mode === "off" ? "System idle" : `${mode} mode`}
+          </p>
         </div>
         <ArcGauge value={set} min={50} max={90} size={100} color="#00f0ff">
           <p className="font-mono text-[21px] font-semibold leading-none text-white">
@@ -40,6 +49,26 @@ export default function ClimateCard({ temp, set, onAdjust }) {
           <p className="mt-1 text-[8.5px] uppercase tracking-[0.16em] text-neon/70">Cabin</p>
         </ArcGauge>
       </div>
+
+      {onChangeMode ? (
+        <div className="mt-2 grid grid-cols-4 gap-1 rounded-full border border-white/[0.06] bg-ink-950 p-1">
+          {MODES.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={mode === item.id}
+              onClick={() => onChangeMode(item.id)}
+              className={
+                mode === item.id
+                  ? "rounded-full bg-neon/15 py-1 text-[8.5px] font-semibold uppercase tracking-[0.1em] text-neon"
+                  : "rounded-full py-1 text-[8.5px] font-semibold uppercase tracking-[0.1em] text-white/35 transition hover:text-white/70"
+              }
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </Panel>
   );
 }

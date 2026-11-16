@@ -27,16 +27,22 @@ function AlertRow({ alert, onResolve }) {
   );
 }
 
-export default function AlertsPanel({ alerts, onResolve, onDiagnostics }) {
+export default function AlertsPanel({ alerts = [], warnings = [], onResolve, onDiagnostics }) {
   const active = openAlerts(alerts);
+  const total = active.length + warnings.length;
+
   return (
     <aside className="panel-surface flex flex-col rounded-2xl border border-neon/25 p-4">
       <header className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Bell className="h-3.5 w-3.5 text-alert/80" strokeWidth={1.8} />
-          <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">Alerts ({active.length})</h2>
+          <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">Alerts ({total})</h2>
         </div>
-        <span className={active.length ? "h-1.5 w-1.5 animate-soft-pulse rounded-full bg-alert" : "h-1.5 w-1.5 rounded-full bg-ok"} />
+        <span
+          className={
+            total ? "h-1.5 w-1.5 animate-soft-pulse rounded-full bg-alert" : "h-1.5 w-1.5 rounded-full bg-ok"
+          }
+        />
       </header>
 
       {active.length ? (
@@ -45,12 +51,31 @@ export default function AlertsPanel({ alerts, onResolve, onDiagnostics }) {
             <AlertRow key={alert.id} alert={alert} onResolve={onResolve} />
           ))}
         </ul>
-      ) : (
+      ) : null}
+
+      {warnings.length ? (
+        <ul className="mt-2 space-y-2">
+          {warnings.map((warning) => (
+            <li
+              key={warning.id}
+              className="rounded-xl border border-warn/35 bg-warn/[0.06] p-2.5"
+            >
+              <p className="truncate text-[11px] font-medium leading-snug text-warn">{warning.title}</p>
+              {warning.detail ? <p className="mt-0.5 truncate text-[9.5px] text-white/45">{warning.detail}</p> : null}
+              <p className="mt-1 text-[8.5px] uppercase tracking-[0.14em] text-white/25">
+                Live telemetry · {warning.side ?? "van"} side
+              </p>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {!total ? (
         <div className="mt-6 flex flex-1 flex-col items-center justify-center gap-2 py-6 text-center">
           <Check className="h-5 w-5 text-ok" strokeWidth={2} />
           <p className="text-[11px] text-white/45">No active alerts</p>
         </div>
-      )}
+      ) : null}
 
       <button
         type="button"

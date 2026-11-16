@@ -1,9 +1,13 @@
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Activity, BatteryMedium, Car, Check, Compass, Fuel, Gauge, TriangleAlert, Truck } from "lucide-react";
+import { Activity, BatteryMedium, Box, Car, Check, Compass, Fuel, Gauge, TriangleAlert, Truck } from "lucide-react";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
 import Metric from "@/components/dash/Metric";
+import VanStage from "@/components/dash/VanStage";
+import DiagramViews, { viewFocus } from "@/components/van/DiagramViews";
+import { siteWarnings } from "@/lib/siteWarnings";
 import { clockTime, miles, openAlerts } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
@@ -20,10 +24,22 @@ export const Route = createFileRoute("/_authed/vehicle")({
 function VehiclePage() {
   const van = useVanDashboard();
   const { status, alerts, diagnostics } = van;
+  const [focus, setFocus] = useState(null);
+
+  const warnings = useMemo(() => siteWarnings(status), [status]);
 
   if (!status) return <ModuleShell title="Vehicle" />;
 
   const faults = openAlerts(alerts).length;
+
+  const locate = (alert) =>
+    setFocus({
+      viewId: null,
+      id: alert.id,
+      side: alert.side,
+      zone: "side",
+      title: alert.title,
+    });
 
   return (
     <ModuleShell
@@ -43,6 +59,25 @@ function VehiclePage() {
       }
     >
       <div className="grid gap-3 lg:grid-cols-2">
+        <ModuleCard title="Diagnostics · live 3D view" icon={Box} className="lg:col-span-2">
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_250px]">
+            <VanStage
+              cabinTemp={status.cabin_temp ?? status.climate_temp}
+              vehicleName={status.vehicle_name}
+              trim={status.trim}
+              warnings={warnings}
+              focus={focus}
+              status={status}
+              onClearFocus={() => setFocus(null)}
+            />
+            <DiagramViews
+              active={focus?.viewId ?? "full"}
+              onSelect={(id) => setFocus(id === "full" ? null : viewFocus(id))}
+              status={status}
+            />
+          </div>
+        </ModuleCard>
+
         <ModuleCard title="Drivetrain" icon={Car}>
           <div className="grid grid-cols-2 gap-2">
             <Metric icon={Gauge} label="Odometer" value={`${miles(status.odometer)} mi`} />
@@ -131,13 +166,24 @@ function VehiclePage() {
                       {alert.occurred_at ? clockTime(alert.occurred_at) : "just now"}
                     </span>
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => van.resolveAlert(alert.id)}
-                    className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/70 transition hover:border-ok/50 hover:text-ok"
-                  >
-                    Resolve
-                  </button>
+                  <span className="flex shrink-0 items-center gap-1.5">
+                    {alert.side === "left" || alert.side === "right" ? (
+                      <button
+                        type="button"
+                        onClick={() => locate(alert)}
+                        className="rounded-full border border-neon/40 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-neon transition hover:bg-neon/15"
+                      >
+                        Locate
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => van.resolveAlert(alert.id)}
+                      className="rounded-full border border-white/15 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/70 transition hover:border-ok/50 hover:text-ok"
+                    >
+                      Resolve
+                    </button>
+                  </span>
                 </li>
               ))}
             </ul>

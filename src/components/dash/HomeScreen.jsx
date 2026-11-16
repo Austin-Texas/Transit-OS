@@ -1,137 +1,154 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Lightbulb } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import { openAlerts } from "@/lib/van";
 import { siteWarnings } from "@/lib/siteWarnings";
-import DashHeader from "./DashHeader";
-import SideRail from "./SideRail";
-import VanStage from "./VanStage";
-import LocksPanel from "./LocksPanel";
-import QuickDock from "./QuickDock";
-import StatStrip from "./StatStrip";
-import UtilitySummary from "./UtilitySummary";
-import WaterLevels from "./WaterLevels";
-import PhysicalToggle from "./PhysicalToggle";
-import ClimateControl from "./ClimateControl";
-import AlertStrip from "./AlertStrip";
+import { interpretCommand } from "@/lib/voiceCommands";
+import { cn } from "@/lib/utils";
+import HomeHeader from "./home/HomeHeader";
+import HomeDock from "./home/HomeDock";
+import VoiceControl from "./home/VoiceControl";
+import HardwareLink from "./home/HardwareLink";
+import VanPanel from "@/components/van/VanPanel";
+import ClimateCard from "@/components/van/ClimateCard";
+import WaterCard from "@/components/van/WaterCard";
+import LpgCard from "@/components/van/LpgCard";
+import PowerCard from "@/components/van/PowerCard";
+import CabinCard from "@/components/van/CabinCard";
+import VehicleCard from "@/components/van/VehicleCard";
+import AlertsPanel from "@/components/van/AlertsPanel";
+import QuickModes from "@/components/van/QuickModes";
+import DiagnosticsDialog from "@/components/van/DiagnosticsDialog";
 import VehicleAlertToast from "./VehicleAlertToast";
-
-const RANK = { critical: 0, warning: 1, info: 2 };
-
-// The heat pad alert has no zone on the record, but it lives under the van.
-const zoneOf = (item) =>
-  item.zone ?? (item.alert_key === "auto:tank_heater_fault" ? "underbody" : undefined);
 
 export default function HomeScreen() {
   const van = useVanDashboard();
-  const { status, alerts } = van;
-  const [focus, setFocus] = useState(null);
-  const seen = useRef(null);
+  const { status, alerts, diagnostics } = van;
+  const navigate = useNavigate();
+  const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
+  const [alertsPing, setAlertsPing] = useState(false);
 
   const warnings = useMemo(() => siteWarnings(status), [status]);
 
-  // The stage turns itself to whichever side raised a new problem.
   useEffect(() => {
-    // Sided faults turn the van; the heat pad also drops the camera underbody.
-    const sided = [
-      ...alerts.filter(
-        (alert) => alert.status !== "resolved" && (alert.side === "left" || alert.side === "right")
-      ),
-      ...warnings.filter((warning) => warning.zone !== "underbody" || warning.id === "tank_heater"),
-    ];
-
-    if (!sided.length) {
-      seen.current = new Set();
-      return;
-    }
-
-    if (seen.current === null) {
-      seen.current = new Set(sided.map((item) => item.id));
-      const urgent = [...sided].sort((a, b) => (RANK[a.severity] ?? 3) - (RANK[b.severity] ?? 3))[0];
-      setFocus({ id: urgent.id, side: urgent.side, zone: zoneOf(urgent), title: urgent.title });
-      return;
-    }
-
-    const fresh = sided.find((item) => !seen.current.has(item.id));
-    sided.forEach((item) => seen.current.add(item.id));
-    if (fresh) setFocus({ id: fresh.id, side: fresh.side, zone: zoneOf(fresh), title: fresh.title });
-  }, [alerts, warnings]);
-
-  // Once the fault is gone the van swings back to its open view.
-  useEffect(() => {
-    if (!focus?.id) return;
-    const stillThere =
-      alerts.some((alert) => alert.id === focus.id && alert.status !== "resolved") ||
-      warnings.some((warning) => warning.id === focus.id);
-    if (!stillThere) setFocus(null);
-  }, [alerts, warnings, focus]);
+    if (!alertsPing) return undefined;
+    const timer = setTimeout(() => setAlertsPing(false), 1800);
+    return () => clearTimeout(timer);
+  }, [alertsPing]);
 
   if (!status) {
     return (
-      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-2 bg-background px-6 text-center">
-        <div className="flex items-center gap-3 rounded-full border border-line bg-surface px-5 py-2.5">
-          <span className="h-1.5 w-1.5 animate-soft-pulse rounded-full bg-sys-blue" />
-          <span className="text-[10px] uppercase tracking-[0.22em] text-white/55">Waiting for van telemetry</span>
+      <div className="flex min-h-[100dvh] flex-col bg-background">
+        <HomeHeader status={null} offline={van.offline} />
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
+          <div className="flex items-center gap-3 rounded-full border border-line bg-surface px-5 py-2.5">
+            <span className="h-1.5 w-1.5 animate-soft-pulse rounded-full bg-sys-blue" />
+            <span className="text-[10px] uppercase tracking-[0.22em] text-white/55">Waiting for van telemetry</span>
+          </div>
+          <p className="max-w-sm text-[11px] leading-relaxed text-white/30">
+            No readings have arrived yet. Once your hub posts to the telemetry endpoint, live values appear here
+            automatically.
+          </p>
         </div>
-        <p className="max-w-sm text-[11px] leading-relaxed text-white/30">
-          No readings have arrived yet. Once your hub posts to the telemetry endpoint, live values appear here
-          automatically.
-        </p>
       </div>
     );
   }
 
-  const faultCount = openAlerts(alerts).length;
+  const active = openAlerts(alerts);
   const lightsOn = status.lights_on !== false;
-  const locate = (item) => setFocus({ id: item.id, side: item.side, zone: zoneOf(item), title: item.title });
+  const locked = status.locks_locked !== false;
+
+  // One place where a spoken command becomes the same change the buttons make.
+  const handleCommand = (text) => {
+    const { reply, action } = interpretCommand(text, { status, alerts, diagnostics });
+
+    if (action?.type === "diagnostics") setDiagnosticsOpen(true);
+    if (action?.type === "alerts") {
+      setAlertsPing(true);
+      document.getElementById("home-alerts")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    if (action?.type === "lights") van.update({ lights_on: action.value }).catch(console.error);
+    if (action?.type === "locks") van.update({ locks_locked: action.value }).catch(console.error);
+    if (action?.type === "pump") van.update({ water_pump_on: action.value }).catch(console.error);
+    if (action?.type === "mode") van.setMode(action.value).catch(console.error);
+    if (action?.type === "climate") {
+      van.update({ climate_set: action.value, climate_temp: action.value }).catch(console.error);
+    }
+    if (action?.type === "climateDelta") van.adjustClimate(action.value);
+
+    return reply;
+  };
 
   return (
-    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-background">
-      <DashHeader interiorTemp={status.climate_temp} />
-      <VehicleAlertToast alerts={alerts} warnings={warnings} onLocate={locate} />
+    <div className="relative flex min-h-[100dvh] flex-col bg-background">
+      <HomeHeader status={status} offline={van.offline} />
+      <VehicleAlertToast alerts={alerts} warnings={warnings} onLocate={() => navigate({ to: "/vehicle" })} />
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 py-2.5 lg:flex-row lg:overflow-hidden lg:px-4 lg:py-3">
-        <div className="hidden lg:block">
-          <SideRail />
+      <main className="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-3 px-3 pb-4 pt-3 sm:px-4">
+        <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(300px,352px)]">
+          <div className="flex min-w-0 flex-col gap-3">
+            <VanPanel status={status} offline={van.offline} className="h-[230px] sm:h-[300px] lg:h-[330px]" />
+
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <ClimateCard
+                temp={status.climate_temp ?? 72}
+                set={status.climate_set ?? 72}
+                mode={status.climate_mode}
+                onAdjust={van.adjustClimate}
+                onChangeMode={(mode) => van.update({ climate_mode: mode })}
+              />
+              <WaterCard status={status} />
+              <LpgCard percent={Math.round(Number(status.lpg_percent ?? 0))} gallons={Number(status.lpg_gallons ?? 0)} />
+              <PowerCard
+                percent={Math.round(Number(status.battery_percent ?? 0))}
+                voltage={Number(status.battery_voltage ?? 0)}
+                solar={Number(status.solar_w ?? 0)}
+                load={Number(status.load_w ?? 0)}
+              />
+              <CabinCard
+                temp={status.cabin_temp ?? status.climate_temp ?? 72}
+                photoUri={status.cabin_photo_uri}
+                lightsOn={lightsOn}
+                locksLocked={locked}
+                onLights={(value) => van.update({ lights_on: value })}
+                onLocks={(value) => van.update({ locks_locked: value })}
+              />
+              <VehicleCard
+                odometer={status.odometer}
+                alertCount={active.length + warnings.length}
+                topAlert={active[0]?.title ?? warnings[0]?.title}
+                onDiagnostics={() => setDiagnosticsOpen(true)}
+              />
+            </div>
+
+            <section className="panel-surface rounded-2xl border border-neon/25 px-4 py-3">
+              <QuickModes active={status.active_mode} onSelect={van.setMode} />
+            </section>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <div
+              id="home-alerts"
+              className={cn(
+                "rounded-2xl transition-shadow",
+                alertsPing && "ring-2 ring-alert/70 ring-offset-2 ring-offset-background"
+              )}
+            >
+              <AlertsPanel
+                alerts={alerts}
+                warnings={warnings}
+                onResolve={(alert) => van.resolveAlert(alert.id)}
+                onDiagnostics={() => setDiagnosticsOpen(true)}
+              />
+            </div>
+            <HardwareLink status={status} offline={van.offline} />
+          </div>
         </div>
+      </main>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-2.5 lg:min-h-0">
-          <VanStage
-            cabinTemp={status.cabin_temp ?? status.climate_temp}
-            vehicleName={status.vehicle_name}
-            trim={status.trim}
-            odometer={status.odometer}
-            warnings={warnings}
-            focus={focus}
-            status={status}
-            onClearFocus={() => setFocus(null)}
-          />
-          <UtilitySummary status={status} />
-          <StatStrip status={status} faultCount={faultCount} warnings={warnings} />
-        </div>
-
-        <aside className="flex w-full shrink-0 flex-col gap-2.5 lg:w-[308px] lg:overflow-y-auto lg:pr-0.5 xl:w-[336px]">
-          <AlertStrip alerts={alerts} onResolve={van.resolveAlert} onFocus={locate} />
-          <WaterLevels status={status} />
-          <PhysicalToggle
-            icon={Lightbulb}
-            label="Cabin lights"
-            sub={lightsOn ? `On · ${Math.round(status.light_level ?? 70)}% brightness` : "All zones off"}
-            checked={lightsOn}
-            onChange={(value) => van.update({ lights_on: value })}
-          />
-          <ClimateControl
-            temp={status.climate_temp}
-            set={status.climate_set ?? 72}
-            mode={status.climate_mode}
-            onChangeMode={(mode) => van.update({ climate_mode: mode })}
-            onAdjust={van.adjustClimate}
-          />
-          <LocksPanel locked={status.locks_locked} />
-        </aside>
-      </div>
-
-      <QuickDock />
+      <HomeDock />
+      <VoiceControl onSubmit={handleCommand} />
+      <DiagnosticsDialog open={diagnosticsOpen} onOpenChange={setDiagnosticsOpen} results={diagnostics} />
     </div>
   );
 }
