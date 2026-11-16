@@ -648,10 +648,10 @@ export function createStartupScene({ canvas, lowPower = false }) {
         [0, 0],
         [1.5, 0.3],
         [2.5, -0.35],
-        [4, 1.05],
-        [5.3, 2.45],
-        [6.5, 1.35],
-        [8, 0.5],
+        [4, 0.7],
+        [5.6, 1.3],
+        [6.9, 0.95],
+        [8, 0.55],
       ]),
       track(t, [
         [0, 1.25],
@@ -666,10 +666,10 @@ export function createStartupScene({ canvas, lowPower = false }) {
         [0, 6.3],
         [1.5, 4.5],
         [2.5, 4.25],
-        [4, 5.4],
-        [5.3, 4.95],
-        [6.5, 5.7],
-        [8, 5.2],
+        [4, 5.5],
+        [5.6, 5.18],
+        [6.9, 5.5],
+        [8, 5.25],
       ]),
     );
     cameraTarget.set(
@@ -755,7 +755,7 @@ export function createStartupScene({ canvas, lowPower = false }) {
     const settle = span(t, 5.35, 6.05);
     vanRoot.position.z = lerp(-3.6, -0.15, drive);
     vanRoot.position.y = Math.sin(settle * Math.PI) * 0.035 * (1 - settle) - (1 - drive) * 0.0;
-    vanRoot.rotation.y = -0.32 + Math.sin(t * 0.42) * 0.05 * span(t, 4.2, 6.5);
+    vanRoot.rotation.y = -0.32 + Math.sin(t * 0.3) * 0.022 * span(t, 4.2, 6.5);
     van.root.position.y = -Math.sin(settle * Math.PI * 1.4) * 0.03 * (1 - settle);
     van.wheels.forEach((wheel) => {
       wheel.rotation.z -= (1 - settle) * dt * 9 * drive;
