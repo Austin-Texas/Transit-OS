@@ -5,6 +5,7 @@ import useCameras from "@/hooks/useCameras";
 import ModuleCard from "@/components/dash/ModuleCard";
 import CameraFeed from "@/components/camera/CameraFeed";
 import CameraTile from "@/components/camera/CameraTile";
+import SurroundPanel from "./SurroundPanel";
 import { cn } from "@/lib/utils";
 
 // Live camera feeds, now part of Settings so the dashboard stays uncluttered.
@@ -47,6 +48,10 @@ export default function SettingsCameras({ className }) {
 
   return (
     <div id="cameras" ref={anchor} className={cn("grid gap-3 scroll-mt-4 lg:grid-cols-3", className)}>
+      <div className="lg:col-span-3">
+        <SurroundPanel cameras={cameras.items} />
+      </div>
+
       <ModuleCard
         title={selected.name}
         icon={Video}

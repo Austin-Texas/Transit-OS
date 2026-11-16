@@ -1,0 +1,85 @@
+{
+  "name": "SurroundClip",
+  "type": "object",
+  "properties": {
+    "recorded_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the 360\u00b0 surround clip was recorded."
+    },
+    "duration_s": {
+      "type": "number",
+      "description": "Clip length in seconds."
+    },
+    "file_uri": {
+      "type": "string",
+      "description": "Private storage URI of the recorded 360\u00b0 surround clip."
+    },
+    "camera_count": {
+      "type": "number",
+      "description": "How many camera stills were stitched into the surround view."
+    },
+    "size_kb": {
+      "type": "number",
+      "description": "Approximate clip size in kilobytes."
+    }
+  },
+  "required": [
+    "recorded_at",
+    "file_uri"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
