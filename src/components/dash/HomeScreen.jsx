@@ -9,6 +9,7 @@ import QuickDock from "./QuickDock";
 import StatStrip from "./StatStrip";
 import PhysicalToggle from "./PhysicalToggle";
 import ClimateControl from "./ClimateControl";
+import AlertStrip from "./AlertStrip";
 
 export default function HomeScreen() {
   const van = useVanDashboard();
@@ -42,6 +43,7 @@ export default function HomeScreen() {
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-2.5 lg:min-h-0 lg:gap-3 lg:overflow-y-auto">
+          <AlertStrip alerts={alerts} onResolve={van.resolveAlert} />
           <VanStage
             cabinTemp={status.cabin_temp}
             vehicleName={status.vehicle_name}

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { secrets } from "base44:runtime";
+import { syncAlerts } from "@/lib/alert-engine.server";
 
 const NUMERIC = [
   "battery_voltage",
@@ -110,7 +111,16 @@ export const Route = createFileRoute("/api/van-telemetry")({
           await base44.asServiceRole.entities.EnergyReading.create(reading);
         }
 
-        return Response.json({ ok: true, id: saved.id, updated: Object.keys(patch), history: hasHistory });
+        // Every reading re-runs the alert rules, so a critical value is flagged
+        // even when nobody has the dashboard open.
+        let alerts = null;
+        try {
+          alerts = await syncAlerts(base44.asServiceRole.entities);
+        } catch (error) {
+          console.error("alert sync failed", error);
+        }
+
+        return Response.json({ ok: true, id: saved.id, updated: Object.keys(patch), history: hasHistory, alerts });
       },
     },
   },

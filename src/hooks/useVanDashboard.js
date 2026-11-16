@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { buildDiagnostics } from "@/lib/van";
+import { syncVanAlerts } from "@/lib/server-fns";
 
 // Live dashboard state backed by the VanStatus and Alert records.
 export default function useVanDashboard() {
@@ -24,9 +25,40 @@ export default function useVanDashboard() {
     }
   }, []);
 
+  // Re-runs the alert rules against the latest readings and refreshes if a
+  // critical condition appeared or cleared.
+  const sync = useCallback(async () => {
+    try {
+      const result = await syncVanAlerts();
+      if (result?.raised || result?.resolved) await load();
+    } catch (error) {
+      console.error(error);
+    }
+  }, [load]);
+
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    sync();
+  }, [sync]);
+
+  // A camera stamping fresh motion raises its alert without waiting for a reload.
+  useEffect(() => {
+    let timer = null;
+    const unsubscribe = base44.entities.Camera.subscribe(() => {
+      if (timer) return;
+      timer = setTimeout(() => {
+        timer = null;
+        sync();
+      }, 1500);
+    });
+    return () => {
+      if (timer) clearTimeout(timer);
+      unsubscribe();
+    };
+  }, [sync]);
 
   // Live telemetry: the dashboard follows new readings as the van hub writes them.
   useEffect(() => {

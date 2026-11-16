@@ -41,6 +41,10 @@
       ],
       "default": "open",
       "description": "Whether the alert still needs attention."
+    },
+    "alert_key": {
+      "type": "string",
+      "description": "Rule that raised the alert, so the watcher keeps one open alert per condition and closes it when the reading recovers."
     }
   },
   "required": [
