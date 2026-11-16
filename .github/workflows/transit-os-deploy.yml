@@ -1,0 +1,73 @@
+name: Transit-OS Docker deployment (TPMCS pattern)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: transit-os-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 45
+    steps:
+      - name: Verify target host and Docker access
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(hostname -s)" = "app-host-01"
+          docker info >/dev/null
+      - uses: actions/checkout@v4
+      - name: Build Transit-OS Docker image
+        run: docker build --pull -t transit-os-web:${{ github.sha }} .
+      - name: Deploy with health check and rollback
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE="transit-os-web:${{ github.sha }}"
+          APP_DIR="/home/trad/apps/transit-os"
+          CONTAINER="transit-os-web"
+          PREVIOUS="transit-os-web-previous"
+          PORT=8091
+          mkdir -p "$APP_DIR"
+          docker image inspect "$IMAGE" >/dev/null
+          if docker container inspect "$PREVIOUS" >/dev/null 2>&1; then
+            echo "A previous rollback container exists; refusing to overwrite it."
+            exit 1
+          fi
+          if docker container inspect "$CONTAINER" >/dev/null 2>&1; then
+            docker rename "$CONTAINER" "$PREVIOUS"
+            docker stop "$PREVIOUS"
+          fi
+          rollback() {
+            docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
+            if docker container inspect "$PREVIOUS" >/dev/null 2>&1; then
+              docker rename "$PREVIOUS" "$CONTAINER"
+              docker start "$CONTAINER"
+            fi
+          }
+          trap rollback ERR
+          docker run -d --name "$CONTAINER" --restart unless-stopped \
+            -p "127.0.0.1:${PORT}:80" "$IMAGE"
+          healthy=0
+          for i in $(seq 1 40); do
+            if curl -fsS --max-time 5 "http://127.0.0.1:${PORT}/" -o /dev/null; then
+              healthy=1
+              break
+            fi
+            sleep 3
+          done
+          if [ "$healthy" -ne 1 ]; then
+            docker logs --tail 100 "$CONTAINER"
+            exit 1
+          fi
+          trap - ERR
+          docker rm -f "$PREVIOUS" >/dev/null 2>&1 || true
+          printf '%s\n' "$IMAGE" > "$APP_DIR/deployed-image.txt"
+          echo "Transit-OS HTTP origin responding on localhost:${PORT}"
