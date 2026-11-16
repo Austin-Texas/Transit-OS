@@ -41,7 +41,11 @@ export default function StartupSequence({ onDone }) {
   const stage = elapsed < BEATS[1] ? 0 : elapsed < BEATS[2] ? 1 : elapsed < BEATS[3] ? 2 : elapsed < BEATS[4] ? 3 : 4;
   const finished = STARTUP_CHECKS.every(item => settled(checks[item.id]));
   const ready = STARTUP_CHECKS.filter(item => settled(checks[item.id])).length;
-  // Real checks are tracked independently; the display eases in over time so\n  // fast checks never make the progress bar jump or disappear immediately.\n  const checkPercent = Math.round(ready / STARTUP_CHECKS.length * 100);\n  const animationPercent = Math.round(Math.min(1, Math.max(0, (elapsed - PROGRESS_START) / PROGRESS_DURATION)) * 100);\n  const progress = Math.min(checkPercent, animationPercent);
+  // Real checks are tracked independently; the display eases in over time so
+  // fast checks never make the progress bar jump or disappear immediately.
+  const checkPercent = Math.round(ready / STARTUP_CHECKS.length * 100);
+  const animationPercent = Math.round(Math.min(1, Math.max(0, (elapsed - PROGRESS_START) / PROGRESS_DURATION)) * 100);
+  const progress = Math.min(checkPercent, animationPercent);
   useEffect(() => {
     if (!completed.current && finished && elapsed >= MIN_DURATION) {
       completed.current = true;
