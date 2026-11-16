@@ -1,73 +1,114 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { STARTUP_EXIT_MS, STARTUP_TOTAL_MS } from "@/lib/startupStages";
-import StageBoot from "./StageBoot";
-import ReferenceFrames from "./ReferenceFrames";
+import { STARTUP_CHECKS, runStartupChecks } from "@/lib/startupReadiness";
+import "./StartupLive.css";
 
-// Only ONE visual source is displayed at a time. The previous WebGL layer
-// was visible beneath the artwork and produced the oversized ring/van.
+const MIN_VISUAL_MS = 5200;
+const EXIT_MS = 550;
+const initial = Object.fromEntries(STARTUP_CHECKS.map(check => [check.id, "pending"]));
+const isTerminal = status => ["ready", "offline", "simulated", "error"].includes(status);
+
 export default function StartupSequence({ onDone }) {
+  const [checks, setChecks] = useState(initial);
   const [elapsed, setElapsed] = useState(0);
   const [closing, setClosing] = useState(false);
-  const [gone, setGone] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
+  const checksRef = useRef(initial);
+  const startRef = useRef(0);
 
   useEffect(() => {
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-    setReducedMotion(reduced);
+    const controller = new AbortController();
     const oldOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const start = performance.now();
-    let interval;
-    if (!reduced) {
-      interval = window.setInterval(() => {
-        setElapsed(performance.now() - start);
-      }, 50);
-    }
-    const timer = window.setTimeout(() => setClosing(true), reduced ? 900 : STARTUP_TOTAL_MS);
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+    setReducedMotion(reduced);
+    startRef.current = performance.now();
+    const interval = window.setInterval(() => setElapsed(performance.now() - startRef.current), 60);
+    const update = (id, status) => {
+      if (controller.signal.aborted) return;
+      checksRef.current = { ...checksRef.current, [id]: status };
+      setChecks(checksRef.current);
+    };
+    runStartupChecks(update, controller.signal).catch(() => {
+      if (!controller.signal.aborted) update("application", "error");
+    });
     return () => {
+      controller.abort();
       window.clearInterval(interval);
-      window.clearTimeout(timer);
       document.body.style.overflow = oldOverflow;
     };
   }, []);
 
+  const requiredComplete = STARTUP_CHECKS.filter(check => check.required)
+    .every(check => isTerminal(checks[check.id]));
+  const optionalComplete = STARTUP_CHECKS.filter(check => !check.required)
+    .every(check => isTerminal(checks[check.id]));
+  const allComplete = requiredComplete && optionalComplete;
+  const minDuration = reducedMotion ? 1000 : MIN_VISUAL_MS;
+  const canExit = elapsed >= minDuration && allComplete;
   useEffect(() => {
-    if (!closing) return undefined;
-    const timer = window.setTimeout(() => {
-      setGone(true);
-      doneRef.current?.();
-    }, STARTUP_EXIT_MS);
+    if (!canExit || closing) return;
+    setClosing(true);
+  }, [canExit, closing]);
+
+  useEffect(() => {
+    if (!closing) return;
+    const timer = window.setTimeout(() => doneRef.current?.(), EXIT_MS);
     return () => window.clearTimeout(timer);
   }, [closing]);
 
-  if (gone) return null;
-  const booting = elapsed >= 6500;
+  const readyCount = STARTUP_CHECKS.filter(check => isTerminal(checks[check.id])).length;
+  const progress = Math.round((readyCount / STARTUP_CHECKS.length) * 100);
+  const stage = reducedMotion ? 3 : elapsed < 1300 ? 0 : elapsed < 2500 ? 1 : elapsed < 3900 ? 2 : 3;
+  const mode = useMemo(() => {
+    if (checks.controller === "ready" && checks.sensors === "ready") return "VEHICLE CONNECTED";
+    if (checks.controller === "simulated" || checks.sensors === "simulated") return "SIMULATION MODE";
+    return "WEB LAB · VEHICLE HARDWARE OFFLINE";
+  }, [checks.controller, checks.sensors]);
+
   return (
-    <motion.div
-      className="fixed inset-0 z-[130] overflow-hidden bg-[#010817]"
-      initial={false}
-      animate={{ opacity: closing ? 0 : 1 }}
-      transition={{ duration: STARTUP_EXIT_MS / 1000, ease: "easeInOut" }}
-    >
-      {reducedMotion ? (
-        <div className="absolute inset-0 grid place-items-center">
-          <img src="/branding/tpmcs-logo.svg" alt="TPMCS" className="h-36 w-auto" />
+    <motion.section className="transit-live" role="status" aria-label="TransitOS startup"
+      initial={false} animate={{ opacity: closing ? 0 : 1 }}
+      transition={{ duration: EXIT_MS / 1000 }}>
+      <div className="transit-live__halo" aria-hidden="true" />
+      <div className="transit-live__rays" aria-hidden="true" />
+      <div className="transit-live__ring transit-live__ring--outer" aria-hidden="true" />
+      <div className="transit-live__ring transit-live__ring--inner" aria-hidden="true" />
+      <div className="transit-live__scene">
+        <div className={"transit-live__brand transit-live__brand--stage-" + stage}>
+          <img src="/branding/tpmcs-logo.svg" alt="TPMCS original company logo" />
+          <strong>TPMCS</strong>
         </div>
-      ) : booting ? (
-        <StageBoot />
-      ) : (
-        <ReferenceFrames elapsed={elapsed} />
-      )}
-      <button
-        type="button"
-        onClick={() => setClosing(true)}
-        className="absolute bottom-5 right-5 z-20 rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.22em] text-white/45 backdrop-blur-xl transition hover:border-white/25 hover:text-white/80"
-      >
-        Skip intro
-      </button>
-    </motion.div>
+        <div className={"transit-live__product " + (stage >= 2 ? "transit-live__product--shown" : "")}>
+          <p>TPMCS PRESENTS</p>
+          <h1>Transit<span>OS</span></h1>
+          <small>INTELLIGENT VEHICLE OPERATING SYSTEM</small>
+        </div>
+        <div className={"transit-live__vehicle " + (stage >= 2 ? "transit-live__vehicle--shown" : "")} aria-hidden={stage < 2}>
+          <img src="/branding/transit-van.svg" alt="" />
+          <div className="transit-live__vehicle-shadow" />
+        </div>
+        <div className={"transit-live__diagnostics " + (stage === 3 ? "transit-live__diagnostics--shown" : "")}>
+          <h2>System Initialization</h2>
+          <div className="transit-live__checks">
+            {STARTUP_CHECKS.map(check => (
+              <div className="transit-live__check" key={check.id}>
+                <span>{check.label}</span>
+                <span className={"transit-live__state transit-live__state--" + checks[check.id]}>{checks[check.id]}</span>
+              </div>
+            ))}
+          </div>
+          <div className="transit-live__progress" aria-label={"Startup checks completed: " + progress + "%"}>
+            <span style={{ width: progress + "%" }} />
+          </div>
+          <div className="transit-live__mode">{mode}</div>
+          {!allComplete && <small>Checking application and available interfaces…</small>}
+        </div>
+      </div>
+      <div className="transit-live__footer">TPMCS · TRANSITOS · LIVE STARTUP</div>
+      <button type="button" className="transit-live__skip" onClick={() => setClosing(true)}>Skip intro</button>
+    </motion.section>
   );
 }
