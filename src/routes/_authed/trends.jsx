@@ -7,9 +7,19 @@ import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
 import ArrowPad from "@/components/trends/ArrowPad";
 import TrendChartPanel from "@/components/trends/TrendChartPanel";
+import { MAX_OFFSET_DAYS, METRIC_KEYS, METRICS, WINDOW_HOURS } from "@/lib/trends";
 import { cn } from "@/lib/utils";
 
+const DAY_HOURS = 24;
+
 export const Route = createFileRoute("/_authed/trends")({
+  validateSearch: (search) => {
+    const next = {};
+    if (typeof search.metric === "string" && METRIC_KEYS.includes(search.metric)) next.metric = search.metric;
+    const offset = Number(search.offset);
+    if (Number.isFinite(offset) && offset >= 1) next.offset = Math.min(MAX_OFFSET_DAYS, Math.trunc(offset));
+    return next;
+  },
   head: () => ({
     meta: [
       { title: "TransitOS — Trends" },
@@ -18,17 +28,6 @@ export const Route = createFileRoute("/_authed/trends")({
   }),
   component: TrendsPage,
 });
-
-const METRICS = [
-  { key: "battery", name: "House battery", short: "Battery", color: "#00f0ff" },
-  { key: "fresh", name: "Fresh water", short: "Fresh", color: "#00ff41" },
-  { key: "gray", name: "Gray water", short: "Gray", color: "#ff9500" },
-  { key: "black", name: "Black water", short: "Black", color: "#ff3b30" },
-];
-
-const WINDOW_HOURS = 168;
-const DAY_HOURS = 24;
-const MAX_OFFSET_DAYS = 28;
 
 const fmtDay = (date) => date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
@@ -43,8 +42,12 @@ function Stat({ label, value, tone }) {
 
 function TrendsPage() {
   const van = useVanDashboard();
-  const [metric, setMetric] = useState(0);
-  const [offsetDays, setOffsetDays] = useState(0);
+  // Opens on whatever was picked with the dashboard arrows.
+  const search = Route.useSearch();
+  const [metric, setMetric] = useState(() =>
+    Math.max(0, METRICS.findIndex((item) => item.key === search.metric))
+  );
+  const [offsetDays, setOffsetDays] = useState(search.offset ?? 0);
   const history = useEnergyReadings(WINDOW_HOURS, offsetDays * DAY_HOURS);
   const active = METRICS[metric];
 
