@@ -56,7 +56,7 @@ export default function ModuleShell({ title, subtitle, meta, status, voiceHandle
       </div>
 
       {/* Pinned to the viewport, so it never moves while the page scrolls. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-background via-background/92 to-transparent px-3 pb-2 pt-3 sm:px-4">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-ink-950/92 px-3 pb-2 pt-3 backdrop-blur-2xl sm:px-4">
         <AppDock status={status} onVoice={status ? () => setVoiceSignal((value) => value + 1) : undefined} />
       </div>
 

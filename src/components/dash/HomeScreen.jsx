@@ -135,7 +135,7 @@ export default function HomeScreen() {
         </div>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-background via-background/92 to-transparent px-3 pb-2 pt-3 sm:px-4">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-ink-950/92 px-3 pb-2 pt-3 backdrop-blur-2xl sm:px-4">
         <AppDock status={status} onVoice={() => setVoiceSignal((value) => value + 1)} />
       </div>
       <VoiceControl onSubmit={handleCommand} startSignal={voiceSignal} />
