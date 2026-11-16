@@ -24,6 +24,8 @@ const BROWSER_PREBUNDLE = [
 ];
 
 export default defineConfig({
+  // Only the production hostname is allowed when served by Vite preview behind Cloudflare.
+  preview: { allowedHosts: ["transit.hastenload.com"] },
   optimizeDeps: { include: [...PREBUNDLE, ...BROWSER_PREBUNDLE] },
   environments: {
     ssr: {
