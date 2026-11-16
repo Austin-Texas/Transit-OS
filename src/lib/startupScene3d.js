@@ -589,6 +589,7 @@ export function createStartupScene({ canvas, lowPower = false }) {
   vanRoot.add(van.root);
   vanRoot.rotation.y = -0.32;
   vanRoot.position.set(0, 0, -3.6);
+  vanRoot.scale.setScalar(1.18);
   scene.add(vanRoot);
 
   // mirrored copy for the reflective floor
@@ -699,7 +700,10 @@ export function createStartupScene({ canvas, lowPower = false }) {
     logoInner.traverse((object) => {
       if (object.isMesh) object.material.opacity = 1 - vanish;
     });
-    logoGlow.material.opacity = (0.16 + emerge * 0.3) * (1 - vanish);
+    // glow swells as the mark settles and during the handover to the reveal
+    const glowPulse = Math.max(0, 1 - Math.abs(t - 1.9) / 1.0);
+    logoGlow.material.opacity = (0.34 + emerge * 0.46 + glowPulse * 0.42) * (1 - vanish);
+    logoGlow.scale.setScalar(1 + glowPulse * 0.3 + lift * 0.2);
 
     wordmarkBelow.material.opacity = span(t, 1.35, 2.15) * (1 - span(t, 2.45, 2.8));
     wordmarkSide.material.opacity = span(t, 2.6, 3.15) * (1 - vanish);
