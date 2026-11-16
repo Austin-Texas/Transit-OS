@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 // The microphone on the dashboard: listens, shows what it heard, runs the
 // command and reports back what TransitOS did.
-export default function VoiceControl({ onSubmit }) {
+export default function VoiceControl({ onSubmit, startSignal = 0 }) {
   const [heard, setHeard] = useState("");
   const [reply, setReply] = useState(null);
   const [typed, setTyped] = useState("");
@@ -32,6 +32,14 @@ export default function VoiceControl({ onSubmit }) {
     if (speech.error) setReply(null);
   }, [speech.error]);
 
+  // The Voice chip in the dock opens this same panel.
+  useEffect(() => {
+    if (!startSignal) return;
+    setHeard("");
+    setReply(null);
+    speech.start();
+  }, [startSignal, speech.start]);
+
   // Replies are read back aloud, so a command can be given and confirmed
   // without looking at the screen.
   useEffect(() => {
@@ -47,7 +55,7 @@ export default function VoiceControl({ onSubmit }) {
   const panelOpen = speech.listening || Boolean(heard) || Boolean(reply) || Boolean(speech.error);
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-[96px] z-40 flex flex-col items-end gap-2 px-3 sm:bottom-[104px] sm:px-4">
+    <div className="pointer-events-none fixed inset-x-0 bottom-[150px] z-40 flex flex-col items-end gap-2 px-3 sm:bottom-[158px] sm:px-4">
       {panelOpen ? (
         <div className="glass pointer-events-auto w-full max-w-[350px] overflow-hidden rounded-[24px]">
           <header className="flex items-center gap-2 border-b border-white/[0.08] px-4 py-2.5">

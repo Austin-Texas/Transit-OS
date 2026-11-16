@@ -6,7 +6,7 @@ import { siteWarnings } from "@/lib/siteWarnings";
 import useVanVoice from "@/hooks/useVanVoice";
 import { cn } from "@/lib/utils";
 import HomeHeader from "./home/HomeHeader";
-import HomeDock from "./home/HomeDock";
+import AppDock from "@/components/dash/AppDock";
 import VoiceControl from "./home/VoiceControl";
 import HardwareLink from "./home/HardwareLink";
 import VanPanel from "@/components/van/VanPanel";
@@ -17,7 +17,6 @@ import PowerCard from "@/components/van/PowerCard";
 import CabinCard from "@/components/van/CabinCard";
 import VehicleCard from "@/components/van/VehicleCard";
 import AlertsPanel from "@/components/van/AlertsPanel";
-import QuickModes from "@/components/van/QuickModes";
 import DiagnosticsDialog from "@/components/van/DiagnosticsDialog";
 import VehicleAlertToast from "./VehicleAlertToast";
 
@@ -27,6 +26,7 @@ export default function HomeScreen() {
   const navigate = useNavigate();
   const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
   const [alertsPing, setAlertsPing] = useState(false);
+  const [voiceSignal, setVoiceSignal] = useState(0);
 
   const warnings = useMemo(() => siteWarnings(status), [status]);
 
@@ -113,10 +113,6 @@ export default function HomeScreen() {
                 onDiagnostics={() => setDiagnosticsOpen(true)}
               />
             </div>
-
-            <section className="glass rounded-[26px] px-5 py-4">
-              <QuickModes active={status.active_mode} onSelect={van.setMode} />
-            </section>
           </div>
 
           <div className="flex flex-col gap-4 lg:sticky lg:top-[92px] lg:self-start">
@@ -139,8 +135,10 @@ export default function HomeScreen() {
         </div>
       </main>
 
-      <HomeDock />
-      <VoiceControl onSubmit={handleCommand} />
+      <div className="sticky bottom-0 z-30 px-3 pb-3 pt-2 sm:px-4">
+        <AppDock status={status} onVoice={() => setVoiceSignal((value) => value + 1)} />
+      </div>
+      <VoiceControl onSubmit={handleCommand} startSignal={voiceSignal} />
       <DiagnosticsDialog open={diagnosticsOpen} onOpenChange={setDiagnosticsOpen} results={diagnostics} />
     </div>
   );

@@ -1,8 +1,33 @@
+import { useState } from "react";
+import { base44 } from "@/api/base44Client";
 import DashHeader from "./DashHeader";
 import SideRail from "./SideRail";
-import QuickDock from "./QuickDock";
+import AppDock from "./AppDock";
+import VoiceControl from "./home/VoiceControl";
+import useVanVoice from "@/hooks/useVanVoice";
 
-export default function ModuleShell({ title, subtitle, meta, status, children }) {
+export default function ModuleShell({ title, subtitle, meta, status, voiceHandler, children }) {
+  const [voiceSignal, setVoiceSignal] = useState(0);
+
+  // Pages that bring their own richer voice handler (diagnostics) pass it in;
+  // every other screen gets one that reads and writes through the van record.
+  const fallbackVoice = useVanVoice({
+    status,
+    alerts: [],
+    diagnostics: [],
+    update: (patch) => (status?.id ? base44.entities.VanStatus.update(status.id, patch) : Promise.resolve()),
+    setMode: (mode) =>
+      status?.id ? base44.entities.VanStatus.update(status.id, { active_mode: mode }) : Promise.resolve(),
+    adjustClimate: (delta) => {
+      const next = Math.min(90, Math.max(50, Number(status?.climate_set ?? 72) + delta));
+      return status?.id
+        ? base44.entities.VanStatus.update(status.id, { climate_set: next, climate_temp: next })
+        : Promise.resolve();
+    },
+  });
+
+  const handleCommand = voiceHandler ?? fallbackVoice;
+
   return (
     <div className="flex h-[100dvh] flex-col overflow-hidden">
       <DashHeader interiorTemp={status?.climate_temp ?? 72} />
@@ -30,7 +55,11 @@ export default function ModuleShell({ title, subtitle, meta, status, children })
         </div>
       </div>
 
-      <QuickDock />
+      <div className="shrink-0 px-3 pb-2 pt-2">
+        <AppDock status={status} onVoice={status ? () => setVoiceSignal((value) => value + 1) : undefined} />
+      </div>
+
+      {status ? <VoiceControl onSubmit={handleCommand} startSignal={voiceSignal} /> : null}
     </div>
   );
 }

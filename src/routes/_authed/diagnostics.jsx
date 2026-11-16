@@ -17,7 +17,6 @@ import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
 import Metric from "@/components/dash/Metric";
 import VanStage from "@/components/dash/VanStage";
-import VoiceControl from "@/components/dash/home/VoiceControl";
 import useVanVoice from "@/hooks/useVanVoice";
 import DiagramViews, { viewFocus } from "@/components/van/DiagramViews";
 import { siteWarnings } from "@/lib/siteWarnings";
@@ -70,6 +69,7 @@ function DiagnosticsPage() {
     <>
       <ModuleShell
       title="Diagnostics"
+      voiceHandler={handleCommand}
       subtitle={`${status.vehicle_name} · ${status.trim}`}
       status={status}
       meta={
@@ -219,8 +219,6 @@ function DiagnosticsPage() {
         </ModuleCard>
       </div>
       </ModuleShell>
-
-      <VoiceControl onSubmit={handleCommand} />
     </>
   );
 }
