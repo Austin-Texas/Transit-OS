@@ -35,17 +35,33 @@ export function evaluateAlertConditions(status, cameras = [], now = Date.now()) 
   }
 
   const water = num(status.fresh_water);
-  if (water !== null && Number.isFinite(water) && water < 15) {
-    conditions.push({
-      key: `${PREFIX}fresh_water_low`,
-      severity: "warning",
-      title: "Fresh water low",
-      detail: `${round(water)}% left · refill before the next stop`,
-    });
+  if (water !== null && Number.isFinite(water)) {
+    if (water <= 5) {
+      conditions.push({
+        key: `${PREFIX}fresh_water_critical`,
+        severity: "critical",
+        title: "Fresh water critical",
+        detail: `${round(water)}% left · refill now`,
+      });
+    } else if (water < 15) {
+      conditions.push({
+        key: `${PREFIX}fresh_water_low`,
+        severity: "warning",
+        title: "Fresh water low",
+        detail: `${round(water)}% left · refill before the next stop`,
+      });
+    }
   }
 
   const gray = num(status.gray_water);
-  if (gray !== null && Number.isFinite(gray) && gray > 85) {
+  if (gray !== null && Number.isFinite(gray) && gray >= 95) {
+    conditions.push({
+      key: `${PREFIX}gray_water_critical`,
+      severity: "critical",
+      title: "Gray tank critical",
+      detail: `${round(gray)}% full · drain it now`,
+    });
+  } else if (gray !== null && Number.isFinite(gray) && gray > 85) {
     conditions.push({
       key: `${PREFIX}gray_water_full`,
       severity: "warning",
@@ -55,7 +71,14 @@ export function evaluateAlertConditions(status, cameras = [], now = Date.now()) 
   }
 
   const black = num(status.black_water);
-  if (black !== null && Number.isFinite(black) && black > 85) {
+  if (black !== null && Number.isFinite(black) && black >= 95) {
+    conditions.push({
+      key: `${PREFIX}black_water_critical`,
+      severity: "critical",
+      title: "Black tank critical",
+      detail: `${round(black)}% full · empty it now`,
+    });
+  } else if (black !== null && Number.isFinite(black) && black > 85) {
     conditions.push({
       key: `${PREFIX}black_water_full`,
       severity: "warning",
