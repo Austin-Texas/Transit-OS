@@ -24,6 +24,8 @@ const BROWSER_PREBUNDLE = [
 ];
 
 export default defineConfig({
+  // Permit only the production hostname through Cloudflare; do not disable host checks.
+  preview: { allowedHosts: ["transit.hastenload.com"] },
   optimizeDeps: { include: [...PREBUNDLE, ...BROWSER_PREBUNDLE] },
   environments: {
     ssr: {
