@@ -102,3 +102,11 @@
  .tp-cinema--4 .tp-cinema__init-panel{width:90vw}
  .tp-cinema--4 .tp-cinema__checks{grid-template-columns:1fr 1fr}
 }
+
+/* Longer, smoother storyboard transitions and progress reveal. */
+.tp-cinema__brand,.tp-cinema__presentation,.tp-cinema__initialize{transition:opacity 1.15s cubic-bezier(.22,1,.36,1),filter 1.15s ease,translate 1.25s cubic-bezier(.22,1,.36,1)}
+.tp-cinema__company,.tp-cinema__presentation p{transition:opacity 1.05s ease}
+.tp-cinema__progress-track>div{transition:width .22s linear;will-change:width}
+.tp-cinema__init-panel{animation:tp-cinema-panel-breathe 3.5s ease-in-out infinite alternate}
+@keyframes tp-cinema-panel-breathe{from{box-shadow:inset 0 1px 0 #91eaff33,0 12px 50px #0007,0 0 22px #0073e630}to{box-shadow:inset 0 1px 0 #91eaff55,0 12px 50px #0007,0 0 43px #00aaff55}}
+@media(prefers-reduced-motion:reduce){.tp-cinema__init-panel{animation:none!important}}
