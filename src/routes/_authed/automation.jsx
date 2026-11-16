@@ -7,6 +7,7 @@ import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
 import AutomationRule from "@/components/automation/AutomationRule";
 import AutomationForm from "@/components/automation/AutomationForm";
+import ImportedAutomationPlans from "@/components/platform/ImportedAutomationPlans";
 import { MODES } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
@@ -105,6 +106,8 @@ function AutomationPage() {
           <AutomationForm editing={editing} onSubmit={submit} onCancel={() => setEditingId(null)} />
         </ModuleCard>
       </div>
+
+      <ImportedAutomationPlans activeRules={automations.items} />
 
       {status ? (
         <div className="grid gap-3 lg:grid-cols-2">
