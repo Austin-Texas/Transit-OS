@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { STAGES, STARTUP_EXIT_MS, STARTUP_TOTAL_MS } from "@/lib/startupStages";
-import StartupPoster from "./StartupPoster";
 import StageBoot from "./StageBoot";
+import ReferenceFrames from "./ReferenceFrames";
 
-// The cinematic startup: the brand frame builds up beat by beat, then the
-// initialization interface, then a fade into the dashboard.
+// The cinematic startup: the approved nine-frame artwork plays the intro, then
+// the initialization interface, then a fade into the dashboard.
 export default function StartupSequence({ onDone }) {
   const [phase, setPhase] = useState(0);
-  const [mode, setMode] = useState("poster");
   const [closing, setClosing] = useState(false);
   const [gone, setGone] = useState(false);
   const doneRef = useRef(onDone);
@@ -20,8 +19,6 @@ export default function StartupSequence({ onDone }) {
     document.body.style.overflow = "hidden";
 
     if (reduced) {
-      setMode("static");
-      setPhase(3);
       const timer = setTimeout(() => setClosing(true), 900);
       return () => {
         clearTimeout(timer);
@@ -54,33 +51,29 @@ export default function StartupSequence({ onDone }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-[130] overflow-hidden bg-[#03080f]"
+      className="fixed inset-0 z-[130] overflow-hidden bg-[#01040d]"
       animate={{ opacity: closing ? 0 : 1 }}
       transition={{ duration: STARTUP_EXIT_MS / 1000, ease: "easeInOut" }}
     >
-      <StartupPoster phase={mode === "static" ? 3 : phase} />
+      {phase < 4 ? <ReferenceFrames /> : null}
 
-      {mode !== "static" ? (
-        <>
-          <motion.div
-            className="absolute inset-0 bg-[#03080f]/94"
-            initial={false}
-            animate={{ opacity: phase >= 4 ? 1 : 0 }}
-            transition={{ duration: 0.6 }}
-            style={{ pointerEvents: phase >= 4 ? "auto" : "none" }}
-          >
-            {phase >= 4 ? <StageBoot /> : null}
-          </motion.div>
+      <motion.div
+        className="absolute inset-0 bg-[#01040d]/92"
+        initial={false}
+        animate={{ opacity: phase >= 4 ? 1 : 0 }}
+        transition={{ duration: 0.6 }}
+        style={{ pointerEvents: phase >= 4 ? "auto" : "none" }}
+      >
+        {phase >= 4 ? <StageBoot /> : null}
+      </motion.div>
 
-          <button
-            type="button"
-            onClick={() => setClosing(true)}
-            className="absolute bottom-5 right-5 z-20 rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.22em] text-white/45 backdrop-blur-xl transition hover:border-white/25 hover:text-white/80"
-          >
-            Skip intro
-          </button>
-        </>
-      ) : null}
+      <button
+        type="button"
+        onClick={() => setClosing(true)}
+        className="absolute bottom-5 right-5 z-20 rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.22em] text-white/45 backdrop-blur-xl transition hover:border-white/25 hover:text-white/80"
+      >
+        Skip intro
+      </button>
     </motion.div>
   );
 }
