@@ -1,5 +1,15 @@
 # AGENTS.md
 
+## TransitOS owner workflow
+
+This is the Ford-TrainstOs / TransitOS project. The preferred implementation is Base44 app `6afa3d27af32e7eb7d4b7f76`. Read `document.md` and `TransitOS_Master_Project_Prompt.md` for the complete current handover and owner policy.
+
+- Recheck current Base44 status/revision and relevant source before code edits, documentation finalization or GitHub writes. Preserve newer owner work; GitHub is a reviewed snapshot, not automatic synchronization.
+- Keep the preferred dashboard layout and style. Reuse existing controls/records and stable identities; add missing capabilities without duplicate active pages, devices or rules.
+- At the end of a new work batch ask: "Are you satisfied with the result? Should I push to GitHub and update document.md?" No means continue. Yes authorizes finalizing that reviewed batch, synchronizing both full master documents, and pushing only agreed changes to Austin-Texas/TransitOS, main. Do not ask again for the same approved action or create duplicate commits for an already finalized batch.
+- Recheck repository visibility before publication. Exclude live entity rows, credentials, account information, private media and generated output from source exports. Do not change visibility or delete old apps without a separate instruction.
+- Distinguish implemented prototype functions, simulations, integration plans and commissioned hardware. Never turn simulated confirmations into physical-control claims.
+
 ## Project Context
 
 This is a Base44 app repository built with **TanStack Start** (React 19, plain JavaScript — no TypeScript): file-based routes, server functions and server routes, server-side rendering by default. Treat it as user-owned application code, keep changes focused on the user's request, and preserve the conventions below.
