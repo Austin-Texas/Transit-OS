@@ -21,6 +21,7 @@ jobs:
           set -euo pipefail
           test "$(hostname -s)" = "app-host-01"
           docker info >/dev/null
+          docker network inspect trade-app_default >/dev/null
       - uses: actions/checkout@v4
       - name: Require confirmed standalone-runtime readiness
         shell: bash
@@ -61,6 +62,7 @@ jobs:
           }
           trap rollback ERR
           docker run -d --name "$CONTAINER" --restart unless-stopped \
+            --network trade-app_default \
             -p "127.0.0.1:${PORT}:80" "$IMAGE"
           healthy=0
           for i in $(seq 1 40); do
