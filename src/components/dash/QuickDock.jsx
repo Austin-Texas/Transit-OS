@@ -1,6 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { Activity, Archive, Camera, DoorOpen, Droplets, Lightbulb, Snowflake, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
+import QuickJumps from "./QuickJumps";
 
 const DOCK = [
   { id: "doors", label: "Doors", icon: DoorOpen, to: "/security" },
@@ -18,6 +19,7 @@ export default function QuickDock() {
 
   return (
     <div className="shrink-0 px-3 pb-1 pt-2">
+      <QuickJumps />
       <div className="flex items-stretch justify-between gap-1 rounded-2xl border border-line/80 bg-surface px-2 py-1.5">
         {DOCK.map(({ id, label, icon: Icon, to }) => (
           <Link
