@@ -1,24 +1,41 @@
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function Panel({ id, title, icon: Icon, action, children, className }) {
+// Shared translucent card surface: every dashboard module sits on it.
+export default function Panel({
+  id,
+  title,
+  icon: Icon,
+  action,
+  children,
+  className,
+  accent = "text-ios-teal",
+}) {
   return (
     <section
       id={id}
       className={cn(
-        "panel-surface relative overflow-hidden rounded-2xl border border-neon/25 p-4 shadow-[0_0_34px_-24px_rgba(0,240,255,1)] transition-colors duration-300 hover:border-neon/45",
+        "glass relative overflow-hidden rounded-[26px] p-5 transition duration-300 ease-out hover:-translate-y-0.5 hover:bg-white/[0.09]",
         className
       )}
     >
-      <span className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-neon/60 to-transparent" />
       <header className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
-          {Icon ? <Icon className="h-3.5 w-3.5 shrink-0 text-neon/85" strokeWidth={1.75} /> : null}
-          <h2 className="truncate text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">{title}</h2>
+        <div className="flex min-w-0 items-center gap-2.5">
+          {Icon ? (
+            <span
+              className={cn(
+                "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 ring-1 ring-inset ring-white/10",
+                accent
+              )}
+            >
+              <Icon className="h-4 w-4" strokeWidth={1.9} />
+            </span>
+          ) : null}
+          <h2 className="truncate text-[13px] font-semibold tracking-tight text-white">{title}</h2>
         </div>
-        {action ?? <ChevronRight className="h-3.5 w-3.5 shrink-0 text-white/25" strokeWidth={2} />}
+        {action ?? <ChevronRight className="h-4 w-4 shrink-0 text-white/25" strokeWidth={2} />}
       </header>
-      <div className="mt-3">{children}</div>
+      <div className="mt-4">{children}</div>
     </section>
   );
 }

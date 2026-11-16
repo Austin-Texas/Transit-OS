@@ -1,27 +1,32 @@
 import { Zap } from "lucide-react";
 import Panel from "./Panel";
 import ArcGauge from "./ArcGauge";
-import { cn } from "@/lib/utils";
 
 export default function PowerCard({ percent = 0, voltage, solar = 0, load = 0 }) {
   const charging = Number(solar) > Number(load);
+  const color = percent < 30 ? "#ff375f" : "#30d158";
 
   return (
-    <Panel id="card-power" title="Power" icon={Zap}>
-      <div className="flex items-end justify-between gap-2">
-        <div className="pb-3">
-          <p className="font-mono text-[12px] text-ok">{Number(voltage ?? 0).toFixed(1)} V</p>
-          <p className="mt-0.5 text-[9.5px] uppercase tracking-[0.12em] text-white/35">House bank</p>
-          <p className={cn("mt-2 text-[10px]", charging ? "text-ok" : "text-warn")}>
-            {charging ? "Charging" : "On battery"} · {Math.round(solar)} W solar
+    <Panel id="card-power" title="Power" icon={Zap} accent="text-ios-green">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[22px] font-semibold leading-none tracking-tight text-white">
+            {Number(voltage ?? 0).toFixed(1)}
+            <span className="ml-1 text-[13px] font-medium text-white/40">V</span>
           </p>
-          <p className="mt-0.5 text-[9.5px] uppercase tracking-[0.12em] text-white/25">
-            {Math.round(load)} W load
+          <p className="mt-1.5 text-[12px] font-medium text-white/45">House bank</p>
+          <p className={charging ? "mt-2.5 text-[12px] font-medium text-ios-green" : "mt-2.5 text-[12px] font-medium text-ios-orange"}>
+            {charging ? "Charging" : "On battery"} · {Math.round(solar)} W
           </p>
+          <p className="mt-0.5 text-[12px] text-white/35">{Math.round(load)} W load</p>
         </div>
-        <ArcGauge value={percent} size={100} color={percent < 30 ? "#ff3b30" : "#00ff41"}>
-          <p className="font-mono text-[21px] font-semibold leading-none text-white">{percent}%</p>
-          <p className="mt-1 text-[8.5px] uppercase tracking-[0.16em] text-ok/70">Battery</p>
+
+        <ArcGauge value={percent} size={104} thickness={7} color={color}>
+          <p className="text-[26px] font-semibold leading-none tracking-tight text-white">
+            {percent}
+            <span className="text-[13px] font-medium text-white/40">%</span>
+          </p>
+          <p className="mt-1.5 text-[11px] font-medium text-white/40">Battery</p>
         </ArcGauge>
       </div>
     </Panel>

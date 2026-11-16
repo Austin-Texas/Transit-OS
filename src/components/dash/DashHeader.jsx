@@ -19,23 +19,23 @@ export default function DashHeader({ interiorTemp }) {
     : "--:--";
 
   return (
-    <header className="flex h-[56px] shrink-0 items-center justify-between border-b border-line/70 px-4">
+    <header className="flex h-[60px] shrink-0 items-center justify-between border-b border-white/[0.08] bg-black/20 px-4 backdrop-blur-xl">
       <div className="flex items-center gap-2.5">
-        <div className="grid h-8 w-8 place-items-center rounded-[10px] bg-sys-blue/15 ring-1 ring-sys-blue/50">
-          <Car className="h-4 w-4 text-sys-blue" strokeWidth={1.8} />
+        <div className="grid h-9 w-9 place-items-center rounded-[13px] bg-gradient-to-br from-ios-blue to-ios-indigo text-white shadow-[0_10px_22px_-12px_rgba(10,132,255,0.9)]">
+          <Car className="h-4 w-4" strokeWidth={2} />
         </div>
-        <span className="text-[15px] font-semibold tracking-tight text-white">
-          Transit<span className="text-sys-blue">OS</span>
+        <span className="text-[16px] font-semibold tracking-tight text-white">
+          Transit<span className="text-ios-teal">OS</span>
         </span>
       </div>
 
-      <div className="flex items-center gap-4 text-white/65">
+      <div className="flex items-center gap-4 text-white/60">
         <Wifi className="h-4 w-4" strokeWidth={1.9} />
         <Bluetooth className="h-4 w-4" strokeWidth={1.9} />
-        <span className="font-mono text-[12px] tabular-nums text-white/85">{time}</span>
+        <span className="text-[12.5px] font-medium tabular-nums text-white/85">{time}</span>
         <span className="flex items-center gap-1.5">
           <Thermometer className="h-4 w-4" strokeWidth={1.9} />
-          <span className="font-mono text-[12px] text-white/85">{Math.round(interiorTemp)}°F</span>
+          <span className="text-[12.5px] font-medium text-white/85">{Math.round(interiorTemp)}°F</span>
         </span>
       </div>
     </header>

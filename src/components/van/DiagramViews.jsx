@@ -93,23 +93,21 @@ export default function DiagramViews({ active = "full", onSelect, status }) {
                 onClick={() => onSelect(view.id)}
                 aria-pressed={isActive}
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-xl border px-2.5 py-2 text-left transition-colors",
+                  "flex w-full items-center gap-2.5 rounded-2xl px-3 py-2.5 text-left ring-1 ring-inset transition duration-200",
                   isActive
-                    ? "border-neon/60 bg-neon/10 text-white"
-                    : "border-line/70 bg-surface text-white/55 hover:border-neon/30 hover:text-white/85"
+                    ? "bg-white/[0.14] text-white ring-white/20"
+                    : "bg-white/[0.04] text-white/60 ring-white/[0.07] hover:bg-white/[0.08] hover:text-white/90"
                 )}
               >
                 <span
                   className={cn(
-                    "h-6 w-6 shrink-0 rounded-md border",
-                    isActive ? "border-neon/60 bg-neon/20" : "border-white/10 bg-white/[0.03]"
+                    "h-6 w-6 shrink-0 rounded-full",
+                    isActive ? "bg-white" : "bg-white/10 ring-1 ring-inset ring-white/10"
                   )}
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[10.5px] font-semibold leading-tight">{view.label}</span>
-                  <span className="block truncate text-[8.5px] uppercase tracking-[0.1em] text-white/30">
-                    {view.hint}
-                  </span>
+                  <span className="block truncate text-[12px] font-semibold leading-tight">{view.label}</span>
+                  <span className="block truncate text-[11px] text-white/35">{view.hint}</span>
                 </span>
               </button>
             </li>
@@ -117,11 +115,11 @@ export default function DiagramViews({ active = "full", onSelect, status }) {
         })}
       </ul>
 
-      <dl className="rounded-xl border border-line/70 bg-surface-raised px-2.5 py-2">
+      <dl className="rounded-2xl bg-white/[0.04] px-3 py-2 ring-1 ring-inset ring-white/[0.07]">
         {readingsFor(active, status).map(([label, value]) => (
-          <div key={label} className="flex items-center justify-between gap-2 border-b border-white/[0.05] py-1 last:border-0">
-            <dt className="truncate text-[8.5px] uppercase tracking-[0.12em] text-white/30">{label}</dt>
-            <dd className="shrink-0 font-mono text-[10px] text-white/80">{value}</dd>
+          <div key={label} className="flex items-center justify-between gap-2 border-b border-white/[0.06] py-1.5 last:border-0">
+            <dt className="truncate text-[11.5px] font-medium text-white/40">{label}</dt>
+            <dd className="shrink-0 text-[11.5px] font-semibold text-white/85">{value}</dd>
           </div>
         ))}
       </dl>

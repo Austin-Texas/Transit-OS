@@ -1,6 +1,17 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Activity, BatteryMedium, Box, Car, Check, Compass, Fuel, Gauge, TriangleAlert, Truck } from "lucide-react";
+import {
+  Activity,
+  BatteryMedium,
+  Box,
+  Car,
+  Check,
+  Compass,
+  Fuel,
+  Gauge,
+  TriangleAlert,
+  Truck,
+} from "lucide-react";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
@@ -11,24 +22,27 @@ import { siteWarnings } from "@/lib/siteWarnings";
 import { clockTime, miles, openAlerts } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authed/vehicle")({
+export const Route = createFileRoute("/_authed/diagnostics")({
   head: () => ({
     meta: [
-      { title: "TransitOS — Vehicle" },
-      { name: "description", content: "Odometer, drivetrain health and OBD-II diagnostics for your van." },
+      { title: "TransitOS — Diagnostics" },
+      {
+        name: "description",
+        content: "Explore your van in 3D: drivetrain, utilities and live faults, plus OBD-II health checks.",
+      },
     ],
   }),
-  component: VehiclePage,
+  component: DiagnosticsPage,
 });
 
-function VehiclePage() {
+function DiagnosticsPage() {
   const van = useVanDashboard();
   const { status, alerts, diagnostics } = van;
   const [focus, setFocus] = useState(null);
 
   const warnings = useMemo(() => siteWarnings(status), [status]);
 
-  if (!status) return <ModuleShell title="Vehicle" />;
+  if (!status) return <ModuleShell title="Diagnostics" />;
 
   const faults = openAlerts(alerts).length;
 
@@ -43,14 +57,14 @@ function VehiclePage() {
 
   return (
     <ModuleShell
-      title="Vehicle"
+      title="Diagnostics"
       subtitle={`${status.vehicle_name} · ${status.trim}`}
       status={status}
       meta={
         <span
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[9.5px] font-semibold uppercase tracking-[0.14em]",
-            faults ? "border-alert/45 bg-alert/10 text-alert" : "border-ok/45 bg-ok/10 text-ok"
+            "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold",
+            faults ? "bg-ios-orange/15 text-ios-orange" : "bg-ios-green/15 text-ios-green"
           )}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-current" />
@@ -58,8 +72,8 @@ function VehiclePage() {
         </span>
       }
     >
-      <div className="grid gap-3 lg:grid-cols-2">
-        <ModuleCard title="Diagnostics · live 3D view" icon={Box} className="lg:col-span-2">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ModuleCard title="Live 3D diagnostics" icon={Box} className="lg:col-span-2">
           <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_250px]">
             <VanStage
               cabinTemp={status.cabin_temp ?? status.climate_temp}
@@ -102,10 +116,10 @@ function VehiclePage() {
             ].map(([label, value]) => (
               <div
                 key={label}
-                className="flex items-center justify-between gap-4 border-b border-white/[0.06] py-2 last:border-0"
+                className="flex items-center justify-between gap-4 border-b border-white/[0.07] py-2 last:border-0"
               >
-                <dt className="text-[10px] uppercase tracking-[0.16em] text-white/35">{label}</dt>
-                <dd className="truncate font-mono text-[11.5px] text-white/85">{value}</dd>
+                <dt className="text-[12px] font-medium text-white/40">{label}</dt>
+                <dd className="truncate text-[12.5px] font-medium text-white/85">{value}</dd>
               </div>
             ))}
           </dl>
@@ -116,32 +130,30 @@ function VehiclePage() {
             {diagnostics.map((row) => (
               <li
                 key={row.label}
-                className="flex items-center justify-between gap-3 rounded-xl border border-line/80 bg-surface-raised px-3 py-2.5"
+                className="flex items-center justify-between gap-3 rounded-2xl bg-white/[0.05] px-3.5 py-2.5 ring-1 ring-inset ring-white/[0.08]"
               >
                 <span className="flex min-w-0 items-center gap-2.5">
                   <span
                     className={cn(
-                      "grid h-7 w-7 shrink-0 place-items-center rounded-lg border",
-                      row.state === "ok"
-                        ? "border-ok/35 bg-ok/10 text-ok"
-                        : "border-warn/40 bg-warn/10 text-warn"
+                      "grid h-8 w-8 shrink-0 place-items-center rounded-full",
+                      row.state === "ok" ? "bg-ios-green/15 text-ios-green" : "bg-ios-orange/15 text-ios-orange"
                     )}
                   >
                     {row.state === "ok" ? (
-                      <Check className="h-3.5 w-3.5" strokeWidth={2.4} />
+                      <Check className="h-4 w-4" strokeWidth={2.4} />
                     ) : (
-                      <TriangleAlert className="h-3.5 w-3.5" strokeWidth={2.2} />
+                      <TriangleAlert className="h-4 w-4" strokeWidth={2.2} />
                     )}
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-[11.5px] font-medium text-white">{row.label}</span>
-                    <span className="block truncate text-[10px] text-white/40">{row.detail}</span>
+                    <span className="block truncate text-[13px] font-medium text-white">{row.label}</span>
+                    <span className="block truncate text-[11.5px] text-white/40">{row.detail}</span>
                   </span>
                 </span>
                 <span
                   className={cn(
-                    "shrink-0 text-[9px] font-semibold uppercase tracking-[0.16em]",
-                    row.state === "ok" ? "text-ok/80" : "text-warn"
+                    "shrink-0 text-[11.5px] font-semibold",
+                    row.state === "ok" ? "text-ios-green" : "text-ios-orange"
                   )}
                 >
                   {row.state === "ok" ? "OK" : "Check"}
@@ -157,11 +169,11 @@ function VehiclePage() {
               {alerts.map((alert) => (
                 <li
                   key={alert.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-alert/35 bg-alert/[0.07] px-3 py-2.5"
+                  className="flex items-center justify-between gap-3 rounded-2xl bg-ios-pink/[0.1] px-3.5 py-2.5 ring-1 ring-inset ring-ios-pink/25"
                 >
                   <span className="min-w-0">
-                    <span className="block truncate text-[11.5px] font-medium text-alert">{alert.title}</span>
-                    <span className="block truncate text-[10px] text-white/40">
+                    <span className="block truncate text-[13px] font-semibold text-ios-pink">{alert.title}</span>
+                    <span className="block truncate text-[11.5px] text-white/40">
                       {alert.detail ? `${alert.detail} · ` : ""}
                       {alert.occurred_at ? clockTime(alert.occurred_at) : "just now"}
                     </span>
@@ -171,7 +183,7 @@ function VehiclePage() {
                       <button
                         type="button"
                         onClick={() => locate(alert)}
-                        className="rounded-full border border-neon/40 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-neon transition hover:bg-neon/15"
+                        className="rounded-full bg-white/10 px-3 py-1.5 text-[11.5px] font-semibold text-white transition hover:bg-white/20"
                       >
                         Locate
                       </button>
@@ -179,7 +191,7 @@ function VehiclePage() {
                     <button
                       type="button"
                       onClick={() => van.resolveAlert(alert.id)}
-                      className="rounded-full border border-white/15 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/70 transition hover:border-ok/50 hover:text-ok"
+                      className="rounded-full bg-ios-green/15 px-3 py-1.5 text-[11.5px] font-semibold text-ios-green transition hover:bg-ios-green/25"
                     >
                       Resolve
                     </button>
@@ -188,7 +200,7 @@ function VehiclePage() {
               ))}
             </ul>
           ) : (
-            <p className="rounded-xl border border-ok/30 bg-ok/[0.06] px-3 py-3 text-[11.5px] text-ok">
+            <p className="rounded-2xl bg-ios-green/[0.1] px-3.5 py-3 text-[12.5px] font-medium text-ios-green ring-1 ring-inset ring-ios-green/20">
               No open alerts — the hub reports a clean bill of health.
             </p>
           )}

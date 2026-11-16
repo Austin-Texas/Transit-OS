@@ -30,12 +30,22 @@ export default {
   				700: '#0b1c31'
   			},
   			neon: {
-  				DEFAULT: '#00f0ff',
-  				dim: '#0b8b96'
+  				DEFAULT: '#64d2ff',
+  				dim: '#2b7f9c'
   			},
-  			ok: '#00ff41',
-  			alert: '#ff3b30',
-  			warn: '#ff9500',
+  			ios: {
+  				blue: '#0a84ff',
+  				indigo: '#5e5ce6',
+  				purple: '#bf5af2',
+  				teal: '#64d2ff',
+  				green: '#30d158',
+  				orange: '#ff9f0a',
+  				pink: '#ff375f',
+  				gray: '#8e8e93'
+  			},
+  			ok: '#30d158',
+  			alert: '#ff375f',
+  			warn: '#ff9f0a',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

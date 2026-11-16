@@ -4,13 +4,20 @@ import { Switch } from "@/components/ui/switch";
 import { CABIN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
-function ControlRow({ icon: Icon, label, sub, checked, onChange, tone = "text-ok" }) {
+function ControlRow({ icon: Icon, label, sub, checked, onChange, tone = "text-ios-green" }) {
   return (
-    <div className="flex items-center gap-2.5 border-b border-white/[0.06] py-1.5 last:border-0">
-      <Icon className={cn("h-3.5 w-3.5 shrink-0", checked ? tone : "text-white/30")} strokeWidth={2} />
+    <div className="flex items-center gap-3 border-b border-white/[0.07] py-2.5 last:border-0">
+      <span
+        className={cn(
+          "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 ring-1 ring-inset ring-white/10 transition",
+          checked ? tone : "text-white/35"
+        )}
+      >
+        <Icon className="h-4 w-4" strokeWidth={1.9} />
+      </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[11px] font-medium text-white/85">{label}</span>
-        <span className="block truncate text-[8.5px] uppercase tracking-[0.12em] text-white/30">{sub}</span>
+        <span className="block truncate text-[13px] font-medium text-white">{label}</span>
+        <span className="block truncate text-[11.5px] text-white/40">{sub}</span>
       </span>
       <Switch checked={checked} onCheckedChange={onChange} aria-label={label} />
     </div>
@@ -30,47 +37,53 @@ export default function CabinCard({
   return (
     <section
       id="card-cabin"
-      className="panel-surface photo-slot relative flex flex-col overflow-hidden rounded-2xl border transition-colors duration-300"
+      className="glass group relative flex flex-col overflow-hidden rounded-[26px] transition duration-300 ease-out hover:-translate-y-0.5"
     >
-      <div className="relative h-[124px] w-full shrink-0">
+      <div className="relative h-[132px] w-full shrink-0 overflow-hidden">
         <VanPhoto
           uri={photoUri}
           fallback={CABIN_IMAGE}
           alt="Camper van cabin interior"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
           onPhoto={onPhoto}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/35 to-ink-950/55" />
-        <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-2 p-3">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#06070c] via-[#06070c]/25 to-transparent" />
+
+        <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-2 p-4">
           <div className="flex items-center gap-2">
-            <BedDouble className="h-3.5 w-3.5 text-neon/80" strokeWidth={1.75} />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/70">Cabin</span>
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 text-white ring-1 ring-inset ring-white/15 backdrop-blur">
+              <BedDouble className="h-4 w-4" strokeWidth={1.9} />
+            </span>
+            <span className="text-[13px] font-semibold tracking-tight text-white">Cabin</span>
           </div>
           <span
             className={cn(
-              "rounded-full border px-2 py-0.5 text-[8.5px] font-semibold uppercase tracking-[0.14em]",
-              locksLocked ? "border-ok/40 bg-ok/10 text-ok" : "border-warn/45 bg-warn/10 text-warn"
+              "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur",
+              locksLocked ? "bg-ios-green/20 text-ios-green" : "bg-ios-orange/20 text-ios-orange"
             )}
           >
+            <span className="h-1.5 w-1.5 rounded-full bg-current" />
             {locksLocked ? "Secured" : "Unlocked"}
           </span>
         </div>
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-3">
-          <div>
-            <p className="font-mono text-[15px] font-semibold leading-none text-white">{Math.round(temp)}°F</p>
-            <p className="mt-1 text-[9.5px] text-white/45">Interior · cabin</p>
-          </div>
+
+        <div className="absolute inset-x-0 bottom-0 p-4">
+          <p className="text-[26px] font-semibold leading-none tracking-tight text-white">
+            {Math.round(temp)}
+            <span className="align-top text-[13px] font-medium text-white/45">°F</span>
+          </p>
+          <p className="mt-1.5 text-[11.5px] font-medium text-white/50">Interior temperature</p>
         </div>
       </div>
 
-      <div className="px-3.5 py-2">
+      <div className="px-4 py-1.5">
         <ControlRow
           icon={Lightbulb}
           label="Cabin lights"
           sub={lightsOn ? "On" : "All zones off"}
           checked={lightsOn}
           onChange={onLights}
-          tone="text-neon"
+          tone="text-ios-teal"
         />
         <ControlRow
           icon={Lock}

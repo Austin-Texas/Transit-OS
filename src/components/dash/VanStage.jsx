@@ -23,8 +23,8 @@ export default function VanStage({
   return (
     <section
       className={cn(
-        "photo-slot relative flex min-h-[380px] flex-1 overflow-hidden rounded-2xl border bg-[radial-gradient(125%_120%_at_50%_-10%,#0d2d40_0%,#061019_52%,#03070c_100%)] lg:min-h-[420px]",
-        focus ? "border-alert/55" : "border-line/80"
+        "photo-slot relative flex min-h-[380px] flex-1 overflow-hidden rounded-[26px] border bg-[radial-gradient(125%_120%_at_50%_-10%,#122841_0%,#0a1220_55%,#05070c_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] lg:min-h-[430px]",
+        focus ? "border-ios-pink/50" : "border-white/10"
       )}
     >
       <FordTransit3D
@@ -42,9 +42,9 @@ export default function VanStage({
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(78%_68%_at_50%_44%,transparent_42%,rgba(2,6,11,0.6)_100%)]" />
 
-      <div className="pointer-events-none absolute left-4 top-3.5 z-10 flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-white/65">
-        <span className="h-1.5 w-1.5 rounded-full bg-sys-blue" />
-        Live van · Interior {Math.round(cabinTemp)}°F
+      <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-medium text-white/70 ring-1 ring-inset ring-white/10 backdrop-blur">
+        <span className="h-1.5 w-1.5 rounded-full bg-ios-teal" />
+        Live 3D · Interior {Math.round(cabinTemp)}°F
       </div>
 
       {focus ? (
@@ -114,7 +114,7 @@ export default function VanStage({
       <Link
         to="/settings"
         hash="cameras"
-        className="group absolute bottom-3.5 right-3.5 z-10 inline-flex items-center gap-2 rounded-full border border-neon/45 bg-ink-950/75 px-3 py-1.5 text-[9.5px] font-semibold uppercase tracking-[0.14em] text-neon backdrop-blur transition hover:border-neon/80 hover:bg-neon/15"
+        className="group absolute bottom-3.5 right-3.5 z-10 inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-2 text-[11.5px] font-semibold text-white ring-1 ring-inset ring-white/15 backdrop-blur-xl transition hover:bg-white/20"
       >
         <Camera className="h-3.5 w-3.5" strokeWidth={2.2} />
         Cameras

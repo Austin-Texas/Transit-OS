@@ -3,8 +3,8 @@ import { MODES } from "@/lib/van";
 
 export default function QuickModes({ active, onSelect }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 px-0 py-1">
-      <span className="mr-1 text-[9px] uppercase tracking-[0.22em] text-white/40">Quick Modes</span>
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="mr-1 text-[12px] font-medium text-white/40">Quick modes</span>
       {MODES.map((mode) => {
         const isActive = active === mode.id;
         return (
@@ -14,10 +14,10 @@ export default function QuickModes({ active, onSelect }) {
             onClick={() => onSelect(mode.id)}
             aria-pressed={isActive}
             className={cn(
-              "rounded-xl border px-4 py-2 text-[10.5px] font-semibold uppercase tracking-[0.14em] transition-all duration-300",
+              "rounded-full px-4 py-2 text-[12.5px] font-semibold transition duration-200 active:scale-[0.98]",
               isActive
-                ? "border-neon bg-neon/15 text-white shadow-[0_0_28px_-8px_rgba(0,240,255,1)]"
-                : "border-white/10 bg-white/[0.04] text-white/45 hover:border-neon/30 hover:text-white/80"
+                ? "bg-white text-[#0b0b0f] shadow-[0_10px_26px_-14px_rgba(255,255,255,0.8)]"
+                : "bg-white/[0.07] text-white/55 ring-1 ring-inset ring-white/[0.08] hover:bg-white/[0.12] hover:text-white"
             )}
           >
             {mode.label}

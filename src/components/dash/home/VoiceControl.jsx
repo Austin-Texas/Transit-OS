@@ -34,21 +34,21 @@ export default function VoiceControl({ onSubmit }) {
   const panelOpen = speech.listening || Boolean(heard) || Boolean(reply) || Boolean(speech.error);
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-[86px] z-40 flex flex-col items-end gap-2 px-3 sm:bottom-[92px] sm:px-4">
+    <div className="pointer-events-none fixed inset-x-0 bottom-[96px] z-40 flex flex-col items-end gap-2 px-3 sm:bottom-[104px] sm:px-4">
       {panelOpen ? (
-        <div className="pointer-events-auto w-full max-w-[360px] overflow-hidden rounded-2xl border border-neon/35 bg-ink-950/95 shadow-[0_24px_60px_-28px_rgba(0,240,255,0.75)] backdrop-blur-xl">
-          <header className="flex items-center gap-2 border-b border-white/[0.07] px-3.5 py-2">
-            <Sparkles className="h-3.5 w-3.5 text-neon" strokeWidth={2} />
-            <span className="text-[9.5px] font-semibold uppercase tracking-[0.18em] text-white/55">
-              {speech.listening ? "Listening" : "Voice control"}
+        <div className="glass pointer-events-auto w-full max-w-[350px] overflow-hidden rounded-[24px]">
+          <header className="flex items-center gap-2 border-b border-white/[0.08] px-4 py-2.5">
+            <Sparkles className="h-4 w-4 text-ios-teal" strokeWidth={2} />
+            <span className="text-[12.5px] font-semibold text-white/75">
+              {speech.listening ? "Listening…" : "Voice control"}
             </span>
             {speech.listening ? (
-              <span className="ml-1 flex items-end gap-[2px]">
+              <span className="ml-0.5 flex items-end gap-[2px]">
                 {[0, 1, 2, 3].map((bar) => (
                   <span
                     key={bar}
-                    className="w-[2px] animate-soft-pulse rounded-full bg-neon"
-                    style={{ height: `${6 + bar * 3}px`, animationDelay: `${bar * 120}ms` }}
+                    className="w-[2.5px] animate-soft-pulse rounded-full bg-ios-teal"
+                    style={{ height: `${7 + bar * 3}px`, animationDelay: `${bar * 120}ms` }}
                   />
                 ))}
               </span>
@@ -61,30 +61,30 @@ export default function VoiceControl({ onSubmit }) {
                 setReply(null);
               }}
               aria-label="Close voice control"
-              className="ml-auto rounded p-1 text-white/35 transition hover:text-white"
+              className="ml-auto rounded-full p-1 text-white/40 transition hover:bg-white/10 hover:text-white"
             >
-              <X className="h-3.5 w-3.5" strokeWidth={2.4} />
+              <X className="h-4 w-4" strokeWidth={2.4} />
             </button>
           </header>
 
-          <div className="space-y-2.5 px-3.5 py-3">
+          <div className="space-y-2.5 px-4 py-3.5">
             {speech.error ? (
-              <p className="rounded-lg border border-warn/40 bg-warn/10 px-2.5 py-2 text-[10.5px] leading-relaxed text-warn">
+              <p className="rounded-xl bg-ios-orange/15 px-3 py-2 text-[11.5px] leading-relaxed text-ios-orange">
                 {speech.error}
               </p>
             ) : null}
 
             {heard ? (
               <div>
-                <p className="text-[8.5px] uppercase tracking-[0.18em] text-white/30">You said</p>
-                <p className="mt-0.5 text-[12px] leading-snug text-white">“{heard}”</p>
+                <p className="text-[10.5px] font-medium text-white/35">You said</p>
+                <p className="mt-0.5 text-[13px] leading-snug text-white">“{heard}”</p>
               </div>
             ) : null}
 
             {reply ? (
-              <div className="rounded-lg border border-neon/30 bg-neon/[0.07] px-2.5 py-2">
-                <p className="text-[8.5px] uppercase tracking-[0.18em] text-neon/70">TransitOS</p>
-                <p className="mt-0.5 text-[11px] leading-relaxed text-white/85">{reply}</p>
+              <div className="rounded-xl bg-ios-teal/[0.12] px-3 py-2">
+                <p className="text-[10.5px] font-semibold text-ios-teal">TransitOS</p>
+                <p className="mt-0.5 text-[12px] leading-relaxed text-white/85">{reply}</p>
               </div>
             ) : null}
 
@@ -105,25 +105,25 @@ export default function VoiceControl({ onSubmit }) {
                   onChange={(event) => setTyped(event.target.value)}
                   placeholder="Type a command…"
                   aria-label="Type a voice command"
-                  className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11px] text-white placeholder:text-white/25 focus:border-neon/50 focus:outline-none"
+                  className="min-w-0 flex-1 rounded-full bg-white/[0.08] px-3.5 py-2 text-[12px] text-white placeholder:text-white/30 ring-1 ring-inset ring-white/10 focus:outline-none focus:ring-white/25"
                 />
                 <button
                   type="submit"
                   aria-label="Send command"
-                  className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-neon/40 bg-neon/15 text-neon"
+                  className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ios-blue text-white transition hover:brightness-110"
                 >
-                  <Send className="h-3.5 w-3.5" strokeWidth={2.2} />
+                  <Send className="h-4 w-4" strokeWidth={2.2} />
                 </button>
               </form>
             ) : null}
 
             {!heard && !reply && !speech.error ? (
               <div>
-                <p className="text-[8.5px] uppercase tracking-[0.18em] text-neon/70">Try saying</p>
+                <p className="text-[10.5px] font-semibold text-ios-teal">Try saying</p>
                 <ul className="mt-1.5 space-y-1">
                   {VOICE_EXAMPLES.slice(0, 4).map((example) => (
-                    <li key={example} className="flex items-start gap-1.5 text-[10.5px] leading-snug text-white/45">
-                      <ArrowRight className="mt-[3px] h-2.5 w-2.5 shrink-0 text-neon/60" strokeWidth={2.6} />
+                    <li key={example} className="flex items-start gap-1.5 text-[12px] leading-snug text-white/50">
+                      <ArrowRight className="mt-[3px] h-3 w-3 shrink-0 text-ios-teal" strokeWidth={2.6} />
                       {example}
                     </li>
                   ))}
@@ -148,17 +148,16 @@ export default function VoiceControl({ onSubmit }) {
         aria-label={speech.listening ? "Stop listening" : "Start voice control"}
         aria-pressed={speech.listening}
         className={cn(
-          "pointer-events-auto inline-flex items-center gap-2 rounded-full border px-4 py-3 text-[10.5px] font-semibold uppercase tracking-[0.16em] shadow-[0_18px_40px_-18px_rgba(0,240,255,0.9)] backdrop-blur transition",
+          "glass pointer-events-auto inline-flex items-center gap-2 rounded-full px-4 py-3 text-[12.5px] font-semibold transition duration-200 active:scale-[0.98]",
           speech.listening
-            ? "border-neon bg-neon/25 text-white"
-            : "border-neon/55 bg-ink-950/90 text-neon hover:border-neon hover:bg-neon/15"
+            ? "bg-ios-pink/25 text-white"
+            : "text-white/85 hover:bg-white/[0.12]"
         )}
+        style={speech.listening ? { boxShadow: "0 18px 44px -20px rgba(255,55,95,0.9)" } : undefined}
       >
         <span className="relative grid h-6 w-6 place-items-center">
-          {speech.listening ? (
-            <span className="absolute inset-0 animate-ping rounded-full bg-neon/40" />
-          ) : null}
-          <Mic className="relative h-4 w-4" strokeWidth={2.2} />
+          {speech.listening ? <span className="absolute inset-0 animate-ping rounded-full bg-ios-pink/50" /> : null}
+          <Mic className={cn("relative h-4 w-4", speech.listening ? "text-white" : "text-ios-teal")} strokeWidth={2.2} />
         </span>
         {speech.listening ? "Listening" : "Voice"}
       </button>

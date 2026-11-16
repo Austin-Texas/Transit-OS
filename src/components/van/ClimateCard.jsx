@@ -8,7 +8,7 @@ function StepButton({ label, onClick, children }) {
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="grid h-6 w-6 place-items-center rounded-md border border-white/10 bg-white/[0.05] text-white/60 transition hover:border-neon/40 hover:text-neon"
+      className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/70 ring-1 ring-inset ring-white/10 transition hover:bg-white/20 hover:text-white active:scale-95"
     >
       {children}
     </button>
@@ -24,34 +24,37 @@ const MODES = [
 
 export default function ClimateCard({ temp, set, mode = "auto", onAdjust, onChangeMode }) {
   return (
-    <Panel id="card-climate" title="Climate" icon={Snowflake}>
-      <div className="flex items-end justify-between gap-2">
-        <div className="pb-3">
-          <p className="text-[9px] uppercase tracking-[0.18em] text-white/35">Set</p>
-          <div className="mt-1.5 flex items-center gap-1.5">
+    <Panel id="card-climate" title="Climate" icon={Snowflake} accent="text-ios-teal">
+      <div className="flex items-end justify-between gap-3">
+        <div className="pb-1">
+          <p className="text-[12.5px] font-medium text-white/45">Set to</p>
+          <div className="mt-2 flex items-center gap-2">
             <StepButton label="Lower set point" onClick={() => onAdjust(-1)}>
-              <Minus className="h-3 w-3" strokeWidth={2.4} />
+              <Minus className="h-3.5 w-3.5" strokeWidth={2.4} />
             </StepButton>
-            <span className="w-10 text-center font-mono text-[12.5px] font-medium text-white">{Math.round(set)}°F</span>
+            <span className="min-w-[54px] text-center text-[19px] font-semibold tracking-tight text-white">
+              {Math.round(set)}°
+            </span>
             <StepButton label="Raise set point" onClick={() => onAdjust(1)}>
-              <Plus className="h-3 w-3" strokeWidth={2.4} />
+              <Plus className="h-3.5 w-3.5" strokeWidth={2.4} />
             </StepButton>
           </div>
-          <p className="mt-2 text-[10px] capitalize text-white/30">
-            {mode === "off" ? "System idle" : `${mode} mode`}
+          <p className="mt-2.5 text-[12px] capitalize text-white/40">
+            {mode === "off" ? "System off" : `${mode} mode`}
           </p>
         </div>
-        <ArcGauge value={set} min={50} max={90} size={100} color="#00f0ff">
-          <p className="font-mono text-[21px] font-semibold leading-none text-white">
+
+        <ArcGauge value={set} min={50} max={90} size={104} thickness={7} color="#64d2ff">
+          <p className="text-[30px] font-semibold leading-none tracking-tight text-white">
             {Math.round(temp)}
-            <span className="text-[11px] text-white/45">°F</span>
+            <span className="align-top text-[14px] font-medium text-white/40">°</span>
           </p>
-          <p className="mt-1 text-[8.5px] uppercase tracking-[0.16em] text-neon/70">Cabin</p>
+          <p className="mt-1.5 text-[11px] font-medium text-white/40">Cabin</p>
         </ArcGauge>
       </div>
 
       {onChangeMode ? (
-        <div className="mt-2 grid grid-cols-4 gap-1 rounded-full border border-white/[0.06] bg-ink-950 p-1">
+        <div className="mt-3 grid grid-cols-4 gap-1 rounded-full bg-black/30 p-1 ring-1 ring-inset ring-white/[0.07]">
           {MODES.map((item) => (
             <button
               key={item.id}
@@ -60,8 +63,8 @@ export default function ClimateCard({ temp, set, mode = "auto", onAdjust, onChan
               onClick={() => onChangeMode(item.id)}
               className={
                 mode === item.id
-                  ? "rounded-full bg-neon/15 py-1 text-[8.5px] font-semibold uppercase tracking-[0.1em] text-neon"
-                  : "rounded-full py-1 text-[8.5px] font-semibold uppercase tracking-[0.1em] text-white/35 transition hover:text-white/70"
+                  ? "rounded-full bg-white/90 py-1.5 text-[11px] font-semibold text-[#0b0b0f] shadow-sm transition"
+                  : "rounded-full py-1.5 text-[11px] font-medium text-white/45 transition hover:text-white/80"
               }
             >
               {item.label}

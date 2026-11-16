@@ -38,14 +38,14 @@ export default function HomeScreen() {
 
   if (!status) {
     return (
-      <div className="flex min-h-[100dvh] flex-col bg-background">
+      <div className="flex min-h-[100dvh] flex-col">
         <HomeHeader status={null} offline={van.offline} />
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
-          <div className="flex items-center gap-3 rounded-full border border-line bg-surface px-5 py-2.5">
-            <span className="h-1.5 w-1.5 animate-soft-pulse rounded-full bg-sys-blue" />
-            <span className="text-[10px] uppercase tracking-[0.22em] text-white/55">Waiting for van telemetry</span>
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
+          <div className="glass flex items-center gap-3 rounded-full px-5 py-2.5">
+            <span className="h-1.5 w-1.5 animate-soft-pulse rounded-full bg-ios-teal" />
+            <span className="text-[12px] font-medium text-white/60">Waiting for van telemetry</span>
           </div>
-          <p className="max-w-sm text-[11px] leading-relaxed text-white/30">
+          <p className="max-w-sm text-[12px] leading-relaxed text-white/35">
             No readings have arrived yet. Once your hub posts to the telemetry endpoint, live values appear here
             automatically.
           </p>
@@ -80,16 +80,16 @@ export default function HomeScreen() {
   };
 
   return (
-    <div className="relative flex min-h-[100dvh] flex-col bg-background">
+    <div className="relative flex min-h-[100dvh] flex-col">
       <HomeHeader status={status} offline={van.offline} />
-      <VehicleAlertToast alerts={alerts} warnings={warnings} onLocate={() => navigate({ to: "/vehicle" })} />
+      <VehicleAlertToast alerts={alerts} warnings={warnings} onLocate={() => navigate({ to: "/diagnostics" })} />
 
-      <main className="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-3 px-3 pb-4 pt-3 sm:px-4">
-        <div className="grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(300px,352px)]">
-          <div className="flex min-w-0 flex-col gap-3">
-            <VanPanel status={status} offline={van.offline} className="h-[230px] sm:h-[300px] lg:h-[330px]" />
+      <main className="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-4 px-3 pb-4 pt-4 sm:px-4">
+        <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,352px)]">
+          <div className="flex min-w-0 flex-col gap-4">
+            <VanPanel status={status} offline={van.offline} className="h-[240px] sm:h-[310px] lg:h-[340px]" />
 
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               <ClimateCard
                 temp={status.climate_temp ?? 72}
                 set={status.climate_set ?? 72}
@@ -121,17 +121,17 @@ export default function HomeScreen() {
               />
             </div>
 
-            <section className="panel-surface rounded-2xl border border-neon/25 px-4 py-3">
+            <section className="glass rounded-[26px] px-5 py-4">
               <QuickModes active={status.active_mode} onSelect={van.setMode} />
             </section>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <div
               id="home-alerts"
               className={cn(
-                "rounded-2xl transition-shadow",
-                alertsPing && "ring-2 ring-alert/70 ring-offset-2 ring-offset-background"
+                "rounded-[26px] transition-shadow",
+                alertsPing && "ring-2 ring-ios-blue/70 ring-offset-2 ring-offset-background"
               )}
             >
               <AlertsPanel

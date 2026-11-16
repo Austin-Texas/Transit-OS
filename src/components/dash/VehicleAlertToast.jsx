@@ -39,11 +39,11 @@ export default function VehicleAlertToast({ alerts = [], warnings = [], onLocate
   const SideIcon = item.side === "left" ? ArrowLeft : ArrowRight;
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-[60px] z-40 flex justify-center px-3">
+    <div className="pointer-events-none absolute inset-x-0 top-[92px] z-40 flex justify-center px-3">
       <div
         className={cn(
-          "pointer-events-auto flex w-full max-w-xl items-center gap-1 rounded-xl border px-1.5 py-1.5 shadow-[0_18px_50px_-24px_rgba(255,59,48,0.9)] backdrop-blur",
-          critical ? "border-alert/60 bg-ink-950/92" : "border-warn/55 bg-ink-950/92"
+          "glass pointer-events-auto flex w-full max-w-xl items-center gap-1 rounded-[20px] px-2 py-1.5",
+          critical ? "bg-ios-pink/15" : "bg-ios-orange/10"
         )}
       >
         <button

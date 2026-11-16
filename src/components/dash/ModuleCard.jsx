@@ -2,11 +2,15 @@ import { cn } from "@/lib/utils";
 
 export default function ModuleCard({ title, icon: Icon, action, children, className }) {
   return (
-    <section className={cn("rounded-2xl border border-line/80 bg-surface p-4", className)}>
-      <header className="mb-3 flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
-          {Icon ? <Icon className="h-3.5 w-3.5 shrink-0 text-sys-blue" strokeWidth={2} /> : null}
-          <h2 className="truncate text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">{title}</h2>
+    <section className={cn("glass rounded-[26px] p-5", className)}>
+      <header className="mb-4 flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2.5">
+          {Icon ? (
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 text-ios-teal ring-1 ring-inset ring-white/10">
+              <Icon className="h-4 w-4" strokeWidth={1.9} />
+            </span>
+          ) : null}
+          <h2 className="truncate text-[13px] font-semibold tracking-tight text-white">{title}</h2>
         </div>
         {action}
       </header>

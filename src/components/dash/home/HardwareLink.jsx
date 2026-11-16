@@ -16,14 +16,16 @@ export default function HardwareLink({ status, offline }) {
   const missing = SENSORS.filter((sensor) => status?.[sensor.key] === undefined || status?.[sensor.key] === null);
 
   return (
-    <section className="panel-surface rounded-2xl border border-neon/25 p-4">
-      <header className="flex items-center gap-2">
-        <Radio className="h-3.5 w-3.5 text-neon/80" strokeWidth={1.9} />
-        <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">Hardware link</h2>
+    <section className="glass rounded-[26px] p-5">
+      <header className="flex items-center gap-2.5">
+        <span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-ios-teal ring-1 ring-inset ring-white/10">
+          <Radio className="h-4 w-4" strokeWidth={1.9} />
+        </span>
+        <h2 className="text-[13px] font-semibold tracking-tight text-white">Hardware link</h2>
         <span
           className={cn(
-            "ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[8.5px] font-semibold uppercase tracking-[0.12em]",
-            offline ? "border-alert/45 bg-alert/10 text-alert" : "border-ok/45 bg-ok/10 text-ok"
+            "ml-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold",
+            offline ? "bg-ios-pink/15 text-ios-pink" : "bg-ios-green/15 text-ios-green"
           )}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-current" />
@@ -31,20 +33,20 @@ export default function HardwareLink({ status, offline }) {
         </span>
       </header>
 
-      <p className="mt-2 text-[10.5px] leading-relaxed text-white/40">
+      <p className="mt-3 text-[12px] leading-relaxed text-white/45">
         {missing.length
           ? "These readings have no sensor connected yet and stay empty until the van hub reports them."
           : "Every tracked sensor is reporting to the van hub."}
       </p>
 
       {missing.length ? (
-        <ul className="mt-2.5 flex flex-wrap gap-1.5">
+        <ul className="mt-3 flex flex-wrap gap-1.5">
           {missing.map((sensor) => (
             <li
               key={sensor.key}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-2 py-1 text-[9px] font-medium uppercase tracking-[0.1em] text-white/40"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.07] px-2.5 py-1 text-[11px] font-medium text-white/45 ring-1 ring-inset ring-white/[0.08]"
             >
-              <PlugZap className="h-2.5 w-2.5" strokeWidth={2.4} />
+              <PlugZap className="h-3 w-3" strokeWidth={2.4} />
               {sensor.label}
             </li>
           ))}

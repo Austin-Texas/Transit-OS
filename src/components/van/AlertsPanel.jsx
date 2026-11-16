@@ -6,22 +6,22 @@ const iconFor = (alert) => (/misfire|engine|p0\d/i.test(alert.title) ? Gauge : T
 function AlertRow({ alert, onResolve }) {
   const Icon = iconFor(alert);
   return (
-    <li className="group flex items-start gap-2.5 rounded-xl border border-alert/35 bg-alert/[0.07] p-2.5 transition hover:border-alert/60">
-      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-alert/30 bg-alert/10 text-alert">
-        <Icon className="h-3.5 w-3.5" strokeWidth={2} />
+    <li className="group flex items-start gap-3 rounded-2xl bg-white/[0.06] p-3 ring-1 ring-inset ring-white/[0.08] transition hover:bg-white/[0.1]">
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ios-pink/15 text-ios-pink">
+        <Icon className="h-4 w-4" strokeWidth={2} />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[11px] font-medium leading-snug text-alert">{alert.title}</p>
-        {alert.detail ? <p className="mt-0.5 truncate text-[9.5px] text-white/45">{alert.detail}</p> : null}
-        <p className="mt-1 font-mono text-[9px] text-white/30">{clockTime(alert.occurred_at)}</p>
+        <p className="truncate text-[13px] font-semibold leading-snug text-white">{alert.title}</p>
+        {alert.detail ? <p className="mt-0.5 truncate text-[11.5px] text-white/45">{alert.detail}</p> : null}
+        <p className="mt-1 text-[11px] font-medium text-white/30">{clockTime(alert.occurred_at)}</p>
       </div>
       <button
         type="button"
         onClick={() => onResolve(alert)}
         aria-label={`Resolve ${alert.title}`}
-        className="shrink-0 rounded p-1 text-white/25 transition hover:text-white"
+        className="shrink-0 rounded-full p-1.5 text-white/30 transition hover:bg-white/10 hover:text-white"
       >
-        <X className="h-3 w-3" strokeWidth={2.4} />
+        <X className="h-3.5 w-3.5" strokeWidth={2.4} />
       </button>
     </li>
   );
@@ -32,21 +32,26 @@ export default function AlertsPanel({ alerts = [], warnings = [], onResolve, onD
   const total = active.length + warnings.length;
 
   return (
-    <aside className="panel-surface flex flex-col rounded-2xl border border-neon/25 p-4">
+    <aside className="glass flex flex-col rounded-[26px] p-5">
       <header className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Bell className="h-3.5 w-3.5 text-alert/80" strokeWidth={1.8} />
-          <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/55">Alerts ({total})</h2>
+        <div className="flex items-center gap-2.5">
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-ios-pink/15 text-ios-pink">
+            <Bell className="h-4 w-4" strokeWidth={1.9} />
+          </span>
+          <div>
+            <h2 className="text-[13px] font-semibold tracking-tight text-white">Alerts</h2>
+            <p className="text-[11px] text-white/40">{total ? `${total} need attention` : "All clear"}</p>
+          </div>
         </div>
         <span
           className={
-            total ? "h-1.5 w-1.5 animate-soft-pulse rounded-full bg-alert" : "h-1.5 w-1.5 rounded-full bg-ok"
+            total ? "h-2 w-2 animate-soft-pulse rounded-full bg-ios-pink" : "h-2 w-2 rounded-full bg-ios-green"
           }
         />
       </header>
 
       {active.length ? (
-        <ul className="mt-3 max-h-[300px] space-y-2.5 overflow-y-auto">
+        <ul className="mt-4 max-h-[300px] space-y-2 overflow-y-auto">
           {active.map((alert) => (
             <AlertRow key={alert.id} alert={alert} onResolve={onResolve} />
           ))}
@@ -56,13 +61,10 @@ export default function AlertsPanel({ alerts = [], warnings = [], onResolve, onD
       {warnings.length ? (
         <ul className="mt-2 space-y-2">
           {warnings.map((warning) => (
-            <li
-              key={warning.id}
-              className="rounded-xl border border-warn/35 bg-warn/[0.06] p-2.5"
-            >
-              <p className="truncate text-[11px] font-medium leading-snug text-warn">{warning.title}</p>
-              {warning.detail ? <p className="mt-0.5 truncate text-[9.5px] text-white/45">{warning.detail}</p> : null}
-              <p className="mt-1 text-[8.5px] uppercase tracking-[0.14em] text-white/25">
+            <li key={warning.id} className="rounded-2xl bg-ios-orange/[0.1] p-3 ring-1 ring-inset ring-ios-orange/25">
+              <p className="truncate text-[13px] font-semibold leading-snug text-ios-orange">{warning.title}</p>
+              {warning.detail ? <p className="mt-0.5 truncate text-[11.5px] text-white/45">{warning.detail}</p> : null}
+              <p className="mt-1 text-[10.5px] font-medium uppercase tracking-[0.12em] text-white/30">
                 Live telemetry · {warning.side ?? "van"} side
               </p>
             </li>
@@ -71,18 +73,21 @@ export default function AlertsPanel({ alerts = [], warnings = [], onResolve, onD
       ) : null}
 
       {!total ? (
-        <div className="mt-6 flex flex-1 flex-col items-center justify-center gap-2 py-6 text-center">
-          <Check className="h-5 w-5 text-ok" strokeWidth={2} />
-          <p className="text-[11px] text-white/45">No active alerts</p>
+        <div className="mt-4 flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl bg-white/[0.04] py-8 text-center">
+          <span className="grid h-10 w-10 place-items-center rounded-full bg-ios-green/15 text-ios-green">
+            <Check className="h-5 w-5" strokeWidth={2.2} />
+          </span>
+          <p className="text-[13px] font-medium text-white/70">No active alerts</p>
+          <p className="text-[11.5px] text-white/35">Every system is reporting nominal.</p>
         </div>
       ) : null}
 
       <button
         type="button"
         onClick={onDiagnostics}
-        className="mt-auto flex w-full items-center justify-center gap-2 rounded-xl border border-neon/50 bg-neon/10 px-3 py-2.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-neon shadow-[0_0_28px_-12px_rgba(0,240,255,1)] transition hover:bg-neon/20"
+        className="mt-auto flex w-full items-center justify-center gap-2 rounded-full bg-ios-blue px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_12px_30px_-16px_rgba(10,132,255,0.9)] transition hover:brightness-110 active:scale-[0.99]"
       >
-        <Activity className="h-3.5 w-3.5" strokeWidth={2} />
+        <Activity className="h-4 w-4" strokeWidth={2.2} />
         Run Diagnostics
       </button>
     </aside>

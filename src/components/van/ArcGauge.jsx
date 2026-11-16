@@ -24,7 +24,7 @@ export default function ArcGauge({
   return (
     <div className="relative shrink-0" style={{ width: size, height }}>
       <svg width={size} height={height} viewBox={`0 0 ${size} ${height}`} aria-hidden="true">
-        <path d={path} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={thickness} strokeLinecap="round" />
+        <path d={path} fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth={thickness} strokeLinecap="round" />
         <path
           d={path}
           fill="none"
@@ -33,7 +33,10 @@ export default function ArcGauge({
           strokeLinecap="round"
           strokeDasharray={length}
           strokeDashoffset={length * (1 - pct)}
-          style={{ transition: "stroke-dashoffset 700ms cubic-bezier(0.22,1,0.36,1)", filter: `drop-shadow(0 0 6px ${color})` }}
+          style={{
+            transition: "stroke-dashoffset 700ms cubic-bezier(0.22,1,0.36,1)",
+            filter: `drop-shadow(0 0 5px ${color}aa)`,
+          }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">{children}</div>

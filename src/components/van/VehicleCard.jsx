@@ -5,37 +5,37 @@ import { cn } from "@/lib/utils";
 
 export default function VehicleCard({ odometer, alertCount = 0, topAlert, onDiagnostics }) {
   return (
-    <Panel id="card-vehicle" title="Vehicle" icon={Car}>
-      <div className="flex items-center justify-between gap-2">
+    <Panel id="card-vehicle" title="Vehicle" icon={Car} accent="text-ios-purple">
+      <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-[9px] uppercase tracking-[0.16em] text-white/35">Odometer</p>
-          <p className="mt-1 font-mono text-[12.5px] text-white">{miles(odometer)} mi</p>
+          <p className="text-[22px] font-semibold leading-none tracking-tight text-white">{miles(odometer)}</p>
+          <p className="mt-1.5 text-[12px] font-medium text-white/45">Odometer, miles</p>
         </div>
         <span
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em]",
-            alertCount ? "border-warn/50 bg-warn/15 text-warn" : "border-ok/45 bg-ok/10 text-ok"
+            "inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold",
+            alertCount ? "bg-ios-orange/15 text-ios-orange" : "bg-ios-green/15 text-ios-green"
           )}
         >
-          <TriangleAlert className="h-3 w-3" strokeWidth={2.2} />
+          <TriangleAlert className="h-3.5 w-3.5" strokeWidth={2.2} />
           {alertCount ? `${alertCount} alert${alertCount > 1 ? "s" : ""}` : "Nominal"}
         </span>
       </div>
 
-      <p className="mt-2 truncate text-[10px] text-white/40">
+      <p className="mt-2.5 truncate text-[12px] text-white/40">
         {topAlert ? topAlert : "No active vehicle faults reported."}
       </p>
 
       <button
         type="button"
         onClick={onDiagnostics}
-        className="mt-3 flex w-full items-center justify-between rounded-lg border border-neon/35 bg-neon/[0.07] px-2.5 py-1.5 text-[9.5px] font-semibold uppercase tracking-[0.16em] text-neon transition hover:bg-neon/15"
+        className="mt-4 flex w-full items-center justify-between rounded-full bg-ios-blue px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_10px_28px_-14px_rgba(10,132,255,0.9)] transition hover:brightness-110 active:scale-[0.99]"
       >
-        <span className="inline-flex items-center gap-1.5">
-          <Activity className="h-3 w-3" strokeWidth={2.2} />
+        <span className="inline-flex items-center gap-2">
+          <Activity className="h-4 w-4" strokeWidth={2.2} />
           Run Diagnostics
         </span>
-        <span className="font-mono text-[9px] text-neon/60">→</span>
+        <span className="text-white/70">→</span>
       </button>
     </Panel>
   );

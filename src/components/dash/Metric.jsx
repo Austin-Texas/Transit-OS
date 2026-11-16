@@ -1,14 +1,14 @@
 import { cn } from "@/lib/utils";
 
-export default function Metric({ icon: Icon, label, value, sub, tone = "text-sys-blue" }) {
+export default function Metric({ icon: Icon, label, value, sub, tone = "text-ios-teal" }) {
   return (
-    <div className="rounded-xl border border-line/80 bg-surface-raised px-3 py-2.5">
+    <div className="rounded-2xl bg-white/[0.05] px-3.5 py-3 ring-1 ring-inset ring-white/[0.08]">
       <div className="flex items-center gap-1.5">
-        {Icon ? <Icon className={cn("h-3.5 w-3.5 shrink-0", tone)} strokeWidth={1.9} /> : null}
-        <span className="truncate text-[9px] font-medium uppercase tracking-[0.14em] text-white/40">{label}</span>
+        {Icon ? <Icon className={cn("h-3.5 w-3.5 shrink-0", tone)} strokeWidth={2} /> : null}
+        <span className="truncate text-[11.5px] font-medium text-white/40">{label}</span>
       </div>
-      <p className="mt-1.5 font-mono text-[13px] font-semibold leading-none text-white">{value}</p>
-      {sub ? <p className="mt-1 truncate text-[10px] text-white/40">{sub}</p> : null}
+      <p className="mt-1.5 text-[15px] font-semibold leading-none tracking-tight text-white">{value}</p>
+      {sub ? <p className="mt-1 truncate text-[11px] text-white/40">{sub}</p> : null}
     </div>
   );
 }
