@@ -1,7 +1,7 @@
 import { Lock, Mail, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { base44 } from "@/api/base44Client";
+import { selfhostAuth } from "@/lib/selfhostAuth";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { MfaFlow } from "@/components/auth/MfaFlow";
 import { MfaScreen } from "@/components/auth/MfaParts";
@@ -38,8 +38,8 @@ export function RegisterPage() {
     }
     setBusy(true);
     try {
-      await base44.auth.register({ email, password });
-      setStep("otp");
+      await selfhostAuth.register(email, password);
+      window.location.href = returnTo;
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {
@@ -128,8 +128,6 @@ export function RegisterPage() {
 
   return (
     <AuthLayout icon={UserPlus} title="Create your account" subtitle="Sign up to get started">
-      <GoogleButton returnTo={returnTo} onError={setError} />
-      <OrDivider />
       <AuthError>{error}</AuthError>
       <form onSubmit={register} className="space-y-4">
         <div className="space-y-2">

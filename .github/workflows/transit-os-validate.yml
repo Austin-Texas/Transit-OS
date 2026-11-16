@@ -1,0 +1,45 @@
+name: Transit-OS build validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: transit-os-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 35
+    steps:
+      - name: Verify target host
+        run: test "$(hostname -s)" = "app-host-01"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install pinned dependencies
+        run: npm ci
+      - name: Run application unit tests
+        run: node --test tests/platform.test.mjs tests/simulation.test.mjs
+      - name: Build app
+        run: npm run build
+      - name: Validate Docker build
+        if: github.event_name != 'pull_request'
+        run: docker build --pull -t transit-os-verify:${{ github.sha }} .
+      - name: Validate self-hosted API container build
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -t transitos-api-ci:${{ github.sha }} selfhost/api
+          docker run --rm --entrypoint node transitos-api-ci:${{ github.sha }} --check server.mjs
+      - name: Explain validation scope
+        run: echo "Build passed. Base44 authentication/backend and container runtime behavior still require deployment-gate checks."

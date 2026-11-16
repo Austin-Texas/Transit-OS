@@ -1,6 +1,6 @@
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useContext, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
+import { selfhostAuth } from "@/lib/selfhostAuth";
 import { currentUrl } from "@/lib/authReturnTo";
 
 /**
@@ -14,14 +14,9 @@ import { currentUrl } from "@/lib/authReturnTo";
 export const authQuery = queryOptions({
   queryKey: ["auth", "me"],
   queryFn: async () => {
-    // No token means no session; /me could only answer 401.
-    if (!base44.auth.hasToken()) return { user: null, error: null };
     try {
-      return { user: await base44.auth.me(), error: null };
+      return { user: await selfhostAuth.me(), error: null };
     } catch (err) {
-      if (err?.data?.extra_data?.reason === "user_not_registered") {
-        return { user: null, error: { type: "user_not_registered", message: "Not registered" } };
-      }
       if (err?.status === 401 || err?.status === 403) return { user: null, error: null };
       throw err;
     }
@@ -48,14 +43,15 @@ export function AuthProvider({ children }) {
       isLoadingAuth: isPending,
       authError: data?.error ?? (error ? { type: "unknown", message: error.message ?? "Failed to load session" } : null),
       refresh: () => queryClient.fetchQuery({ ...authQuery, staleTime: 0 }),
-      logout: () => {
+      logout: async () => {
+        await selfhostAuth.logout();
         queryClient.setQueryData(authQuery.queryKey, { user: null, error: null });
-        base44.auth.logout(window.location.origin);
+        window.location.assign("/login");
       },
       // Full-page sign-in: /login with the current page as the way back. A hard
       // navigation on purpose — on an app served behind the platform login the
       // platform answers /login itself; an app with its own auth pages serves its /login route.
-      navigateToLogin: () => base44.auth.redirectToLogin(currentUrl()),
+      navigateToLogin: () => window.location.assign(`/login?returnTo=${encodeURIComponent(currentUrl())}`),
     }),
     [data, error, isPending, queryClient],
   );
