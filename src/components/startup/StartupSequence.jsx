@@ -74,11 +74,12 @@ export default function StartupSequence({ onDone }) {
           <h1>Transit<span>OS</span></h1>
           <p>INTELLIGENT VEHICLE OPERATING SYSTEM</p>
         </div>
-        <div className="tp-boot__vehicle" aria-hidden={stage !== 3}>
-          <div className="tp-boot__light-trail tp-boot__light-trail--cyan" />
-          <div className="tp-boot__light-trail tp-boot__light-trail--purple" />
-          <img src="/branding/transit-van.svg" alt="White high-roof cargo van" />
-          <div className="tp-boot__reflection" />
+        <div className="tp-boot__cinematic" aria-hidden="true">
+          <div className="tp-boot__cinematic-orbit tp-boot__cinematic-orbit--cyan" />
+          <div className="tp-boot__cinematic-orbit tp-boot__cinematic-orbit--violet" />
+          <div className="tp-boot__cinematic-flare" />
+          <div className="tp-boot__cinematic-sweep" />
+          <span className="tp-boot__cinematic-caption">ENGINEERED BY TPMCS</span>
         </div>
         <div className="tp-boot__status">
           <div className="tp-boot__status-head"><span>INITIALIZING TRANSITOS</span><span>{Math.round(ready / STARTUP_CHECKS.length * 100)}%</span></div>
