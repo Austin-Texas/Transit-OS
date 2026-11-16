@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authed")({
 function AuthedLayout() {
   return (
     <>
-      {typeof window !== "undefined" && window.location.hostname !== "transit.hastenload.com" ? <DashcamWatcher /> : null}
+      {import.meta.env.VITE_PUBLIC_DEMO !== "true" ? <DashcamWatcher /> : null}
       <Outlet />
     </>
   );
