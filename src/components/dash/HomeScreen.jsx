@@ -1,4 +1,4 @@
-import { Fan, Lightbulb } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import { openAlerts } from "@/lib/van";
 import DashHeader from "./DashHeader";
@@ -8,6 +8,7 @@ import LocksPanel from "./LocksPanel";
 import QuickDock from "./QuickDock";
 import StatStrip from "./StatStrip";
 import PhysicalToggle from "./PhysicalToggle";
+import ClimateControl from "./ClimateControl";
 
 export default function HomeScreen() {
   const van = useVanDashboard();
@@ -30,7 +31,6 @@ export default function HomeScreen() {
 
   const faultCount = openAlerts(alerts).length;
   const lightsOn = status.lights_on !== false;
-  const ventOn = (status.climate_mode ?? "auto") !== "off";
 
   return (
     <div className="flex h-[100dvh] flex-col overflow-hidden bg-background">
@@ -59,13 +59,12 @@ export default function HomeScreen() {
               checked={lightsOn}
               onChange={(value) => van.update({ lights_on: value })}
             />
-            <PhysicalToggle
-              icon={Fan}
-              label="Ventilation"
-              sub={ventOn ? "Fan running · auto" : "Fan stopped"}
-              checked={ventOn}
-              onChange={(value) => van.update({ climate_mode: value ? "auto" : "off" })}
-              tone="green"
+            <ClimateControl
+              temp={status.climate_temp}
+              set={status.climate_set ?? 72}
+              mode={status.climate_mode}
+              onChangeMode={(mode) => van.update({ climate_mode: mode })}
+              onAdjust={van.adjustClimate}
             />
           </div>
         </div>
