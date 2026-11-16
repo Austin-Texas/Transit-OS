@@ -28,8 +28,9 @@ export default function SurroundPanel({ cameras = [] }) {
             <SurroundRecorder urls={urls} onSaved={clips.reload} />
           </SurroundView>
           <p className="mt-1.5 text-[9px] leading-relaxed text-white/30">
-            Drag to look around the van. The dashcam is armed: when a camera reports motion a 360° clip saves here on its
-            own, and you can record one any time. Clips are stored privately, so only your account can open them.
+            Drag to look around the van. The dashcam is armed while TransitOS is open: when a camera reports motion a 360°
+            clip saves here on its own, and you can record one any time. Clips are stored privately, so only your account
+            can open them.
           </p>
         </div>
 
