@@ -8,8 +8,12 @@ import { cn } from "@/lib/utils";
 export default function VanPanel({ status, offline = false, className }) {
   return (
     <section
-      className={cn("glass group relative flex flex-col overflow-hidden rounded-[28px] p-0", className)}
+      className={cn(
+        "glass group relative flex flex-col overflow-hidden rounded-[28px] p-0 transition duration-300 ease-out hover:shadow-[0_36px_84px_-40px_rgba(0,0,0,1)]",
+        className
+      )}
     >
+      <span className="sheen z-10" aria-hidden="true" />
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <VanPhoto
           uri={status.van_photo_uri}

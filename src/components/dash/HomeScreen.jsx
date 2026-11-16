@@ -84,7 +84,7 @@ export default function HomeScreen() {
       <HomeHeader status={status} offline={van.offline} />
       <VehicleAlertToast alerts={alerts} warnings={warnings} onLocate={() => navigate({ to: "/diagnostics" })} />
 
-      <main className="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-4 px-3 pb-4 pt-4 sm:px-4">
+      <main className="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-4 px-3 pb-5 pt-4 sm:px-4">
         <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,352px)]">
           <div className="flex min-w-0 flex-col gap-4">
             <VanPanel status={status} offline={van.offline} className="h-[240px] sm:h-[310px] lg:h-[340px]" />
@@ -126,7 +126,7 @@ export default function HomeScreen() {
             </section>
           </div>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 lg:sticky lg:top-[92px] lg:self-start">
             <div
               id="home-alerts"
               className={cn(

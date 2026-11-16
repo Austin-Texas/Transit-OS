@@ -6,7 +6,7 @@ const iconFor = (alert) => (/misfire|engine|p0\d/i.test(alert.title) ? Gauge : T
 function AlertRow({ alert, onResolve }) {
   const Icon = iconFor(alert);
   return (
-    <li className="group flex items-start gap-3 rounded-2xl bg-white/[0.06] p-3 ring-1 ring-inset ring-white/[0.08] transition hover:bg-white/[0.1]">
+    <li className="glass-inset group flex items-start gap-3 rounded-2xl p-3 transition hover:bg-white/[0.09]">
       <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ios-pink/15 text-ios-pink">
         <Icon className="h-4 w-4" strokeWidth={2} />
       </span>
@@ -32,7 +32,8 @@ export default function AlertsPanel({ alerts = [], warnings = [], onResolve, onD
   const total = active.length + warnings.length;
 
   return (
-    <aside className="glass flex flex-col rounded-[26px] p-5">
+    <aside className="glass relative flex h-full flex-col overflow-hidden rounded-[28px] p-5">
+      <span className="sheen" aria-hidden="true" />
       <header className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
           <span className="grid h-8 w-8 place-items-center rounded-full bg-ios-pink/15 text-ios-pink">

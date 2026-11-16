@@ -37,8 +37,9 @@ export default function CabinCard({
   return (
     <section
       id="card-cabin"
-      className="glass group relative flex flex-col overflow-hidden rounded-[26px] transition duration-300 ease-out hover:-translate-y-0.5"
+      className="glass group relative flex h-full flex-col overflow-hidden rounded-[28px] transition duration-300 ease-out hover:-translate-y-[3px] hover:shadow-[0_36px_80px_-40px_rgba(0,0,0,1)]"
     >
+      <span className="sheen z-10" aria-hidden="true" />
       <div className="relative h-[132px] w-full shrink-0 overflow-hidden">
         <VanPhoto
           uri={photoUri}

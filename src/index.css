@@ -77,24 +77,51 @@
   /* The one surface used by every dashboard card: translucent, blurred,
      hairline-bordered, with a soft float shadow underneath. */
   .glass {
-    background-image: linear-gradient(158deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.028));
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-image: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.078) 0%,
+      rgba(255, 255, 255, 0.03) 48%,
+      rgba(255, 255, 255, 0.018) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.095);
     box-shadow:
-      0 28px 64px -34px rgba(0, 0, 0, 0.95),
-      0 2px 10px -6px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    -webkit-backdrop-filter: blur(30px) saturate(150%);
-    backdrop-filter: blur(30px) saturate(150%);
+      0 1px 0 0 rgba(255, 255, 255, 0.07) inset,
+      0 -18px 40px -30px rgba(255, 255, 255, 0.06) inset,
+      0 24px 60px -34px rgba(0, 0, 0, 0.95),
+      0 2px 8px -6px rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(32px) saturate(160%);
+    backdrop-filter: blur(32px) saturate(160%);
   }
 
   .panel-surface {
-    background-image: linear-gradient(158deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.028));
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-image: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.078) 0%,
+      rgba(255, 255, 255, 0.03) 48%,
+      rgba(255, 255, 255, 0.018) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.095);
     box-shadow:
-      0 28px 64px -34px rgba(0, 0, 0, 0.95),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12);
-    -webkit-backdrop-filter: blur(30px) saturate(150%);
-    backdrop-filter: blur(30px) saturate(150%);
+      0 1px 0 0 rgba(255, 255, 255, 0.07) inset,
+      0 24px 60px -34px rgba(0, 0, 0, 0.95);
+    -webkit-backdrop-filter: blur(32px) saturate(160%);
+    backdrop-filter: blur(32px) saturate(160%);
+  }
+
+  /* Nested surfaces (rows, wells, chips) sit inside a glass card. */
+  .glass-inset {
+    background-color: rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 0 0 1px rgba(255, 255, 255, 0.055);
+  }
+
+  .sheen {
+    pointer-events: none;
+    position: absolute;
+    left: 1.5rem;
+    right: 1.5rem;
+    top: 0;
+    height: 1px;
+    background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
   }
 
   .hairline-top {

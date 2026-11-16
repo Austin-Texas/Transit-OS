@@ -16,7 +16,8 @@ export default function HardwareLink({ status, offline }) {
   const missing = SENSORS.filter((sensor) => status?.[sensor.key] === undefined || status?.[sensor.key] === null);
 
   return (
-    <section className="glass rounded-[26px] p-5">
+    <section className="glass relative overflow-hidden rounded-[28px] p-5">
+      <span className="sheen" aria-hidden="true" />
       <header className="flex items-center gap-2.5">
         <span className="grid h-8 w-8 place-items-center rounded-full bg-white/10 text-ios-teal ring-1 ring-inset ring-white/10">
           <Radio className="h-4 w-4" strokeWidth={1.9} />
