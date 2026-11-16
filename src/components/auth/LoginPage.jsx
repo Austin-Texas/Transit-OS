@@ -1,80 +1,43 @@
-import { Lock, LogIn, Mail } from "lucide-react";
-import { useState } from "react";
-import { AuthLayout } from "@/components/auth/AuthLayout";
-import { AuthError, AuthLink, GoogleButton, OrDivider, SubmitButton } from "@/components/auth/parts";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { MfaFlow } from "@/components/auth/MfaFlow";
-import { MfaScreen } from "@/components/auth/MfaParts";
-import { loginWithMfa } from "@/lib/authMfa";
-import { safeReturnTo } from "@/lib/authReturnTo";
+import { Activity, BatteryCharging, Droplets, Thermometer, Wifi, ShieldCheck, Truck, Gauge } from "lucide-react";
 
-// The /login page. ?returnTo= (or the platform's ?from_url=) is where the visitor
-// goes after signing in — the login gate and the MCP consent page send people here with it.
+// Public design preview only. No authenticated APIs, user records, cameras, or hardware commands.
+const cards = [
+  { label: "Battery", value: "82%", icon: BatteryCharging, detail: "Demo reading" },
+  { label: "Cabin temperature", value: "72°F", icon: Thermometer, detail: "Demo reading" },
+  { label: "Fresh water", value: "68%", icon: Droplets, detail: "Demo reading" },
+  { label: "Vehicle status", value: "Parked", icon: Truck, detail: "Simulation" },
+  { label: "Connectivity", value: "Online", icon: Wifi, detail: "Simulated" },
+  { label: "System health", value: "Normal", icon: Activity, detail: "Simulation" },
+];
+
 export function LoginPage() {
-  const returnTo = safeReturnTo();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [mfaChallenge, setMfaChallenge] = useState(null);
-
-  async function submit(e) {
-    e.preventDefault();
-    setError("");
-    setBusy(true);
-    try {
-      const result = await loginWithMfa(email, password);
-      if (result.mfa_required) {
-        setMfaChallenge(result);
-        return;
-      }
-      // A hard redirect: the app re-initializes with the new session.
-      window.location.href = returnTo;
-    } catch (err) {
-      setError(err.message || "Invalid email or password");
-      setBusy(false);
-    }
-  }
-
-  // The second sign-in step (authenticator app or text message) replaces the whole page.
-  if (mfaChallenge) return <MfaScreen><MfaFlow challenge={mfaChallenge} returnTo={returnTo} /></MfaScreen>;
-
   return (
-    <AuthLayout icon={LogIn} title="Welcome back" subtitle="Log in to your account">
-      <GoogleButton returnTo={returnTo} onError={setError} />
-      <OrDivider />
-      <AuthError>{error}</AuthError>
-      <form onSubmit={submit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="login-email">Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-            <Input id="login-email" type="email" autoComplete="email" autoFocus placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 pl-10" required />
+    <main className="min-h-screen bg-[#020a14] px-4 py-8 text-white sm:px-8">
+      <div className="mx-auto max-w-6xl">
+        <header className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-cyan-900/50 pb-5">
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl bg-cyan-400 p-3 text-slate-950"><Gauge size={26} /></div>
+            <div><h1 className="text-2xl font-bold tracking-tight">TransitOS</h1><p className="text-sm text-slate-400">Ford Transit Smart Camper</p></div>
           </div>
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="login-password">Password</Label>
-            <AuthLink to="/forgot-password" returnTo={returnTo} className="text-xs text-primary hover:underline">
-              Forgot password?
-            </AuthLink>
-          </div>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-            <Input id="login-password" type="password" autoComplete="current-password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 pl-10" required />
-          </div>
-        </div>
-        <SubmitButton busy={busy} busyLabel="Logging in...">
-          Log in
-        </SubmitButton>
-      </form>
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Don't have an account?{" "}
-        <AuthLink to="/register" returnTo={returnTo}>
-          Create one
-        </AuthLink>
-      </p>
-    </AuthLayout>
+          <span className="rounded-full border border-cyan-700/60 bg-cyan-950/40 px-4 py-2 text-sm text-cyan-300">Public design preview · No login</span>
+        </header>
+        <section className="mb-8 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8">
+          <p className="mb-2 text-sm font-medium uppercase tracking-widest text-cyan-400">TransitOS dashboard preview</p>
+          <h2 className="text-3xl font-semibold sm:text-4xl">Your smart camper, at a glance.</h2>
+          <p className="mt-3 max-w-3xl text-slate-400">Explore the interface without an account. All values below are illustrative, not live vehicle data. Real equipment controls and private records are unavailable in this public preview.</p>
+          <div className="mt-6 flex items-center gap-2 text-sm text-emerald-300"><ShieldCheck size={18} /> Read-only · Simulation only</div>
+        </section>
+        <section aria-label="Demo vehicle status" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {cards.map(({ label, value, icon: Icon, detail }) => (
+            <article key={label} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
+              <div className="mb-5 flex items-center justify-between text-slate-400"><span>{label}</span><Icon className="text-cyan-400" size={22} /></div>
+              <p className="text-3xl font-semibold">{value}</p>
+              <p className="mt-2 text-xs text-slate-500">{detail}</p>
+            </article>
+          ))}
+        </section>
+        <p className="mt-8 text-center text-sm text-slate-500">TransitOS development preview. Production authentication and private vehicle data remain protected.</p>
+      </div>
+    </main>
   );
 }
