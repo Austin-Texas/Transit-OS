@@ -542,3 +542,8 @@ This update changes project instructions and documentation only. No new app/brow
 **My immediate request for this new chat:** [Replace this line with the next change, question, or build task, or leave it blank for the read-only project review above.]
 
 
+
+
+## TPMCS-branded startup overlay — November 16, 2026
+
+For the self-hosted deployment from `Austin-Texas/Transit-OS`, the owner approved the six-stage TPMCS/TransitOS intro storyboard. Implemented in `src/components/startup/TransitStartup.jsx` with CSS in the adjacent file, and mounted in `src/routes/__root.jsx`. The genuine TPMCS logo is copied from `Austin-Texas/tpmcs-website/public/favicon.svg` to `public/branding/tpmcs-logo.svg`. An original, unbranded white cargo van SVG is provided in `public/branding/transit-van.svg`. A minimum five-second intro plays on full browser load/refresh; internal client navigation does not replay it. The original dashboard is unchanged, and no actual vehicle connectivity is claimed. Respect reduced motion. Future Linux/Pi kiosks may use Plymouth separately during OS boot and launch the local browser when services are ready. Source committed to GitHub; live browser/production deployment validation is still pending. The current self-hosted repository name is `Austin-Texas/Transit-OS`; older `Austin-Texas/TransitOS` references are historical and must not be used as a deployment target.
