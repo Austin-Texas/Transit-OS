@@ -1,0 +1,45 @@
+{
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 5,
+      "interval_unit": "minutes",
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Checks the house battery every five minutes and switches the climate mode to Eco whenever it drops below 20%.",
+  "name": "Battery Saver",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "battery_saver",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "check_battery": {
+          "call": "invoke_server_route",
+          "with": {
+            "path": "/api/battery-saver",
+            "method": "POST"
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Check battery level",
+            "description": "Under 20% switches climate to Eco"
+          }
+        }
+      }
+    ]
+  }
+}
