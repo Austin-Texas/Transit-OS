@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authed/settings")({
 const FIELDS = [
   { key: "vehicle_name", label: "Vehicle", placeholder: "2026 Ford Transit" },
   { key: "trim", label: "Trim", placeholder: "Full Extended High Roof" },
-  { key: "vin", label: "VIN", placeholder: "1FTBR1C8XPK104482" },
+  { key: "vin", label: "VIN", placeholder: "Enter VIN (optional)" },
   { key: "odometer", label: "Odometer (mi)", placeholder: "12480", numeric: true },
 ];
 
