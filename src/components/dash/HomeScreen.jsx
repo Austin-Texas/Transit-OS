@@ -27,11 +27,12 @@ export default function HomeScreen() {
 
   // The stage turns itself to whichever side raised a new problem.
   useEffect(() => {
+    // Underbody faults stay findable by touch instead of hijacking the view.
     const sided = [
       ...alerts.filter(
         (alert) => alert.status !== "resolved" && (alert.side === "left" || alert.side === "right")
       ),
-      ...warnings,
+      ...warnings.filter((warning) => warning.zone !== "underbody"),
     ];
 
     if (!sided.length) {
@@ -97,6 +98,7 @@ export default function HomeScreen() {
             odometer={status.odometer}
             warnings={warnings}
             focus={focus}
+            status={status}
             onClearFocus={() => setFocus(null)}
           />
           <StatStrip status={status} faultCount={faultCount} warnings={warnings} />

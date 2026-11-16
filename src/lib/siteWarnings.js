@@ -40,6 +40,17 @@ export function siteWarnings(status) {
     });
   }
 
+  if (status.tank_heater_fault === true) {
+    found.push({
+      id: "tank_heater",
+      title: "Fresh water heat pad fault",
+      detail: "Pad beneath the spare-tire tank · not responding",
+      side: "left",
+      zone: "underbody",
+      severity: "warning",
+    });
+  }
+
   return found;
 }
 

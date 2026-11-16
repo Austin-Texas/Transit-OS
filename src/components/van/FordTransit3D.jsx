@@ -1,208 +1,91 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
+import { buildVanModel } from "@/lib/van3dModel";
 
-const ALERT = 0xff2f2f;
+const RED = 0xff3131;
+const GREEN = 0x00ff41;
 
 // Camera angle that puts a fault in view: the flank it sits on, angled toward
-// the front or rear corner it belongs to.
+// the corner it belongs to. Underbody faults drop the camera below the van.
 function targetYawFor(focus) {
   const side = focus?.side === "left" ? "left" : "right";
   const base = side === "left" ? Math.PI : 0;
   const corner = focus?.zone === "front" ? 1 : focus?.zone === "rear" || focus?.zone === "fuel" ? -1 : 0;
-  return base + (side === "right" ? corner : -corner) * 0.62;
-}
-
-// Soft studio gradient used as the reflection map, so the paint reads as glossy
-// metal instead of flat colour.
-function environmentTexture(renderer) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 64;
-  canvas.height = 256;
-  const ctx = canvas.getContext("2d");
-  const grad = ctx.createLinearGradient(0, 0, 0, 256);
-  grad.addColorStop(0, "#a8e8ff");
-  grad.addColorStop(0.32, "#2c5268");
-  grad.addColorStop(0.52, "#0a1a26");
-  grad.addColorStop(1, "#01050a");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 64, 256);
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.mapping = THREE.EquirectangularReflectionMapping;
-  texture.colorSpace = THREE.SRGBColorSpace;
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const env = pmrem.fromEquirectangular(texture).texture;
-  texture.dispose();
-  pmrem.dispose();
-  return env;
-}
-
-function contactShadow() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 256;
-  const ctx = canvas.getContext("2d");
-  const grad = ctx.createRadialGradient(128, 128, 20, 128, 128, 126);
-  grad.addColorStop(0, "rgba(0,0,0,0.9)");
-  grad.addColorStop(0.5, "rgba(0,0,0,0.42)");
-  grad.addColorStop(1, "rgba(0,0,0,0)");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 256, 256);
-  return new THREE.CanvasTexture(canvas);
-}
-
-// Ford Transit side profile (length along +X, nose at the front).
-function bodyShape() {
-  const shape = new THREE.Shape();
-  shape.moveTo(-3.0, 0.62);
-  shape.lineTo(-3.1, 1.15);
-  shape.quadraticCurveTo(-3.16, 1.5, -3.14, 2.5);
-  shape.quadraticCurveTo(-3.13, 2.84, -2.8, 2.86);
-  shape.lineTo(0.35, 2.9);
-  shape.quadraticCurveTo(0.86, 2.9, 1.12, 2.62);
-  shape.lineTo(1.6, 2.1);
-  shape.lineTo(2.05, 1.86);
-  shape.quadraticCurveTo(2.34, 1.78, 2.55, 1.58);
-  shape.lineTo(2.92, 1.36);
-  shape.quadraticCurveTo(3.12, 1.26, 3.14, 1.02);
-  shape.lineTo(3.14, 0.8);
-  shape.quadraticCurveTo(3.14, 0.6, 2.9, 0.6);
-  shape.lineTo(-2.86, 0.6);
-  shape.quadraticCurveTo(-3.0, 0.6, -3.0, 0.62);
-  return shape;
+  return base + (side === "right" ? corner : -corner) * 0.6;
 }
 
 function markerPosition(warning) {
-  const z = warning.side === "left" ? -1.16 : 1.16;
-  if (warning.zone === "front") return [2.0, 0.5, z];
-  if (warning.zone === "rear") return [-1.95, 0.5, z];
-  if (warning.zone === "fuel") return [-2.62, 1.0, -1.16];
-  return [0.1, 1.72, z];
+  const z = warning.side === "left" ? -1.12 : 1.12;
+  if (warning.zone === "front") return [2.0, 0.44, z];
+  if (warning.zone === "rear") return [-1.95, 0.44, z];
+  if (warning.zone === "fuel") return [-2.62, 0.95, -1.12];
+  if (warning.zone === "underbody") return [-2.35, 0.14, 0.46];
+  return [0.1, 1.74, z];
 }
 
-function buildVan() {
-  const van = new THREE.Group();
-
-  const paint = new THREE.MeshStandardMaterial({
-    color: 0xe9eff5,
-    metalness: 0.5,
-    roughness: 0.3,
-    envMapIntensity: 1.2,
-    emissive: new THREE.Color(ALERT),
-    emissiveIntensity: 0,
-  });
-  const trim = new THREE.MeshStandardMaterial({ color: 0x0d1319, metalness: 0.45, roughness: 0.62 });
-  const glass = new THREE.MeshStandardMaterial({
-    color: 0x0a1c26,
-    metalness: 0.95,
-    roughness: 0.06,
-    envMapIntensity: 1.7,
-  });
-  const chrome = new THREE.MeshStandardMaterial({ color: 0xc3ced8, metalness: 1, roughness: 0.16 });
-  const rubber = new THREE.MeshStandardMaterial({ color: 0x080a0d, roughness: 0.95, metalness: 0.1 });
-  const rim = new THREE.MeshStandardMaterial({ color: 0x98a6b3, metalness: 0.95, roughness: 0.22 });
-  const head = new THREE.MeshStandardMaterial({
-    color: 0xfff4dc,
-    emissive: 0xfff1cf,
-    emissiveIntensity: 1.4,
-    roughness: 0.2,
-  });
-  const tail = new THREE.MeshStandardMaterial({
-    color: 0x8d120e,
-    emissive: 0xff2418,
-    emissiveIntensity: 1.5,
-    roughness: 0.3,
-  });
-
-  const add = (geometry, material, position, rotation) => {
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(position[0], position[1], position[2]);
-    if (rotation) mesh.rotation.set(rotation[0], rotation[1], rotation[2]);
-    van.add(mesh);
-    return mesh;
-  };
-
-  // Shell
-  const shell = new THREE.ExtrudeGeometry(bodyShape(), {
-    depth: 2.02,
-    bevelEnabled: true,
-    bevelThickness: 0.05,
-    bevelSize: 0.05,
-    bevelSegments: 2,
-    curveSegments: 18,
-  });
-  shell.translate(0, 0, -1.01);
-  add(shell, paint, [0, 0, 0]);
-
-  // Glass: cab, sliding door and rear quarter panels on both flanks.
-  [
-    [1.34, 2.16, 0.94, 0.6],
-    [0.02, 2.16, 1.5, 0.64],
-    [-2.02, 2.16, 1.46, 0.64],
-  ].forEach(([x, y, width, height]) => {
-    [-1.075, 1.075].forEach((z) => {
-      add(new THREE.BoxGeometry(width, height, 0.03), glass, [x, y, z]);
-    });
-  });
-
-  // Windshield and rear doors glass
-  add(new THREE.BoxGeometry(0.74, 0.09, 1.84), glass, [1.37, 2.38, 0], [0, 0, -0.88]);
-  add(new THREE.BoxGeometry(0.04, 0.5, 1.4), glass, [-3.17, 2.2, 0]);
-
-  // Nose: grille, lights, bumper
-  add(new THREE.BoxGeometry(0.08, 0.4, 1.36), trim, [3.14, 1.04, 0]);
-  [0.94, 1.1].forEach((y) => add(new THREE.BoxGeometry(0.04, 0.035, 1.24), chrome, [3.19, y, 0]));
-  [-0.6, 0.6].forEach((z) => add(new THREE.BoxGeometry(0.1, 0.16, 0.44), head, [3.12, 1.44, z]));
-  [-0.78, 0.78].forEach((z) => add(new THREE.BoxGeometry(0.08, 0.09, 0.16), head, [3.16, 0.84, z]));
-  add(new THREE.BoxGeometry(0.22, 0.34, 1.98), trim, [3.06, 0.68, 0]);
-
-  // Tail lights and rear bumper
-  [-0.78, 0.78].forEach((z) => add(new THREE.BoxGeometry(0.07, 0.56, 0.16), tail, [-3.18, 1.52, z]));
-  add(new THREE.BoxGeometry(0.2, 0.32, 1.98), trim, [-3.08, 0.68, 0]);
-
-  // Side trim, door seams, mirrors
-  [-1.04, 1.04].forEach((z) => {
-    add(new THREE.BoxGeometry(5.5, 0.16, 0.05), trim, [0, 0.72, z]);
-    add(new THREE.BoxGeometry(0.025, 1.5, 0.03), trim, [0.98, 1.72, z]);
-    add(new THREE.BoxGeometry(0.025, 1.5, 0.03), trim, [-0.72, 1.72, z]);
-  });
-  [-1.03, 1.03].forEach((z) => add(new THREE.BoxGeometry(0.18, 0.045, 0.05), trim, [1.74, 2.0, z]));
-  [-1.16, 1.16].forEach((z) => add(new THREE.BoxGeometry(0.1, 0.24, 0.17), trim, [1.76, 2.04, z]));
-
-  // Roof details of the camper build
-  add(new THREE.BoxGeometry(2.4, 0.05, 1.5), glass, [-1.1, 2.94, 0]);
-  add(new THREE.BoxGeometry(0.62, 0.1, 0.62), trim, [0.86, 2.96, 0.28]);
-  add(new THREE.BoxGeometry(2.6, 0.12, 0.1), trim, [0.1, 2.6, 1.12]);
-
-  // Wheels plus arch trim
-  const wheelXs = [2.0, -1.95];
-  wheelXs.forEach((x) => {
-    [-1.02, 1.02].forEach((z) => {
-      add(new THREE.CylinderGeometry(0.47, 0.47, 0.32, 26), rubber, [x, 0.47, z], [Math.PI / 2, 0, 0]);
-      add(new THREE.CylinderGeometry(0.28, 0.28, 0.34, 22), rim, [x, 0.47, z], [Math.PI / 2, 0, 0]);
-      add(new THREE.CylinderGeometry(0.09, 0.09, 0.36, 16), chrome, [x, 0.47, z], [Math.PI / 2, 0, 0]);
-      add(new THREE.TorusGeometry(0.56, 0.05, 8, 26, Math.PI), trim, [x, 0.5, z * 1.01], [0, 0, 0]);
-    });
-  });
-
-  // Headlight beams on the floor
-  [-0.8, 0.8].forEach((z) => {
-    const beam = new THREE.Mesh(
-      new THREE.PlaneGeometry(3.4, 0.9),
-      new THREE.MeshBasicMaterial({ color: 0xbfefff, transparent: true, opacity: 0.07, depthWrite: false })
-    );
-    beam.rotation.x = -Math.PI / 2;
-    beam.position.set(4.4, 0.02, z);
-    van.add(beam);
-  });
-
-  return { van, paint };
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
 
-export default function FordTransit3D({ focus, warnings = [], className, onReady }) {
+// The black callout box from the reference view, drawn into a canvas sprite so
+// it always faces the camera.
+function createTag() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 128;
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+  });
+  const sprite = new THREE.Sprite(material);
+  sprite.center.set(0, 0.5);
+  sprite.scale.set(1.95, 0.49, 1);
+  sprite.renderOrder = 20;
+  sprite.userData.canvas = canvas;
+  sprite.userData.texture = texture;
+  return sprite;
+}
+
+function paintTag(sprite, text, alert) {
+  const { canvas, texture } = sprite.userData;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  roundRect(ctx, 3, 12, 506, 104, 26);
+  ctx.fillStyle = "rgba(4, 10, 16, 0.84)";
+  ctx.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "rgba(150, 226, 255, 0.34)";
+  ctx.stroke();
+  ctx.fillStyle = alert ? "#ff3b30" : "#00ff41";
+  ctx.fillRect(22, 42, 7, 44);
+  ctx.font = "600 40px Inter, Arial, sans-serif";
+  ctx.fillStyle = "#eaf7ff";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, 46, 66);
+  texture.needsUpdate = true;
+}
+
+export default function FordTransit3D({ focus, warnings = [], status, className, onReady, onTip }) {
   const hostRef = useRef(null);
   const api = useRef(null);
-  const latest = useRef({ focus, warnings });
-  latest.current = { focus, warnings };
+  const tipRef = useRef(onTip);
+  tipRef.current = onTip;
+  const latest = useRef({ focus, warnings, status });
+  latest.current = { focus, warnings, status };
 
   useEffect(() => {
     const host = hostRef.current;
@@ -212,13 +95,10 @@ export default function FordTransit3D({ focus, warnings = [], className, onReady
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     } catch (error) {
-      // No WebGL here: the stage falls back to the parked photo.
-      onReady?.(false);
+      onReady?.("failed");
       return undefined;
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
     renderer.setClearAlpha(0);
     renderer.domElement.style.display = "block";
     renderer.domElement.style.width = "100%";
@@ -228,96 +108,159 @@ export default function FordTransit3D({ focus, warnings = [], className, onReady
     host.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    scene.environment = environmentTexture(renderer);
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
 
-    const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 200);
-
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.6);
-    keyLight.position.set(6, 9, 7);
-    scene.add(keyLight);
-    const fillLight = new THREE.DirectionalLight(0x7fd8ff, 1.2);
-    fillLight.position.set(-7, 4, -6);
-    scene.add(fillLight);
-    scene.add(new THREE.HemisphereLight(0x9fdcff, 0x02060a, 0.5));
-
-    const alertLight = new THREE.PointLight(ALERT, 0, 9);
-    scene.add(alertLight);
-
-    const { van, paint } = buildVan();
+    const { group: van, hotspots, padMaterial, padDotMaterial } = buildVanModel();
     scene.add(van);
 
-    const contact = new THREE.Mesh(
-      new THREE.PlaneGeometry(10, 7),
-      new THREE.MeshBasicMaterial({ map: contactShadow(), transparent: true, opacity: 0.85, depthWrite: false })
+    // Status callouts, as in the reference: one on the rear cabin, one on the
+    // habitation panel.
+    const rearTag = createTag();
+    rearTag.position.set(-0.55, 2.3, -1.12);
+    const rearDot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.075, 14, 14),
+      new THREE.MeshBasicMaterial({ color: RED })
     );
-    contact.rotation.x = -Math.PI / 2;
-    contact.position.y = 0.005;
-    scene.add(contact);
+    rearDot.position.copy(rearTag.position);
+    const cabinTag = createTag();
+    cabinTag.position.set(0.8, 1.28, 1.1);
+    const cabinDot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.075, 14, 14),
+      new THREE.MeshBasicMaterial({ color: GREEN })
+    );
+    cabinDot.position.copy(cabinTag.position);
+    scene.add(rearTag, rearDot, cabinTag, cabinDot);
 
-    const grid = new THREE.GridHelper(18, 24, 0x0d3a4a, 0x07202c);
-    grid.material.transparent = true;
-    grid.material.opacity = 0.35;
-    grid.position.y = 0.002;
-    scene.add(grid);
-
-    // Warning pins sit on the exact corner of the van that raised them.
-    const markerGroup = new THREE.Group();
-    scene.add(markerGroup);
-    const ringMaterial = new THREE.MeshBasicMaterial({ color: ALERT, transparent: true, opacity: 0.85 });
-    const dotMaterial = new THREE.MeshStandardMaterial({
-      color: 0xff3b30,
-      emissive: 0xff3b30,
-      emissiveIntensity: 2.6,
-      roughness: 0.3,
-    });
-    let rings = [];
-
-    const rebuildMarkers = (list = []) => {
-      markerGroup.children.forEach((child) => child.geometry.dispose());
-      markerGroup.clear();
-      rings = [];
-      list.forEach((warning, index) => {
-        const position = markerPosition(warning);
-        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.085, 14, 14), dotMaterial);
-        dot.position.set(position[0], position[1], position[2]);
-        const ring = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.013, 8, 36), ringMaterial);
-        ring.position.set(position[0], position[1], position[2]);
-        ring.userData.phase = index * 1.4;
-        markerGroup.add(dot, ring);
-        rings.push(ring);
-      });
+    const updateTags = () => {
+      const rearAlert = latest.current.warnings.length > 0;
+      paintTag(rearTag, rearAlert ? "REAR CABIN" : "REAR CABIN OK", rearAlert);
+      rearDot.material.color.set(rearAlert ? RED : GREEN);
+      const temp = Number(latest.current.status?.cabin_temp ?? 72);
+      const cabinAlert = temp < 58 || temp > 82;
+      paintTag(cabinTag, cabinAlert ? "CABIN FAULT" : "CABIN OK", cabinAlert);
+      cabinDot.material.color.set(cabinAlert ? RED : GREEN);
     };
 
-    const state = { yaw: 0.5, pitch: 0.22, target: 0.5, snap: false, alert: false, velocity: 0 };
+    const applyHeat = (fault) => {
+      padMaterial.color.set(fault ? 0xff2f2f : 0xff8a3d);
+      padDotMaterial.color.set(fault ? 0xff2f2f : 0x00ff41);
+    };
+
+    // Warning pins on the corners that raised them.
+    const pinGroup = new THREE.Group();
+    scene.add(pinGroup);
+    const pinDotMaterial = new THREE.MeshBasicMaterial({ color: 0xff3b30 });
+    const pinRingMaterial = new THREE.MeshBasicMaterial({ color: 0xff3b30, transparent: true, opacity: 0.8 });
+    let rings = [];
+
+    const rebuildPins = (list = []) => {
+      pinGroup.children.forEach((child) => child.geometry.dispose());
+      pinGroup.clear();
+      rings = [];
+      list
+        .filter((warning) => warning.zone !== "underbody")
+        .forEach((warning, index) => {
+          const position = markerPosition(warning);
+          const dot = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), pinDotMaterial);
+          dot.position.set(position[0], position[1], position[2]);
+          const ring = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.012, 8, 30), pinRingMaterial);
+          ring.position.copy(dot.position);
+          ring.userData.phase = index * 1.4;
+          pinGroup.add(dot, ring);
+          rings.push(ring);
+        });
+    };
+
+    const state = {
+      yaw: 0.6,
+      pitch: 0.2,
+      yawTarget: 0.6,
+      pitchTarget: 0.2,
+      snap: false,
+      velocity: 0,
+    };
     let dragging = false;
     let spun = false;
+    let moved = 0;
     let lastX = 0;
     let lastY = 0;
+
+    const pointer = new THREE.Vector2();
+    const raycaster = new THREE.Raycaster();
+    let hovered = null;
+
+    const hitTest = (event) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.set(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1
+      );
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObjects(hotspots, false)[0];
+      return hit ? hit.object : null;
+    };
+
+    const tipFor = (object, event) => {
+      if (!object) return null;
+      const rect = renderer.domElement.getBoundingClientRect();
+      const fault = Boolean(latest.current.status?.tank_heater_fault);
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+        title: fault ? "Heat pad malfunction" : "Heat pad OK",
+        detail: fault
+          ? "Fresh water heat pad · not responding"
+          : "Fresh water heat pad · heater nominal",
+        tone: fault ? "alert" : "ok",
+      };
+    };
 
     const onDown = (event) => {
       dragging = true;
       spun = true;
+      moved = 0;
       state.snap = false;
       state.velocity = 0;
       lastX = event.clientX;
       lastY = event.clientY;
       renderer.domElement.style.cursor = "grabbing";
       host.setPointerCapture?.(event.pointerId);
+      tipRef.current?.(null);
     };
+
     const onMove = (event) => {
-      if (!dragging) return;
+      if (!dragging) {
+        const object = hitTest(event);
+        if (object !== hovered) {
+          hovered = object;
+          renderer.domElement.style.cursor = object ? "pointer" : "grab";
+          tipRef.current?.(tipFor(object, event));
+        } else if (object) {
+          tipRef.current?.(tipFor(object, event));
+        }
+        return;
+      }
       const dx = event.clientX - lastX;
       const dy = event.clientY - lastY;
       lastX = event.clientX;
       lastY = event.clientY;
+      moved += Math.abs(dx) + Math.abs(dy);
       state.yaw -= dx * 0.0085;
       state.velocity = -dx * 0.0085;
-      state.pitch = Math.min(0.62, Math.max(-0.04, state.pitch + dy * 0.0032));
+      state.pitch = Math.min(1.05, Math.max(-0.95, state.pitch + dy * 0.0034));
       if (Math.abs(dx) > 2) state.snap = false;
     };
-    const onUp = () => {
+
+    const onUp = (event) => {
+      const wasDragging = dragging;
       dragging = false;
       renderer.domElement.style.cursor = "grab";
+      if (wasDragging && moved < 8) {
+        // A tap on the heat pad keeps its readout open, even on a phone.
+        const object = hitTest(event);
+        if (object) tipRef.current?.(tipFor(object, event));
+        hovered = object;
+      }
     };
 
     host.addEventListener("pointerdown", onDown);
@@ -347,64 +290,69 @@ export default function FordTransit3D({ focus, warnings = [], className, onReady
       const time = performance.now() / 1000;
 
       if (state.snap && !dragging) {
-        let diff = state.target - state.yaw;
+        let diff = state.yawTarget - state.yaw;
         diff = ((diff + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
         state.yaw += diff * Math.min(1, dt * 3.6);
+        state.pitch += (state.pitchTarget - state.pitch) * Math.min(1, dt * 3.2);
       } else if (!dragging) {
         if (Math.abs(state.velocity) > 0.0006) {
           state.yaw += state.velocity;
           state.velocity *= 0.93;
         } else if (!spun) {
-          state.yaw += dt * 0.16;
+          state.yaw += dt * 0.15;
         }
       }
 
-      const dist = Math.max(9.2, 11.4 / Math.max(0.45, camera.aspect));
-      const elevation = state.pitch;
+      const dist = Math.max(9.4, 11.6 / Math.max(0.5, camera.aspect));
       camera.position.set(
-        Math.sin(state.yaw) * Math.cos(elevation) * dist,
-        1.3 + Math.sin(elevation) * dist,
-        Math.cos(state.yaw) * Math.cos(elevation) * dist
+        Math.sin(state.yaw) * Math.cos(state.pitch) * dist,
+        1.25 + Math.sin(state.pitch) * dist,
+        Math.cos(state.yaw) * Math.cos(state.pitch) * dist
       );
-      camera.lookAt(0, 1.28, 0);
+      camera.lookAt(0, 1.2, 0);
 
-      paint.emissiveIntensity = state.alert ? 0.16 + Math.sin(time * 4) * 0.1 : 0;
-      if (state.alert) alertLight.intensity = 9 + Math.sin(time * 4) * 4;
-
+      const pulse = 0.55 + Math.abs(Math.sin(time * 3)) * 0.4;
       rings.forEach((ring) => {
         ring.scale.setScalar(1 + Math.sin(time * 3 + ring.userData.phase) * 0.22);
-        ring.material.opacity = 0.55 + Math.abs(Math.sin(time * 3 + ring.userData.phase)) * 0.4;
+        ring.material.opacity = pulse;
       });
+      rearDot.scale.setScalar(1 + Math.sin(time * 2.4) * 0.18);
+      cabinDot.scale.setScalar(1 + Math.sin(time * 2.4 + 1) * 0.18);
+      padMaterial.opacity = 0.72 + Math.sin(time * 2) * 0.18;
 
       renderer.render(scene, camera);
       if (!reported) {
         reported = true;
-        onReady?.(true);
+        onReady?.("ready");
       }
       frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
 
-    // Only a locate request moves the camera; telemetry updates just refresh pins.
-    const applyFocus = (focus) => {
-      const alertSide = focus?.side === "left" || focus?.side === "right" ? focus.side : null;
-      state.alert = Boolean(alertSide);
-      if (alertSide) {
-        state.target = targetYawFor(focus);
-        state.snap = true;
-        alertLight.position.set(0, 1.5, alertSide === "left" ? -2.4 : 2.4);
-      } else {
+    const applyFocus = (next) => {
+      const sided = next?.side === "left" || next?.side === "right";
+      if (!sided) {
         state.snap = false;
-        alertLight.intensity = 0;
+        return;
       }
+      state.yawTarget = targetYawFor(next);
+      state.pitchTarget = next.zone === "underbody" ? -0.62 : 0.2;
+      state.snap = true;
     };
 
+    updateTags();
+    applyHeat(Boolean(latest.current.status?.tank_heater_fault));
     applyFocus(latest.current.focus);
-    rebuildMarkers(latest.current.warnings);
+    rebuildPins(latest.current.warnings);
 
     api.current = {
       focus: applyFocus,
-      warnings: (list) => rebuildMarkers(list),
+      warnings: (list) => {
+        rebuildPins(list);
+        updateTags();
+      },
+      tags: updateTags,
+      heat: applyHeat,
     };
 
     return () => {
@@ -415,19 +363,27 @@ export default function FordTransit3D({ focus, warnings = [], className, onReady
       host.removeEventListener("pointerup", onUp);
       host.removeEventListener("pointercancel", onUp);
       host.removeEventListener("pointerleave", onUp);
+      host.removeEventListener("pointermove", onMove);
       api.current = null;
+      tipRef.current?.(null);
+      const disposed = new Set();
       scene.traverse((node) => {
-        node.geometry?.dispose();
+        if (node.geometry) node.geometry.dispose();
+        const list = Array.isArray(node.material) ? node.material : node.material ? [node.material] : [];
+        list.forEach((material) => {
+          if (disposed.has(material)) return;
+          disposed.add(material);
+          if (material.map) material.map.dispose();
+          material.dispose();
+        });
       });
-      [paint, ringMaterial, dotMaterial].forEach((material) => material.dispose());
       renderer.dispose();
       if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement);
     };
   }, []);
 
-  // A locate request (new alert, toast tap, pin tap) turns the van; a plain
-  // telemetry refresh only redraws the warning pins.
   const warningKey = warnings.map((warning) => warning.id).join("|");
+  const fault = Boolean(status?.tank_heater_fault);
 
   useEffect(() => {
     api.current?.focus(focus);
@@ -436,6 +392,14 @@ export default function FordTransit3D({ focus, warnings = [], className, onReady
   useEffect(() => {
     api.current?.warnings(latest.current.warnings);
   }, [warningKey]);
+
+  useEffect(() => {
+    api.current?.tags();
+  }, [warningKey, status?.cabin_temp]);
+
+  useEffect(() => {
+    api.current?.heat(fault);
+  }, [fault]);
 
   return <div ref={hostRef} className={className} style={{ touchAction: "none" }} />;
 }

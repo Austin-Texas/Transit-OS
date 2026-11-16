@@ -117,6 +117,11 @@
       "type": "number",
       "description": "Fresh water tank level in percent."
     },
+    "tank_heater_fault": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the heat pad under the spare-tire fresh water tank has stopped responding."
+    },
     "gray_water": {
       "type": "number",
       "description": "Gray water tank level in percent."
