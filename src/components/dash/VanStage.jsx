@@ -18,14 +18,11 @@ export default function VanStage({
   onClearFocus,
 }) {
   const side = focus?.side;
-  const [mode, setMode] = useState("3d");
   const [webgl, setWebgl] = useState("pending");
   const [tip, setTip] = useState(null);
 
+  // Always the 3D van; the flat render only stands in when WebGL can't start.
   const failed = webgl === "failed";
-  // Always the 3D van; the flat image only appears when 2D is chosen.
-  const photo = mode === "2d" || failed;
-  const show3d = mode === "3d" && !failed;
 
   return (
     <section
@@ -34,23 +31,14 @@ export default function VanStage({
         focus ? "border-alert/55" : "border-line/80"
       )}
     >
-      {photo ? (
-        <button
-          type="button"
-          onClick={() => setMode("3d")}
-          aria-label="Switch to the 3D view"
-          className="absolute inset-0 h-full w-full cursor-pointer"
-        >
-          <Image
-            src={VAN_STAGE_IMAGE}
-            alt={vehicleName || "Ford Transit camper van"}
-            fittingType="fill"
-            className="pointer-events-none h-full w-full object-cover"
-          />
-        </button>
-      ) : null}
-
-      {show3d ? (
+      {failed ? (
+        <Image
+          src={VAN_STAGE_IMAGE}
+          alt={vehicleName || "Ford Transit camper van"}
+          fittingType="fill"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+        />
+      ) : (
         <FordTransit3D
           className="absolute inset-0 h-full w-full"
           focus={focus}
@@ -59,36 +47,13 @@ export default function VanStage({
           onReady={setWebgl}
           onTip={setTip}
         />
-      ) : null}
+      )}
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(78%_68%_at_50%_44%,transparent_42%,rgba(2,6,11,0.6)_100%)]" />
 
       <div className="pointer-events-none absolute left-4 top-3.5 z-10 flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-white/65">
         <span className="h-1.5 w-1.5 rounded-full bg-sys-blue" />
         Live van · Interior {Math.round(cabinTemp)}°F
-      </div>
-
-      <div className="absolute right-3 top-3 z-20 inline-flex items-center gap-0.5 rounded-full border border-neon/35 bg-ink-950/85 p-0.5 backdrop-blur">
-        {[
-          { id: "3d", label: "3D" },
-          { id: "2d", label: "2D" },
-        ].map((option) => {
-          const active = option.id === "3d" ? !photo : photo;
-          return (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => setMode(option.id)}
-              aria-pressed={active}
-              className={cn(
-                "rounded-full px-2.5 py-1 text-[8.5px] font-semibold uppercase tracking-[0.14em] transition",
-                active ? "bg-neon/20 text-neon" : "text-white/45 hover:text-white/80"
-              )}
-            >
-              {option.label}
-            </button>
-          );
-        })}
       </div>
 
       {focus ? (
