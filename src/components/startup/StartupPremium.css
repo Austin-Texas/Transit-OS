@@ -125,3 +125,21 @@
 .tp-cinema--1 .tp-cinema__ring,.tp-cinema--2 .tp-cinema__ring{opacity:1}
 .tp-cinema--2 .tp-cinema__ring{top:83%}
 @media(prefers-reduced-motion:reduce){.tp-cinema__brand,.tp-cinema__presentation,.tp-cinema__ring{transition:none!important}}
+
+/* Slow depth-of-field logo arrival: from distant background toward viewer. */
+.tp-cinema--0 .tp-cinema__symbol{
+  animation:tp-cinema-deep-arrival 2.8s cubic-bezier(.16,.65,.2,1) both!important;
+  transform-origin:50% 50%;
+}
+.tp-cinema--1 .tp-cinema__symbol{
+  animation:none!important;
+  transform:perspective(1000px) translateZ(0) scale(1);
+  filter:drop-shadow(0 0 13px #00caff38);
+}
+@keyframes tp-cinema-deep-arrival{
+  0%{opacity:0;transform:perspective(1100px) translateZ(-850px) scale(.38);filter:blur(24px) brightness(.55)}
+  25%{opacity:.3;transform:perspective(1100px) translateZ(-640px) scale(.52);filter:blur(16px) brightness(.75)}
+  65%{opacity:.86;transform:perspective(1100px) translateZ(-260px) scale(.82);filter:blur(5px) brightness(1.1)}
+  100%{opacity:1;transform:perspective(1100px) translateZ(0) scale(1);filter:drop-shadow(0 0 13px #00caff38)}
+}
+@media(prefers-reduced-motion:reduce){.tp-cinema--0 .tp-cinema__symbol{animation:none!important;transform:none!important}}
