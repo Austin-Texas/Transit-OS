@@ -255,6 +255,11 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       const wasDragging = dragging;
       dragging = false;
       renderer.domElement.style.cursor = "grab";
+      if (event?.type === "pointerleave" || event?.type === "pointercancel") {
+        hovered = null;
+        tipRef.current?.(null);
+        return;
+      }
       if (wasDragging && moved < 8) {
         // A tap on the heat pad keeps its readout open, even on a phone.
         const object = hitTest(event);
@@ -303,13 +308,16 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
         }
       }
 
-      const dist = Math.max(9.4, 11.6 / Math.max(0.5, camera.aspect));
+      // Frame the van to the stage: as wide as the panel allows, never clipped.
+      const halfFov = THREE.MathUtils.degToRad(16);
+      const horizontal = Math.tan(halfFov) * Math.max(0.4, camera.aspect);
+      const dist = Math.min(16, Math.max(3.5 / horizontal, 1.95 / Math.tan(halfFov)));
       camera.position.set(
         Math.sin(state.yaw) * Math.cos(state.pitch) * dist,
-        1.25 + Math.sin(state.pitch) * dist,
+        1.35 + Math.sin(state.pitch) * dist,
         Math.cos(state.yaw) * Math.cos(state.pitch) * dist
       );
-      camera.lookAt(0, 1.2, 0);
+      camera.lookAt(0, 1.3, 0);
 
       const pulse = 0.55 + Math.abs(Math.sin(time * 3)) * 0.4;
       rings.forEach((ring) => {
