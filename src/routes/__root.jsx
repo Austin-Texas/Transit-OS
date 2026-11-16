@@ -1,4 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import StartupSequence from "@/components/startup/StartupSequence";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import { Toaster } from "@/components/ui/sonner";
@@ -30,10 +32,12 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+  const [booting, setBooting] = useState(true);
   return (
     <AuthProvider>
       <Outlet />
       <Toaster />
+      {booting ? <StartupSequence onDone={() => setBooting(false)} /> : null}
     </AuthProvider>
   );
 }
