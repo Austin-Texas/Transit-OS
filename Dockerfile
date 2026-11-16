@@ -12,6 +12,8 @@ RUN npm run build
 FROM node:22-bookworm-slim
 WORKDIR /app
 ENV NODE_ENV=production
+# Vite preview host validation for the Cloudflare public hostname.
+ENV __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS=transit.hastenload.com
 COPY --from=build /app /app
 EXPOSE 80
 CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "80"]
