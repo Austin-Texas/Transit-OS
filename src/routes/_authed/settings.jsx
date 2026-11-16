@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/AuthContext";
 import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
 import PhotoSlots from "@/components/settings/PhotoSlots";
+import SettingsCameras from "@/components/settings/SettingsCameras";
 
 export const Route = createFileRoute("/_authed/settings")({
   head: () => ({
@@ -144,6 +145,8 @@ function SettingsPage() {
           </ModuleCard>
         </div>
       </div>
+
+      <SettingsCameras className="mt-3" />
     </ModuleShell>
   );
 }

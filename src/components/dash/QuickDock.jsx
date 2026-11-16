@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Activity, Archive, Camera, DoorOpen, Droplets, Lightbulb, Snowflake, Zap } from "lucide-react";
+import { Activity, Archive, DoorOpen, Droplets, Lightbulb, Snowflake, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import QuickJumps from "./QuickJumps";
 
@@ -11,7 +11,6 @@ const DOCK = [
   { id: "power", label: "Power", icon: Zap, to: "/electrical" },
   { id: "water", label: "Water", icon: Droplets, to: "/water" },
   { id: "diagnose", label: "Diagnose", icon: Activity, to: "/vehicle" },
-  { id: "cameras", label: "Cameras", icon: Camera, to: "/cameras" },
 ];
 
 export default function QuickDock() {

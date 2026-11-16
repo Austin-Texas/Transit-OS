@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 
 const JUMPS = [
   { id: "electrical", label: "Electrical", icon: Zap, to: "/electrical" },
-  { id: "cameras", label: "Cameras", icon: Camera, to: "/cameras" },
+  { id: "cameras", label: "Cameras", icon: Camera, to: "/settings", hash: "cameras" },
   { id: "automation", label: "Automation", icon: Layers, to: "/automation" },
 ];
 
@@ -14,12 +14,13 @@ export default function QuickJumps() {
 
   return (
     <nav aria-label="Quick access" className="mb-1.5 grid grid-cols-3 gap-1.5">
-      {JUMPS.map(({ id, label, icon: Icon, to }) => {
+      {JUMPS.map(({ id, label, icon: Icon, to, hash }) => {
         const isActive = pathname.startsWith(to);
         return (
           <Link
             key={id}
             to={to}
+            hash={hash}
             aria-current={isActive ? "page" : undefined}
             className={cn(
               "flex items-center justify-center gap-1.5 rounded-full border px-2 py-1.5 transition-colors",
