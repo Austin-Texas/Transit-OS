@@ -22,7 +22,7 @@ export function Empty({children}) {return <p className='rounded-xl border border
 
 export function PlatformPage({title,subtitle,children}) {
   const {status}=useVanDashboard();
-  return <ModuleShell title={title} subtitle={subtitle} status={status} meta={<Link to='/platform' className='inline-flex items-center gap-1 rounded-xl border border-line px-3 py-2 text-[11px] text-sys-blue'><ArrowLeft className='h-3 w-3'/>Platform tools</Link>}>{children}</ModuleShell>;
+  return <ModuleShell title={title} subtitle={subtitle} status={status} meta={title==='Platform tools'?null:<Link to='/platform' className='inline-flex items-center gap-1 rounded-xl border border-line px-3 py-2 text-[11px] text-sys-blue'><ArrowLeft className='h-3 w-3'/>Platform tools</Link>}>{children}</ModuleShell>;
 }
 
 export function PlatformAccess() {return <ModuleCard title='Platform tools' icon={Layers}><p className={`${panelText} mb-3`}>Devices, tracking, LPG, leveling, integrations, updates and simulation in the same TransitOS app.</p><Link to='/platform' className='inline-flex rounded-xl border border-sys-blue/40 bg-sys-blue/10 px-4 py-2 text-[12px] font-semibold text-sys-blue'>Open platform tools</Link></ModuleCard>;}
