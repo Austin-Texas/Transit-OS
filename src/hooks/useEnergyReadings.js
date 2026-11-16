@@ -25,9 +25,10 @@ export default function useEnergyReadings(range = 24) {
     try {
       const page = await base44.entities.EnergyReading.filter(
         { recorded_at: { $gte: since } },
-        { sort: "recorded_at", limit: 500 }
+        { sort: "-recorded_at", limit: 500 }
       );
-      setItems(page.items ?? []);
+      // Newest first from the server, oldest first for the charts.
+      setItems((page.items ?? []).slice().reverse());
     } finally {
       setLoading(false);
     }
