@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import VanPhoto from "@/components/van/VanPhoto";
+import PhotoGrade from "@/components/van/PhotoGrade";
 import { VAN_STAGE_IMAGE } from "@/lib/van";
 
 function Marker({ className, tone, label }) {
@@ -31,8 +32,7 @@ export default function VanStage({ cabinTemp, vehicleName, trim, photoUri, focus
       />
 
       {/* Neon grade over the photo so it reads as part of the dark interface. */}
-      <span className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-neon/10 via-transparent to-sys-blue/10 mix-blend-screen" />
-      <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_40%,rgba(2,10,20,0.8)_100%)]" />
+      <PhotoGrade />
 
       {focus ? (
         <>

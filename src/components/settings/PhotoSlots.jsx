@@ -3,6 +3,7 @@ import { BedDouble, ImagePlus, Trash2, Truck } from "lucide-react";
 import { toast } from "sonner";
 import ModuleCard from "@/components/dash/ModuleCard";
 import VanPhoto from "@/components/van/VanPhoto";
+import PhotoGrade from "@/components/van/PhotoGrade";
 import { base44 } from "@/api/base44Client";
 import { CABIN_IMAGE, VAN_IMAGE } from "@/lib/van";
 
@@ -44,6 +45,7 @@ function PhotoRow({ slot, uri, onUpdate }) {
     <div className="flex items-center gap-3 rounded-xl border border-line/80 bg-surface-raised p-2.5">
       <div className="relative h-[62px] w-[92px] shrink-0 overflow-hidden rounded-lg border photo-slot">
         <VanPhoto uri={uri} fallback={slot.fallback} alt={slot.label} className="absolute inset-0 h-full w-full object-cover" />
+        <PhotoGrade />
       </div>
 
       <div className="min-w-0 flex-1">

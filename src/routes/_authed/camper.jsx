@@ -8,6 +8,7 @@ import Metric from "@/components/dash/Metric";
 import ToggleRow from "@/components/dash/ToggleRow";
 import { Slider } from "@/components/ui/slider";
 import VanPhoto from "@/components/van/VanPhoto";
+import PhotoGrade from "@/components/van/PhotoGrade";
 import { CABIN_IMAGE } from "@/lib/van";
 
 export const Route = createFileRoute("/_authed/camper")({
@@ -50,9 +51,7 @@ function CamperPage() {
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/25 to-transparent" />
             {/* Neon grade: cool cyan in the highlights, deep ink at the edges, so any photo sits in the same palette. */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-neon/10 via-transparent to-sys-blue/10 mix-blend-screen" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_35%,rgba(2,10,20,0.75)_100%)]" />
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-neon/50 to-transparent" />
+            <PhotoGrade />
             <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
               <div>
                 <p className="text-[9.5px] uppercase tracking-[0.2em] text-white/45">Cabin</p>
