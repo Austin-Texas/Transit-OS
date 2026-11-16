@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MfaFlow } from "@/components/auth/MfaFlow";
 import { MfaScreen } from "@/components/auth/MfaParts";
-import { loginWithMfa } from "@/lib/authMfa";
+import { selfhostAuth } from "@/lib/selfhostAuth";
 import { safeReturnTo } from "@/lib/authReturnTo";
 
 // The /login page. ?returnTo= (or the platform's ?from_url=) is where the visitor
@@ -24,11 +24,7 @@ export function LoginPage() {
     setError("");
     setBusy(true);
     try {
-      const result = await loginWithMfa(email, password);
-      if (result.mfa_required) {
-        setMfaChallenge(result);
-        return;
-      }
+      await selfhostAuth.login(email, password);
       // A hard redirect: the app re-initializes with the new session.
       window.location.href = returnTo;
     } catch (err) {
@@ -42,8 +38,6 @@ export function LoginPage() {
 
   return (
     <AuthLayout icon={LogIn} title="Welcome back" subtitle="Log in to your account">
-      <GoogleButton returnTo={returnTo} onError={setError} />
-      <OrDivider />
       <AuthError>{error}</AuthError>
       <form onSubmit={submit} className="space-y-4">
         <div className="space-y-2">
