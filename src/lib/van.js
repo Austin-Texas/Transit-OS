@@ -14,7 +14,7 @@ export const MODES = [
 export const SAMPLE_STATUS = {
   vehicle_name: "2026 Ford Transit",
   trim: "Full Extended High Roof",
-  vin: "1FTBR1C8XPK104482",
+  vin: "",
   active_mode: "camping",
   battery_voltage: 12.6,
   battery_percent: 92,
