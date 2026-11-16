@@ -1,10 +1,8 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Camera, Layers, Zap } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Camera, Layers, Zap } from "lucide-react";import { cn } from "@/lib/utils";
 
 const JUMPS = [
   { id: "electrical", label: "Electrical", icon: Zap, to: "/electrical" },
-  { id: "cameras", label: "Cameras", icon: Camera, to: "/settings", hash: "cameras" },
   { id: "automation", label: "Automation", icon: Layers, to: "/automation" },
 ];
 
@@ -13,7 +11,7 @@ export default function QuickJumps() {
   const pathname = useLocation({ select: (location) => location.pathname });
 
   return (
-    <nav aria-label="Quick access" className="mb-1.5 grid grid-cols-3 gap-1.5">
+    <nav aria-label="Quick access" className="mb-1.5 grid grid-cols-2 gap-1.5">
       {JUMPS.map(({ id, label, icon: Icon, to, hash }) => {
         const isActive = pathname.startsWith(to);
         return (

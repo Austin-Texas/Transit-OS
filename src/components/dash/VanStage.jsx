@@ -1,4 +1,5 @@
-import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Camera, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import VanPhoto from "@/components/van/VanPhoto";
 import PhotoGrade from "@/components/van/PhotoGrade";
 import { VAN_STAGE_IMAGE } from "@/lib/van";
@@ -87,6 +88,17 @@ export default function VanStage({ cabinTemp, vehicleName, trim, photoUri, focus
         <p className="text-[14px] font-semibold leading-tight tracking-tight text-white">{vehicleName}</p>
         <p className="text-[9.5px] uppercase tracking-[0.18em] text-white/40">{trim}</p>
       </div>
+
+      {/* Camera feeds live in Settings now; this is the one-tap way in. */}
+      <Link
+        to="/settings"
+        hash="cameras"
+        className="group absolute bottom-3.5 right-3.5 z-10 inline-flex items-center gap-2 rounded-full border border-neon/45 bg-ink-950/70 px-3 py-1.5 text-[9.5px] font-semibold uppercase tracking-[0.14em] text-neon backdrop-blur transition hover:border-neon/80 hover:bg-neon/15"
+      >
+        <Camera className="h-3.5 w-3.5" strokeWidth={2.2} />
+        Cameras
+        <ArrowUpRight className="h-3 w-3 opacity-60 transition group-hover:opacity-100" strokeWidth={2.4} />
+      </Link>
     </section>
   );
 }
