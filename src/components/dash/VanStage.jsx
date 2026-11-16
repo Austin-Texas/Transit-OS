@@ -2,8 +2,6 @@ import { useState } from "react";
 import { ArrowLeft, ArrowRight, Camera, Move } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import FordTransit3D from "@/components/van/FordTransit3D";
-import { Image } from "@/components/ui/image";
-import { VAN_STAGE_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
 // The home stage: the neon wireframe van you can spin with a finger, plus a
@@ -18,11 +16,7 @@ export default function VanStage({
   onClearFocus,
 }) {
   const side = focus?.side;
-  const [webgl, setWebgl] = useState("pending");
   const [tip, setTip] = useState(null);
-
-  // Always the 3D van; the flat render only stands in when WebGL can't start.
-  const failed = webgl === "failed";
 
   return (
     <section
@@ -31,23 +25,13 @@ export default function VanStage({
         focus ? "border-alert/55" : "border-line/80"
       )}
     >
-      {failed ? (
-        <Image
-          src={VAN_STAGE_IMAGE}
-          alt={vehicleName || "Ford Transit camper van"}
-          fittingType="fill"
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-        />
-      ) : (
-        <FordTransit3D
-          className="absolute inset-0 h-full w-full"
-          focus={focus}
-          warnings={warnings}
-          status={status}
-          onReady={setWebgl}
-          onTip={setTip}
-        />
-      )}
+      <FordTransit3D
+        className="absolute inset-0 h-full w-full"
+        focus={focus}
+        warnings={warnings}
+        status={status}
+        onTip={setTip}
+      />
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(78%_68%_at_50%_44%,transparent_42%,rgba(2,6,11,0.6)_100%)]" />
 
