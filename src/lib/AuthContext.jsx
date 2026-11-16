@@ -14,6 +14,7 @@ import { currentUrl } from "@/lib/authReturnTo";
 export const authQuery = queryOptions({
   queryKey: ["auth", "me"],
   queryFn: async () => {
+    if (import.meta.env.VITE_PUBLIC_DEMO === "true") return { user: { id: "public-demo", role: "viewer", name: "Demo Viewer" }, error: null };
     // No token means no session; /me could only answer 401.
     if (!base44.auth.hasToken()) return { user: null, error: null };
     try {
