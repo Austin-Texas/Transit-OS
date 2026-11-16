@@ -87,6 +87,16 @@ export default function useVanDashboard() {
   const update = async (patch) => {
     setStatus((prev) => (prev ? { ...prev, ...patch } : prev));
     if (status?.id) await base44.entities.VanStatus.update(status.id, patch);
+
+    // Tank changes made in the app (refill, dump) join the history log too.
+    const tanks = ["fresh_water", "gray_water", "black_water"].filter((key) => patch[key] !== undefined);
+    if (tanks.length) {
+      const reading = { recorded_at: new Date().toISOString() };
+      tanks.forEach((key) => {
+        reading[key] = patch[key];
+      });
+      await base44.entities.EnergyReading.create(reading);
+    }
   };
 
   const setMode = (mode) => update({ active_mode: mode });

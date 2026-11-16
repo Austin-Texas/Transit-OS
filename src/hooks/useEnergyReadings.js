@@ -11,7 +11,10 @@ const timeLabel = (date, range) => {
   return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: false, timeZone: zone });
 };
 
-// Power history pushed by the van hub, charted for the selected window.
+const pct = (value) =>
+  value === null || value === undefined || value === "" ? null : Math.round(Number(value));
+
+// Power and tank history pushed by the van hub, charted for the selected window.
 export default function useEnergyReadings(range = 24) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -41,6 +44,9 @@ export default function useEnergyReadings(range = 24) {
       battery: Math.round(Number(reading.battery_percent ?? 0)),
       solar: Math.round(Number(reading.solar_w ?? 0)),
       load: Math.round(Number(reading.load_w ?? 0)),
+      fresh: pct(reading.fresh_water),
+      gray: pct(reading.gray_water),
+      black: pct(reading.black_water),
     };
   });
 

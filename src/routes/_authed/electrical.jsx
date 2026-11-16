@@ -38,7 +38,7 @@ function TrendStat({ label, value, tone = "text-white" }) {
 
 function ElectricalPage() {
   const van = useVanDashboard();
-  const [range, setRange] = useState(24);
+  const [range, setRange] = useState(168);
   const history = useEnergyReadings(range);
   const { status } = van;
 

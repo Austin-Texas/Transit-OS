@@ -101,9 +101,18 @@ export const Route = createFileRoute("/api/van-telemetry")({
           ? await base44.asServiceRole.entities.VanStatus.update(van.id, patch)
           : await base44.asServiceRole.entities.VanStatus.create(patch);
 
-        // Every reading that carries power data also lands in the history the charts draw.
+        // Every reading that carries power or tank data lands in the history the charts draw.
         const reading = { recorded_at: new Date().toISOString() };
-        for (const key of ["battery_percent", "battery_voltage", "solar_w", "load_w"]) {
+        for (const key of [
+          "battery_percent",
+          "battery_voltage",
+          "solar_w",
+          "load_w",
+          "fresh_water",
+          "gray_water",
+          "black_water",
+          "lpg_percent",
+        ]) {
           if (patch[key] !== undefined) reading[key] = patch[key];
         }
         const hasHistory = Object.keys(reading).length > 1;

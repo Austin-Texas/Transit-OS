@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Droplets, RefreshCw, Waves } from "lucide-react";
+import { Droplets, History, RefreshCw, Waves } from "lucide-react";
 import useVanDashboard from "@/hooks/useVanDashboard";
+import useEnergyReadings from "@/hooks/useEnergyReadings";
 import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
 import ToggleRow from "@/components/dash/ToggleRow";
+import TankChart from "@/components/water/TankChart";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authed/water")({
@@ -22,11 +25,36 @@ const TANKS = [
   { key: "black_water", label: "Black", hint: "Toilet", tone: "bg-warn" },
 ];
 
+const RANGES = [
+  { hours: 24, label: "24H" },
+  { hours: 168, label: "7D" },
+];
+
+const extreme = (points, key, pick) => {
+  const values = points.map((point) => point[key]).filter((value) => typeof value === "number");
+  return values.length ? pick(...values) : null;
+};
+
+function Stat({ label, value, tone = "text-white" }) {
+  return (
+    <div className="rounded-lg border border-line/80 bg-surface-raised px-2.5 py-1.5">
+      <p className="text-[8.5px] uppercase tracking-[0.14em] text-white/35">{label}</p>
+      <p className={cn("mt-0.5 font-mono text-[11.5px] font-semibold", tone)}>{value}</p>
+    </div>
+  );
+}
+
 function WaterPage() {
   const van = useVanDashboard();
   const { status } = van;
+  const [range, setRange] = useState(168);
+  const history = useEnergyReadings(range);
 
   if (!status) return <ModuleShell title="Water" />;
+
+  const freshLow = extreme(history.points, "fresh", Math.min);
+  const grayHigh = extreme(history.points, "gray", Math.max);
+  const blackHigh = extreme(history.points, "black", Math.max);
 
   return (
     <ModuleShell title="Water" subtitle="Tank levels, pump and drainage" status={status}>
@@ -93,6 +121,46 @@ function WaterPage() {
               Dumped black
             </button>
           </div>
+        </ModuleCard>
+
+        <ModuleCard
+          title="Tank history"
+          icon={History}
+          className="lg:col-span-3"
+          action={
+            <div className="flex items-center gap-1 rounded-full border border-line bg-surface p-1">
+              {RANGES.map((option) => (
+                <button
+                  key={option.hours}
+                  type="button"
+                  aria-pressed={range === option.hours}
+                  onClick={() => setRange(option.hours)}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 text-[9.5px] font-semibold uppercase tracking-[0.12em] transition",
+                    range === option.hours ? "bg-sys-blue text-white" : "text-white/45 hover:text-white/80"
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          }
+        >
+          {history.loading ? (
+            <div className="h-[190px] animate-pulse rounded-xl border border-line/60 bg-surface-raised" />
+          ) : history.points.some((point) => point.fresh !== null || point.gray !== null || point.black !== null) ? (
+            <TankChart points={history.points} />
+          ) : (
+            <p className="grid h-[190px] place-items-center rounded-xl border border-dashed border-line/80 text-[11px] text-white/40">
+              No tank readings in this window yet.
+            </p>
+          )}
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <Stat label="Fresh low" value={freshLow === null ? "—" : `${freshLow}%`} tone="text-sys-blue" />
+            <Stat label="Gray high" value={grayHigh === null ? "—" : `${grayHigh}%`} />
+            <Stat label="Black high" value={blackHigh === null ? "—" : `${blackHigh}%`} tone="text-warn" />
+          </div>
+          <p className="mt-2 text-[10px] text-white/30">{history.count} readings logged</p>
         </ModuleCard>
       </div>
     </ModuleShell>

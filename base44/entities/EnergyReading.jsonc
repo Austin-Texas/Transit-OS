@@ -22,6 +22,22 @@
     "load_w": {
       "type": "number",
       "description": "House loads drawing power at that moment, in watts."
+    },
+    "fresh_water": {
+      "type": "number",
+      "description": "Fresh water tank level at that moment, in percent."
+    },
+    "gray_water": {
+      "type": "number",
+      "description": "Gray water tank level at that moment, in percent."
+    },
+    "black_water": {
+      "type": "number",
+      "description": "Black water tank level at that moment, in percent."
+    },
+    "lpg_percent": {
+      "type": "number",
+      "description": "Propane level at that moment, in percent."
     }
   },
   "required": [
