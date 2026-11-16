@@ -209,8 +209,8 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
         y: event.clientY - rect.top,
         title: fault ? "Heat pad malfunction" : "Heat pad OK",
         detail: fault
-          ? "Fresh water heat pad · not responding"
-          : "Fresh water heat pad · heater nominal",
+          ? "Hardware fault: pad under the fresh tank · software: heater controller not responding"
+          : "Hardware: heat pad nominal · software: heater controller online",
         tone: fault ? "alert" : "ok",
       };
     };

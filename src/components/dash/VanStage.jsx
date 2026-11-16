@@ -23,7 +23,8 @@ export default function VanStage({
   const [tip, setTip] = useState(null);
 
   const failed = webgl === "failed";
-  const photo = mode === "2d" || failed || webgl === "pending";
+  // Always the 3D van; the flat image only appears when 2D is chosen.
+  const photo = mode === "2d" || failed;
   const show3d = mode === "3d" && !failed;
 
   return (
@@ -116,9 +117,9 @@ export default function VanStage({
         </span>
       ) : null}
 
-      <div className="pointer-events-none absolute bottom-3.5 left-4 z-10 min-w-0 max-w-[58%]">
-        <p className="truncate text-[15px] font-semibold leading-tight tracking-tight text-white">{vehicleName}</p>
-        <p className="truncate text-[9.5px] uppercase tracking-[0.18em] text-white/45">{trim}</p>
+      <div className="pointer-events-none absolute bottom-3.5 left-4 z-10 min-w-0 max-w-[68%]">
+        <p className="text-[15px] font-semibold leading-tight tracking-tight text-white">{vehicleName}</p>
+        <p className="text-[9.5px] uppercase leading-snug tracking-[0.18em] text-white/45">{trim}</p>
       </div>
 
       {tip ? (
