@@ -1,3 +1,5 @@
+import { heatPad } from "@/lib/heatPad";
+
 // Every automation-owned alert key starts with this prefix, so the watcher only
 // ever creates, updates or closes alerts it raised itself.
 const PREFIX = "auto:";
@@ -117,8 +119,9 @@ export function evaluateAlertConditions(status, cameras = [], now = Date.now()) 
     }
   }
 
-  // The heat pad under the spare-tire fresh tank stopped answering.
-  if (status.tank_heater_fault === true) {
+  // The heat pad under the spare-tire fresh tank stopped answering: either the
+  // hub's fault flag is set or the controller reported the fault state itself.
+  if (heatPad(status).fault) {
     conditions.push({
       key: `${PREFIX}tank_heater_fault`,
       severity: "warning",

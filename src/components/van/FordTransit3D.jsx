@@ -224,8 +224,40 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     };
     let faulted = heatPad(latest.current.status).key === "fault";
 
+    // The hotspot the fault belongs to: the pad sits under the spare-tire tank.
+    // A failure marks that exact spot with pulsing red rings on the pad and a
+    // tag that reads through the body, so it is visible before the camera
+    // swings underneath.
+    const padAlert = new THREE.Group();
+    padAlert.visible = faulted;
+    const padRings = [0.36, 0.6].map((radius, index) => {
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(radius, radius + 0.05, 40),
+        new THREE.MeshBasicMaterial({
+          color: 0xff2f2f,
+          transparent: true,
+          opacity: 0.85,
+          side: THREE.DoubleSide,
+          depthTest: false,
+          depthWrite: false,
+        })
+      );
+      ring.rotation.x = -Math.PI / 2;
+      ring.position.set(-2.35, 0.125, 0);
+      ring.renderOrder = 18;
+      ring.userData.phase = index * 1.5;
+      padAlert.add(ring);
+      return ring;
+    });
+    const padAlertTag = createTag();
+    padAlertTag.position.set(-3.15, 0.46, 0.92);
+    paintTag(padAlertTag, "HEAT PAD FAILURE", true);
+    padAlert.add(padAlertTag);
+    scene.add(padAlert);
+
     const applyHeat = (key) => {
       faulted = key === "fault";
+      padAlert.visible = faulted;
       padMaterial.color.set(PAD_COLORS[key] ?? PAD_COLORS.unknown);
       padDotMaterial.color.set(key === "fault" ? 0xff2f2f : key === "unknown" ? 0x6b8794 : 0x00ff41);
     };
@@ -423,6 +455,13 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       padMaterial.opacity = 0.72 + Math.sin(time * 2) * 0.18;
       // A faulted heat pad pulses, so the red dot is easy to find under the van.
       padDot.scale.setScalar(faulted ? 1.5 + Math.abs(Math.sin(time * 3.4)) * 0.7 : 1);
+      if (padAlert.visible) {
+        padRings.forEach((ring) => {
+          const wave = (Math.sin(time * 2.6 + ring.userData.phase) + 1) / 2;
+          ring.scale.setScalar(1 + wave * 0.32);
+          ring.material.opacity = 0.32 + (1 - wave) * 0.55;
+        });
+      }
 
       renderer.render(scene, camera);
       if (!reported) {
