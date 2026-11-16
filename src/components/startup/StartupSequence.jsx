@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { STARTUP_EXIT_MS, STARTUP_TOTAL_MS } from "@/lib/startupStages";
-import StartupWebGL from "./StartupWebGL";
+import { STAGES, STARTUP_EXIT_MS, STARTUP_TOTAL_MS } from "@/lib/startupStages";
+import StartupPoster from "./StartupPoster";
 import StageBoot from "./StageBoot";
 
-// The cinematic startup: a WebGL scene for the symbol, the reveal and the van,
-// then the initialization interface, then a fade into the dashboard.
+// The cinematic startup: the brand frame builds up beat by beat, then the
+// initialization interface, then a fade into the dashboard.
 export default function StartupSequence({ onDone }) {
-  const [stage, setStage] = useState(0);
-  const [mode, setMode] = useState("webgl");
+  const [phase, setPhase] = useState(0);
+  const [mode, setMode] = useState("poster");
   const [closing, setClosing] = useState(false);
   const [gone, setGone] = useState(false);
   const doneRef = useRef(onDone);
@@ -21,6 +21,7 @@ export default function StartupSequence({ onDone }) {
 
     if (reduced) {
       setMode("static");
+      setPhase(3);
       const timer = setTimeout(() => setClosing(true), 900);
       return () => {
         clearTimeout(timer);
@@ -28,8 +29,13 @@ export default function StartupSequence({ onDone }) {
       };
     }
 
+    const beacons = STAGES.slice(1).map((stage, index) =>
+      setTimeout(() => setPhase(index + 1), stage.at * 1000),
+    );
     const timer = setTimeout(() => setClosing(true), STARTUP_TOTAL_MS);
+
     return () => {
+      beacons.forEach(clearTimeout);
       clearTimeout(timer);
       document.body.style.overflow = previousOverflow;
     };
@@ -46,52 +52,35 @@ export default function StartupSequence({ onDone }) {
 
   if (gone) return null;
 
-  if (mode === "static") {
-    return (
-      <motion.div
-        className="fixed inset-0 z-[130] grid place-items-center bg-[#01040d]"
-        animate={{ opacity: closing ? 0 : 1 }}
-        transition={{ duration: STARTUP_EXIT_MS / 1000 }}
-      >
-        <div className="flex flex-col items-center gap-6">
-          <img src="/branding/tpmcs-logo.svg" alt="TPMCS" className="h-40 w-auto" />
-          <span className="text-[13px] font-semibold uppercase tracking-[0.4em] text-white/70">TransitOS</span>
-        </div>
-      </motion.div>
-    );
-  }
-
   return (
     <motion.div
-      className="fixed inset-0 z-[130] overflow-hidden bg-[#01040d]"
+      className="fixed inset-0 z-[130] overflow-hidden bg-[#03080f]"
       animate={{ opacity: closing ? 0 : 1 }}
       transition={{ duration: STARTUP_EXIT_MS / 1000, ease: "easeInOut" }}
     >
-      <StartupWebGL
-        onStage={setStage}
-        onFail={() => {
-          setMode("static");
-          setClosing(true);
-        }}
-      />
+      <StartupPoster phase={mode === "static" ? 3 : phase} />
 
-      <motion.div
-        className="absolute inset-0 bg-[#01040d]/92"
-        initial={false}
-        animate={{ opacity: stage >= 4 ? 1 : 0 }}
-        transition={{ duration: 0.6 }}
-        style={{ pointerEvents: stage >= 4 ? "auto" : "none" }}
-      >
-        {stage >= 4 ? <StageBoot /> : null}
-      </motion.div>
+      {mode !== "static" ? (
+        <>
+          <motion.div
+            className="absolute inset-0 bg-[#03080f]/94"
+            initial={false}
+            animate={{ opacity: phase >= 4 ? 1 : 0 }}
+            transition={{ duration: 0.6 }}
+            style={{ pointerEvents: phase >= 4 ? "auto" : "none" }}
+          >
+            {phase >= 4 ? <StageBoot /> : null}
+          </motion.div>
 
-      <button
-        type="button"
-        onClick={() => setClosing(true)}
-        className="absolute bottom-5 right-5 z-20 rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.22em] text-white/45 backdrop-blur-xl transition hover:border-white/25 hover:text-white/80"
-      >
-        Skip intro
-      </button>
+          <button
+            type="button"
+            onClick={() => setClosing(true)}
+            className="absolute bottom-5 right-5 z-20 rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.22em] text-white/45 backdrop-blur-xl transition hover:border-white/25 hover:text-white/80"
+          >
+            Skip intro
+          </button>
+        </>
+      ) : null}
     </motion.div>
   );
 }
