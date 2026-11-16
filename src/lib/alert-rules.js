@@ -1,4 +1,5 @@
 import { heatPad } from "@/lib/heatPad";
+import { formatMiles, remainingText, serviceState } from "@/lib/maintenance";
 
 // Every automation-owned alert key starts with this prefix, so the watcher only
 // ever creates, updates or closes alerts it raised itself.
@@ -12,7 +13,7 @@ const MOTION_WINDOW_MS = 10 * 60 * 1000;
 
 // Turns the latest van readings and camera motion stamps into the alert
 // conditions the dashboard should be showing right now.
-export function evaluateAlertConditions(status, cameras = [], now = Date.now()) {
+export function evaluateAlertConditions(status, cameras = [], now = Date.now(), maintenance = []) {
   if (!status) return [];
   const conditions = [];
 
@@ -128,6 +129,19 @@ export function evaluateAlertConditions(status, cameras = [], now = Date.now()) 
       title: "Fresh water heat pad fault",
       detail: "Pad under the spare-tire tank · sensor not responding",
       side: "left",
+    });
+  }
+
+  // Tracked parts whose mileage or day limit has passed.
+  const odometer = num(status.odometer);
+  for (const item of maintenance) {
+    const state = serviceState(item, odometer, now);
+    if (!state.due) continue;
+    conditions.push({
+      key: `${PREFIX}maintenance:${item.id}`,
+      severity: "warning",
+      title: `${item.name} due for service`,
+      detail: `${remainingText(state)}${Number.isFinite(odometer) ? ` · odometer ${formatMiles(odometer)}` : ""}`,
     });
   }
 

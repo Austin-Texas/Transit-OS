@@ -1,0 +1,106 @@
+{
+  "name": "MaintenanceItem",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Part or service being tracked, e.g. Engine oil & filter."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "engine",
+        "brakes",
+        "tires",
+        "fluids",
+        "coach",
+        "electrical",
+        "safety"
+      ],
+      "enumColors": [
+        "blue",
+        "red",
+        "yellow",
+        "green",
+        "purple",
+        "blue",
+        "pink"
+      ],
+      "default": "engine",
+      "description": "What kind of part this is, used to group the list."
+    },
+    "interval_miles": {
+      "type": "number",
+      "description": "How many miles the part may run between services."
+    },
+    "interval_days": {
+      "type": "number",
+      "description": "How many days the part may run between services."
+    },
+    "last_service_miles": {
+      "type": "number",
+      "description": "Odometer reading when the part was last serviced."
+    },
+    "last_service_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the part was last serviced."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Part number, torque spec or anything worth remembering at service time."
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "user"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

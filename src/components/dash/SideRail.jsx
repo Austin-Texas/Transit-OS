@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { BedDouble, Car, Droplets, Home, Layers, Settings, ShieldCheck, Snowflake, TrendingUp, Zap } from "lucide-react";
+import { BedDouble, Car, Droplets, Home, Layers, Settings, ShieldCheck, Snowflake, TrendingUp, Wrench, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const NAV_ITEMS = [
@@ -12,6 +12,7 @@ export const NAV_ITEMS = [
   { id: "climate", label: "Climate", icon: Snowflake, to: "/climate" },
   { id: "security", label: "Security", icon: ShieldCheck, to: "/security" },
   { id: "automation", label: "Automation", icon: Layers, to: "/automation" },
+  { id: "maintenance", label: "Maintenance", icon: Wrench, to: "/maintenance" },
   { id: "settings", label: "Settings", icon: Settings, to: "/settings" },
 ];
 
@@ -19,7 +20,7 @@ export default function SideRail() {
   const pathname = useLocation({ select: (location) => location.pathname });
 
   return (
-    <nav className="flex w-[164px] shrink-0 flex-col gap-1">
+    <nav className="no-scrollbar flex w-[164px] shrink-0 flex-col gap-1 overflow-y-auto">
       {NAV_ITEMS.map((item) => {
         const isActive = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
         const Icon = item.icon;
