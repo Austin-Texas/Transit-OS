@@ -48,7 +48,7 @@ function RootDocument({ children }) {
       {/* data-react-root: the builder's preview bridge looks for #root and falls back to this. */}
       <body data-react-root="true">
         {children}
-        <Base44Scripts />
+        {import.meta.env.VITE_PUBLIC_DEMO !== "true" ? <Base44Scripts /> : null}
         <Scripts />
       </body>
     </html>
