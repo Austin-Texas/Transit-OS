@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Circle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { base44 } from "@/api/base44Client";
-import { recordSurround } from "@/lib/surroundCapture";
+import { recordSurround, saveSurroundClip } from "@/lib/surroundCapture";
 
 const CLIP_SECONDS = 10;
 
@@ -22,14 +21,12 @@ export default function SurroundRecorder({ urls, onSaved }) {
         seconds: CLIP_SECONDS,
         onProgress: setProgress,
       });
-      const file = new File([blob], `surround-${Date.now()}.webm`, { type: "video/webm" });
-      const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
-      await base44.entities.SurroundClip.create({
-        recorded_at: new Date().toISOString(),
+      await saveSurroundClip({
+        blob,
         duration_s,
-        file_uri,
-        camera_count: urls.length,
-        size_kb: Math.round(blob.size / 1024),
+        cameraCount: urls.length,
+        trigger: "manual",
+        reason: `Saved by you · ${urls.length} cameras`,
       });
       toast.success("360° clip saved");
       await onSaved?.();

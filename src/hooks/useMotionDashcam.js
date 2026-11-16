@@ -31,6 +31,12 @@ export default function useMotionDashcam({ cameras, urls, ready, onSaved }) {
       return;
     }
 
+    // A camera seen for the first time only sets its baseline, so motion from
+    // before the app opened is never re-recorded.
+    cameras.forEach((camera) => {
+      if (!baseline.current.has(camera.id)) baseline.current.set(camera.id, stampOf(camera));
+    });
+
     const fresh = cameras.filter((camera) => {
       if (camera.motion_alerts === false) return false;
       const stamp = stampOf(camera);

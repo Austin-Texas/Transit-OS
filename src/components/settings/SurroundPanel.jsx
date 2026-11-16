@@ -28,13 +28,13 @@ export default function SurroundPanel({ cameras = [] }) {
             <SurroundRecorder urls={urls} onSaved={clips.reload} />
           </SurroundView>
           <p className="mt-1.5 text-[9px] leading-relaxed text-white/30">
-            Drag the view to look around the van, then record a 10-second 360° clip. Clips are stored privately and only
-            load for you.
+            Drag to look around the van. The dashcam is armed: when a camera reports motion a 360° clip saves here on its
+            own, and you can record one any time. Clips are stored privately, so only your account can open them.
           </p>
         </div>
 
         <div className="min-w-0">
-          <p className="mb-1.5 text-[10px] uppercase tracking-[0.16em] text-white/40">Recorded clips</p>
+          <p className="mb-1.5 text-[10px] uppercase tracking-[0.16em] text-white/40">Clip library</p>
           <SurroundClips clips={clips} />
         </div>
       </div>

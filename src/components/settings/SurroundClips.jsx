@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { cn } from "@/lib/utils";
 
 const stamp = (iso) =>
   new Date(iso).toLocaleString("en-US", {
@@ -13,6 +14,7 @@ const stamp = (iso) =>
 
 function ClipCard({ clip, onDelete }) {
   const [url, setUrl] = useState(null);
+  const motion = clip.trigger === "motion";
 
   useEffect(() => {
     let active = true;
@@ -27,7 +29,12 @@ function ClipCard({ clip, onDelete }) {
   }, [clip.file_uri]);
 
   return (
-    <li className="group relative overflow-hidden rounded-lg border border-line/80 bg-black">
+    <li
+      className={cn(
+        "group relative overflow-hidden rounded-lg border bg-black",
+        motion ? "border-alert/45" : "border-line/80"
+      )}
+    >
       {url ? (
         <video src={url} controls playsInline preload="metadata" className="h-[92px] w-full bg-black object-cover" />
       ) : (
@@ -37,7 +44,19 @@ function ClipCard({ clip, onDelete }) {
       )}
 
       <div className="flex items-center justify-between gap-1.5 border-t border-line/70 bg-surface-raised px-2 py-1">
-        <span className="truncate text-[8.5px] uppercase tracking-[0.1em] text-white/45">{stamp(clip.recorded_at)}</span>
+        <span className="flex min-w-0 items-center gap-1.5">
+          <span
+            className={cn(
+              "shrink-0 rounded px-1 py-0.5 text-[7.5px] font-semibold uppercase tracking-[0.1em]",
+              motion ? "bg-alert/20 text-alert" : "bg-neon/15 text-neon"
+            )}
+          >
+            {motion ? "Motion" : "Manual"}
+          </span>
+          <span className="truncate text-[8.5px] uppercase tracking-[0.1em] text-white/45">
+            {clip.reason || stamp(clip.recorded_at)}
+          </span>
+        </span>
         <span className="flex shrink-0 items-center gap-1.5">
           <span className="font-mono text-[8.5px] text-white/35">{Math.round(clip.duration_s ?? 0)}s</span>
           <button
@@ -62,7 +81,7 @@ export default function SurroundClips({ clips }) {
   if (!clips.items.length) {
     return (
       <p className="rounded-lg border border-dashed border-line/80 px-3 py-4 text-center text-[9.5px] leading-relaxed text-white/35">
-        No 360° clips yet. Record one to keep a surround view of where the van is parked.
+        No 360° clips yet. One saves automatically the next time a camera reports motion, or record one yourself.
       </p>
     );
   }

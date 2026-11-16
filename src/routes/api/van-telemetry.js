@@ -25,6 +25,21 @@ const NUMERIC = [
 const BOOLEAN = ["lights_on", "locks_locked", "water_pump_on"];
 const TEXT = ["vehicle_name", "trim", "vin"];
 
+// Camera motion the hub detected, so the dashcam can save a clip of the moment.
+const readMotion = (value) => {
+  if (!Array.isArray(value) || value.length > 10) return null;
+  const stamps = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== "object") return null;
+    const camera = typeof entry.camera === "string" ? entry.camera.trim() : "";
+    if (!camera || camera.length > 120) return null;
+    const at = entry.at ? new Date(entry.at) : new Date();
+    if (Number.isNaN(at.getTime())) return null;
+    stamps.push({ camera, at: at.toISOString() });
+  }
+  return stamps;
+};
+
 const ENUMS = {
   active_mode: ["camping", "sleeping", "driving", "away", "custom"],
   climate_mode: ["auto", "eco", "boost", "off"],
@@ -53,6 +68,14 @@ export const Route = createFileRoute("/api/van-telemetry")({
         }
         if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
           return Response.json({ error: "Body must be a JSON object" }, { status: 400 });
+        }
+
+        const motion = payload.camera_motion === undefined ? [] : readMotion(payload.camera_motion);
+        if (motion === null) {
+          return Response.json(
+            { error: "camera_motion must be up to 10 entries of { camera, at }" },
+            { status: 400 }
+          );
         }
 
         const patch = {};
@@ -90,17 +113,38 @@ export const Route = createFileRoute("/api/van-telemetry")({
           patch[key] = payload[key];
         }
 
-        if (!Object.keys(patch).length) {
+        if (!Object.keys(patch).length && !motion.length) {
           return Response.json({ error: "No known readings in payload" }, { status: 400 });
         }
 
         const base44 = context.getBase44();
-        const vanPage = await base44.asServiceRole.entities.VanStatus.filter({}, { sort: "-created_date", limit: 1 });
-        const van = vanPage.items?.[0];
 
-        const saved = van
-          ? await base44.asServiceRole.entities.VanStatus.update(van.id, patch)
-          : await base44.asServiceRole.entities.VanStatus.create(patch);
+        // Motion lands on the camera records first, so the alert rules and the
+        // dashcam both see the moment.
+        const triggered = [];
+        if (motion.length) {
+          const cameras = await base44.asServiceRole.entities.Camera.list("created_date", 50);
+          for (const stamp of motion) {
+            const match =
+              cameras.find((camera) => camera.id === stamp.camera) ??
+              cameras.find((camera) => (camera.name ?? "").toLowerCase() === stamp.camera.toLowerCase());
+            if (!match || match.motion_alerts === false) continue;
+            await base44.asServiceRole.entities.Camera.update(match.id, {
+              last_motion: stamp.at,
+              status: "live",
+            });
+            triggered.push(match.name);
+          }
+        }
+
+        let saved = null;
+        if (Object.keys(patch).length) {
+          const vanPage = await base44.asServiceRole.entities.VanStatus.filter({}, { sort: "-created_date", limit: 1 });
+          const van = vanPage.items?.[0];
+          saved = van
+            ? await base44.asServiceRole.entities.VanStatus.update(van.id, patch)
+            : await base44.asServiceRole.entities.VanStatus.create(patch);
+        }
 
         // Every reading that carries power or tank data lands in the history the charts draw.
         const reading = { recorded_at: new Date().toISOString() };
@@ -135,8 +179,9 @@ export const Route = createFileRoute("/api/van-telemetry")({
 
         return Response.json({
           ok: true,
-          id: saved.id,
+          id: saved?.id ?? null,
           updated: Object.keys(patch),
+          motion: triggered,
           history: hasHistory,
           alerts: alerts ? { raised: alerts.raised, resolved: alerts.resolved, open: alerts.open } : null,
           push,
