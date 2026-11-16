@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { STARTUP_CHECKS, runStartupChecks } from "@/lib/startupReadiness";
 import "./StartupLive.css";
+import StartupWebGL from "./StartupWebGL";
 
-const MIN_VISUAL_MS = 5200;
+const MIN_VISUAL_MS = 6500;
 const EXIT_MS = 550;
 const initial = Object.fromEntries(STARTUP_CHECKS.map(check => [check.id, "pending"]));
 const isTerminal = status => ["ready", "offline", "simulated", "error"].includes(status);
@@ -13,6 +14,7 @@ export default function StartupSequence({ onDone }) {
   const [elapsed, setElapsed] = useState(0);
   const [closing, setClosing] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [webglFailed, setWebglFailed] = useState(false);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
   const checksRef = useRef(initial);
@@ -61,17 +63,20 @@ export default function StartupSequence({ onDone }) {
 
   const readyCount = STARTUP_CHECKS.filter(check => isTerminal(checks[check.id])).length;
   const progress = Math.round((readyCount / STARTUP_CHECKS.length) * 100);
-  const stage = reducedMotion ? 3 : elapsed < 1300 ? 0 : elapsed < 2500 ? 1 : elapsed < 3900 ? 2 : 3;
+  const stage = reducedMotion ? 3 : elapsed < 1300 ? 0 : elapsed < 2500 ? 1 : elapsed < 5200 ? 2 : 3;
   const mode = useMemo(() => {
     if (checks.controller === "ready" && checks.sensors === "ready") return "VEHICLE CONNECTED";
     if (checks.controller === "simulated" || checks.sensors === "simulated") return "SIMULATION MODE";
     return "WEB LAB · VEHICLE HARDWARE OFFLINE";
   }, [checks.controller, checks.sensors]);
 
+  const showWebGL = !reducedMotion && !webglFailed && stage < 3;
+
   return (
-    <motion.section className={"transit-live transit-live--stage-" + stage} role="status" aria-label="TransitOS startup"
+    <motion.section className={"transit-live transit-live--stage-" + stage + (showWebGL ? " transit-live--webgl" : "")} role="status" aria-label="TransitOS startup"
       initial={false} animate={{ opacity: closing ? 0 : 1 }}
       transition={{ duration: EXIT_MS / 1000 }}>
+      {!reducedMotion && !webglFailed && <StartupWebGL onFail={() => setWebglFailed(true)} />}
       <div className="transit-live__halo" aria-hidden="true" />
       <div className="transit-live__rays" aria-hidden="true" />
       <div className="transit-live__ring transit-live__ring--outer" aria-hidden="true" />
