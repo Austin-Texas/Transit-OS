@@ -120,7 +120,40 @@
     "tank_heater_fault": {
       "type": "boolean",
       "default": false,
-      "description": "Whether the heat pad under the spare-tire fresh water tank has stopped responding."
+      "description": "Whether the heat pad under the spare-tire fresh water tank has stopped responding. Kept in step with heat_pad_state by the telemetry endpoint."
+    },
+    "heat_pad_state": {
+      "type": "string",
+      "enum": [
+        "heating",
+        "holding",
+        "idle",
+        "fault"
+      ],
+      "enumColors": [
+        "yellow",
+        "green",
+        "gray",
+        "red"
+      ],
+      "description": "What the heat pad controller last reported: powering the pad, holding its set point, switched off, or not answering."
+    },
+    "heat_pad_temp_f": {
+      "type": "number",
+      "description": "Pad plate temperature the sensor last reported, in Fahrenheit."
+    },
+    "heat_pad_target_f": {
+      "type": "number",
+      "description": "Pad set point held by the controller, in Fahrenheit."
+    },
+    "heat_pad_watts": {
+      "type": "number",
+      "description": "Power the pad is drawing, in watts."
+    },
+    "heat_pad_reported_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the vehicle hub last reported heat pad readings, so a silent sensor can be told apart from a cold one."
     },
     "gray_water": {
       "type": "number",

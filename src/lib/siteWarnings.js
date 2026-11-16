@@ -1,3 +1,5 @@
+import { heatPad } from "@/lib/heatPad";
+
 export const TIRE_MIN_PSI = 40;
 export const FUEL_MIN_PERCENT = 15;
 export const FUEL_CAPACITY_GAL = 25;
@@ -40,11 +42,14 @@ export function siteWarnings(status) {
     });
   }
 
-  if (status.tank_heater_fault === true) {
+  const pad = heatPad(status);
+  if (pad.fault) {
     found.push({
       id: "tank_heater",
       title: "Fresh water heat pad fault",
-      detail: "Pad beneath the spare-tire tank · not responding",
+      detail: pad.temp !== null
+        ? `Pad beneath the spare-tire tank · last read ${pad.temp.toFixed(1)}°F`
+        : "Pad beneath the spare-tire tank · not responding",
       side: "left",
       zone: "underbody",
       severity: "warning",

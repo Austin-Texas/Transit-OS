@@ -1,6 +1,7 @@
 import { Droplets, Power, Thermometer } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { TANK_CAPACITY_GAL } from "@/lib/van";
+import { heatPad } from "@/lib/heatPad";
 import { cn } from "@/lib/utils";
 
 const TANKS = [
@@ -63,7 +64,7 @@ export default function WaterLevels({ status }) {
   const gray = clamp(status.gray_water);
   const black = clamp(status.black_water);
   const pump = Boolean(status.water_pump_on);
-  const padFault = status.tank_heater_fault === true;
+  const pad = heatPad(status);
   const total = { fresh: fresh, gray, black };
 
   return (
@@ -98,13 +99,17 @@ export default function WaterLevels({ status }) {
         hash="diagnostics"
         className={cn(
           "mt-2 flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[8.5px] font-semibold uppercase tracking-[0.12em] transition",
-          padFault
+          pad.fault
             ? "border-alert/55 bg-alert/10 text-alert hover:bg-alert/20"
             : "border-line/70 bg-surface-raised text-white/40 hover:text-white/70"
         )}
       >
         <Thermometer className="h-3 w-3 shrink-0" strokeWidth={2.4} />
-        Heat pad {padFault ? "fault · underbody" : "nominal"}
+        {pad.fault
+          ? "Heat pad fault · underbody"
+          : pad.known
+            ? `Heat pad ${pad.label.toLowerCase()}${pad.temp !== null ? ` · ${Math.round(pad.temp)}°F` : ""}`
+            : "Heat pad · no report"}
         <span className="ml-auto text-[8px] tracking-[0.1em] text-white/25">Diagnostics</span>
       </Link>
     </section>

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { buildVanModel } from "@/lib/van3dModel";
+import { heatPad, heatPadLine } from "@/lib/heatPad";
 
 const RED = 0xff3131;
 const GREEN = 0x00ff41;
@@ -143,12 +144,21 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       cabinDot.material.color.set(cabinAlert ? RED : GREEN);
     };
 
-    let faulted = Boolean(latest.current.status?.tank_heater_fault);
+    // The pad is tinted by what the controller reported: heating amber, holding
+    // cyan, idle dim, fault red, and grey while the sensor is silent.
+    const PAD_COLORS = {
+      heating: 0xff8a3d,
+      holding: 0x00f0ff,
+      idle: 0x2f93ae,
+      fault: 0xff2f2f,
+      unknown: 0x24596b,
+    };
+    let faulted = heatPad(latest.current.status).key === "fault";
 
-    const applyHeat = (fault) => {
-      faulted = fault;
-      padMaterial.color.set(fault ? 0xff2f2f : 0xff8a3d);
-      padDotMaterial.color.set(fault ? 0xff2f2f : 0x00ff41);
+    const applyHeat = (key) => {
+      faulted = key === "fault";
+      padMaterial.color.set(PAD_COLORS[key] ?? PAD_COLORS.unknown);
+      padDotMaterial.color.set(key === "fault" ? 0xff2f2f : key === "unknown" ? 0x6b8794 : 0x00ff41);
     };
 
     // Warning pins on the corners that raised them.
@@ -208,15 +218,18 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     const tipFor = (object, event) => {
       if (!object) return null;
       const rect = renderer.domElement.getBoundingClientRect();
-      const fault = Boolean(latest.current.status?.tank_heater_fault);
+      const pad = heatPad(latest.current.status);
       return {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
-        title: fault ? "Heat pad malfunction" : "Heat pad OK",
-        detail: fault
-          ? "Hardware fault: pad under the fresh tank · software: heater controller not responding"
-          : "Hardware: heat pad nominal · software: heater controller online",
-        tone: fault ? "alert" : "ok",
+        title:
+          pad.key === "fault"
+            ? "Heat pad fault"
+            : pad.key === "unknown"
+              ? "Heat pad · no report"
+              : `Heat pad ${pad.label.toLowerCase()}`,
+        detail: heatPadLine(pad) || "No heat pad readings from the hub yet",
+        tone: pad.key === "fault" ? "alert" : pad.key === "unknown" ? "muted" : "ok",
       };
     };
 
@@ -371,7 +384,7 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     };
 
     updateTags();
-    applyHeat(Boolean(latest.current.status?.tank_heater_fault));
+    applyHeat(heatPad(latest.current.status).key);
     applyFocus(latest.current.focus);
     rebuildPins(latest.current.warnings);
 
@@ -413,7 +426,7 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
   }, []);
 
   const warningKey = warnings.map((warning) => warning.id).join("|");
-  const fault = Boolean(status?.tank_heater_fault);
+  const padKey = heatPad(status).key;
 
   useEffect(() => {
     api.current?.focus(focus);
@@ -428,8 +441,8 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
   }, [warningKey, status?.cabin_temp]);
 
   useEffect(() => {
-    api.current?.heat(fault);
-  }, [fault]);
+    api.current?.heat(padKey);
+  }, [padKey]);
 
   return <div ref={hostRef} className={className} style={{ touchAction: "none" }} />;
 }

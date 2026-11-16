@@ -79,13 +79,17 @@ export default function VanStage({
           <div
             className={cn(
               "rounded-lg border bg-ink-950/95 px-2.5 py-1.5 backdrop-blur",
-              tip.tone === "alert" ? "border-alert/70" : "border-ok/50"
+              tip.tone === "alert"
+                ? "border-alert/70"
+                : tip.tone === "muted"
+                  ? "border-white/20"
+                  : "border-ok/50"
             )}
           >
             <p
               className={cn(
                 "text-[9.5px] font-semibold uppercase tracking-[0.1em]",
-                tip.tone === "alert" ? "text-alert" : "text-ok"
+                tip.tone === "alert" ? "text-alert" : tip.tone === "muted" ? "text-white/55" : "text-ok"
               )}
             >
               {tip.title}

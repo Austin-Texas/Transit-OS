@@ -20,6 +20,9 @@ const NUMERIC = [
   "lpg_gallons",
   "odometer",
   "light_level",
+  "heat_pad_temp_f",
+  "heat_pad_target_f",
+  "heat_pad_watts",
 ];
 
 const BOOLEAN = ["lights_on", "locks_locked", "water_pump_on", "tank_heater_fault"];
@@ -43,7 +46,13 @@ const readMotion = (value) => {
 const ENUMS = {
   active_mode: ["camping", "sleeping", "driving", "away", "custom"],
   climate_mode: ["auto", "eco", "boost", "off"],
+  heat_pad_state: ["heating", "holding", "idle", "fault"],
 };
+
+// Heat pad readings the controller reports: state, plate temperature, set point
+// and draw. The fault flag the dashboard watches is derived from the state, so
+// the 3D underbody and the alerts always agree with the vehicle.
+const PAD_KEYS = ["heat_pad_state", "heat_pad_temp_f", "heat_pad_target_f", "heat_pad_watts"];
 
 // The van hub pushes readings here; the dashboard picks them up in real time.
 export const Route = createFileRoute("/api/van-telemetry")({
@@ -111,6 +120,22 @@ export const Route = createFileRoute("/api/van-telemetry")({
             return Response.json({ error: `${key} must be one of ${allowed.join(", ")}` }, { status: 400 });
           }
           patch[key] = payload[key];
+        }
+
+        if (payload.heat_pad_reported_at !== undefined && payload.heat_pad_reported_at !== null) {
+          const at = new Date(payload.heat_pad_reported_at);
+          if (Number.isNaN(at.getTime())) {
+            return Response.json({ error: "heat_pad_reported_at must be an ISO date" }, { status: 400 });
+          }
+          patch.heat_pad_reported_at = at.toISOString();
+        }
+
+        const padReported = PAD_KEYS.some((key) => patch[key] !== undefined);
+        if (patch.heat_pad_state !== undefined) {
+          patch.tank_heater_fault = patch.heat_pad_state === "fault";
+        }
+        if (padReported && patch.heat_pad_reported_at === undefined) {
+          patch.heat_pad_reported_at = new Date().toISOString();
         }
 
         if (!Object.keys(patch).length && !motion.length) {
