@@ -3,14 +3,24 @@ import { base44 } from "@/api/base44Client";
 import { buildDiagnostics } from "@/lib/van";
 import { syncVanAlerts } from "@/lib/server-fns";
 
+const PUBLIC_DEMO = typeof window !== "undefined" && window.location.hostname === "transit.hastenload.com";
+const DEMO_STATUS = {
+  id: null, climate_temp: 66, climate_set: 66, cabin_temp: 66, exterior_temp: 68,
+  humidity: 45, climate_mode: "off", lpg_percent: 24, lpg_gallons: 6,
+  battery_percent: 82, battery_voltage: 12.8, solar_w: 240, load_w: 120,
+  fresh_water: 68, gray_water: 25, black_water: 12, lights_on: false,
+  locks_locked: true, active_mode: "driving", odometer: 62450,
+};
+
 // Live dashboard state backed by the VanStatus and Alert records.
 export default function useVanDashboard() {
-  const [status, setStatus] = useState(null);
+  const [status, setStatus] = useState(PUBLIC_DEMO ? DEMO_STATUS : null);
   const [alerts, setAlerts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!PUBLIC_DEMO);
   const [offline, setOffline] = useState(false);
 
   const load = useCallback(async () => {
+    if (PUBLIC_DEMO) return;
     try {
       const vanPage = await base44.entities.VanStatus.filter({}, { sort: "-created_date", limit: 1 });
       const alertPage = await base44.entities.Alert.filter({ status: "open" }, { sort: "-created_date", limit: 20 });
@@ -28,6 +38,7 @@ export default function useVanDashboard() {
   // Re-runs the alert rules against the latest readings and refreshes if a
   // critical condition appeared or cleared.
   const sync = useCallback(async () => {
+    if (PUBLIC_DEMO) return;
     try {
       const result = await syncVanAlerts();
       if (result?.raised || result?.resolved) await load();
@@ -46,6 +57,7 @@ export default function useVanDashboard() {
 
   // A camera stamping fresh motion raises its alert without waiting for a reload.
   useEffect(() => {
+    if (PUBLIC_DEMO) return undefined;
     let timer = null;
     const unsubscribe = base44.entities.Camera.subscribe(() => {
       if (timer) return;
@@ -62,6 +74,7 @@ export default function useVanDashboard() {
 
   // Live telemetry: the dashboard follows new readings as the van hub writes them.
   useEffect(() => {
+    if (PUBLIC_DEMO) return undefined;
     const unsubscribeStatus = base44.entities.VanStatus.subscribe((event) => {
       if (event.type === "delete") return;
       setStatus((prev) => (prev && prev.id !== event.data.id ? prev : event.data));
@@ -86,6 +99,7 @@ export default function useVanDashboard() {
   // Applies a change everywhere at once and saves it to the van record.
   const update = async (patch) => {
     setStatus((prev) => (prev ? { ...prev, ...patch } : prev));
+    if (PUBLIC_DEMO) return;
     if (status?.id) await base44.entities.VanStatus.update(status.id, patch);
 
     // Tank changes made in the app (refill, dump) join the history log too.
@@ -108,7 +122,7 @@ export default function useVanDashboard() {
 
   const resolveAlert = async (alertId) => {
     setAlerts((prev) => prev.filter((alert) => alert.id !== alertId));
-    await base44.entities.Alert.update(alertId, { status: "resolved" });
+    if (!PUBLIC_DEMO) await base44.entities.Alert.update(alertId, { status: "resolved" });
   };
 
   return {
