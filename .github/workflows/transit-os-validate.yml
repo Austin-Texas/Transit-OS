@@ -35,5 +35,11 @@ jobs:
       - name: Validate Docker build
         if: github.event_name != 'pull_request'
         run: docker build --pull -t transit-os-verify:${{ github.sha }} .
+      - name: Validate self-hosted API container build
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build -t transitos-api-ci:${{ github.sha }} selfhost/api
+          docker run --rm --entrypoint node transitos-api-ci:${{ github.sha }} --check server.mjs
       - name: Explain validation scope
         run: echo "Build passed. Base44 authentication/backend and container runtime behavior still require deployment-gate checks."
