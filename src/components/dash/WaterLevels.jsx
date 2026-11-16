@@ -12,7 +12,7 @@ const level = (value) => Math.max(0, Math.min(100, Math.round(Number(value) || 0
 // Tank levels at a glance, sitting beside the power readings on the stage.
 export default function WaterLevels({ status }) {
   const fresh = level(status.fresh_water);
-  const freshLow = fresh < 20;
+  const freshLow = fresh < 15;
 
   return (
     <section className="shrink-0 rounded-2xl border border-line/80 bg-surface p-3">
@@ -32,7 +32,7 @@ export default function WaterLevels({ status }) {
       <div className="grid grid-cols-3 gap-2.5">
         {TANKS.map((tank) => {
           const value = level(status[tank.key]);
-          const low = value < 15;
+          const low = tank.key === "fresh_water" ? value < 15 : value > 85;
           return (
             <div key={tank.key} className="rounded-xl border border-line/70 bg-surface-raised px-2.5 py-2">
               <div className="flex items-baseline justify-between gap-1">

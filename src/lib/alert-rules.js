@@ -44,6 +44,26 @@ export function evaluateAlertConditions(status, cameras = [], now = Date.now()) 
     });
   }
 
+  const gray = num(status.gray_water);
+  if (gray !== null && Number.isFinite(gray) && gray > 85) {
+    conditions.push({
+      key: `${PREFIX}gray_water_full`,
+      severity: "warning",
+      title: "Gray tank nearly full",
+      detail: `${round(gray)}% full · plan a dump station before it backs up`,
+    });
+  }
+
+  const black = num(status.black_water);
+  if (black !== null && Number.isFinite(black) && black > 85) {
+    conditions.push({
+      key: `${PREFIX}black_water_full`,
+      severity: "warning",
+      title: "Black tank nearly full",
+      detail: `${round(black)}% full · empty at the next station`,
+    });
+  }
+
   const propane = num(status.lpg_percent);
   if (propane !== null && Number.isFinite(propane) && propane < 15) {
     const gallons = num(status.lpg_gallons);
