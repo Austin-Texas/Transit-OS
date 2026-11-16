@@ -8,6 +8,7 @@ import ModuleShell from "@/components/dash/ModuleShell";
 import { PlatformAccess } from "@/components/platform/shared";
 import ModuleCard from "@/components/dash/ModuleCard";
 import PhotoSlots from "@/components/settings/PhotoSlots";
+import VanReadings from "@/components/settings/VanReadings";
 import SettingsCameras from "@/components/settings/SettingsCameras";
 
 export const Route = createFileRoute("/_authed/settings")({
@@ -78,6 +79,7 @@ function SettingsPage() {
     <ModuleShell title="Settings" subtitle="Vehicle details, hub sync and your account" status={status}>
       <PlatformAccess />
       <div className="grid gap-3 lg:grid-cols-2">
+        <div className="flex flex-col gap-3">
         <ModuleCard title="Vehicle details" icon={Truck}>
           <div className="grid gap-2.5">
             {FIELDS.map((field) => (
@@ -103,6 +105,9 @@ function SettingsPage() {
             {saving ? "Saving" : "Save details"}
           </button>
         </ModuleCard>
+
+          <VanReadings status={status} onUpdate={van.update} />
+        </div>
 
         <div className="flex flex-col gap-3">
           <PhotoSlots status={status} onUpdate={van.update} />
