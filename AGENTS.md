@@ -10,6 +10,30 @@ This is the Ford-TrainstOs / TransitOS project. The preferred implementation is 
 - Recheck repository visibility before publication. Exclude live entity rows, credentials, account information, private media and generated output from source exports. Do not change visibility or delete old apps without a separate instruction.
 - Distinguish implemented prototype functions, simulations, integration plans and commissioned hardware. Never turn simulated confirmations into physical-control claims.
 
+## Project-only scope and new-chat startup
+
+These instructions apply only to TransitOS / Ford-TrainstOs (`Austin-Texas/TransitOS` and the identified project apps). Do not transfer this workflow to unrelated projects as a global preference.
+
+Before acting in each new project chat/session:
+1. Read this root AGENTS.md and any applicable nested AGENTS.md files.
+2. Read the current document.md and TransitOS_Master_Project_Prompt.md in full, then relevant README/Markdown handovers such as docs/CONSOLIDATION.md.
+3. Check the current preferred Base44 app, revision and relevant source against GitHub before making changes. Preserve newer owner work and the preferred layout; do not assume automatic synchronization.
+4. Continue the current task and follow the same validation, No/Yes, documentation and approved-push procedure above. Keep the instruction files consistent when policy changes.
+
+This file is the main entry point and the Markdown files are durable project memory. A new chat must have access to the project/repository or files to read them. Do not claim automatic cross-chat recall, a file read, or a separate global memory write that did not occur.
+
+## Required live browser testing
+
+For application feature, UI and functional changes, perform live browser end-to-end (E2E) testing before calling the batch complete; the owner should not need to ask again.
+
+- Open the current app and actually click/type/select/submit/navigate through changed workflows. Check core navigation and relevant existing functionality for regressions.
+- Cover buttons, forms, dialogs, tabs, validation/error states, state changes and persistence/reload behavior where applicable. A requested full-app test must inventory every page and cover all accessible controls/workflows within the authorized scope; distinguish plans, unavailable adapters and hardware-only actions.
+- Fix scoped failures and retest them. Run meaningful automated tests, lint and build checks appropriate to the change. A clean build alone is not a functional browser test.
+- Report app/revision, tested coverage, pass/fail/blocked results and remaining gaps; provide useful screenshot/direct evidence. Never claim everything works from code inspection or screenshots alone.
+- Use simulation/test environments for physical-control checks unless real hardware operation is specifically authorized. Browser success does not establish commissioned hardware.
+- If access/sign-in blocks testing, explain what is untested and request only the required handoff while continuing independent authorized work. Do not mark blocked checks passed.
+- Documentation/policy-only changes need file/link/consistency verification, not a rerun of the app's live browser suite. Do not claim browser or hardware tests that were not run.
+
 ## Project Context
 
 This is a Base44 app repository built with **TanStack Start** (React 19, plain JavaScript — no TypeScript): file-based routes, server functions and server routes, server-side rendering by default. Treat it as user-owned application code, keep changes focused on the user's request, and preserve the conventions below.
