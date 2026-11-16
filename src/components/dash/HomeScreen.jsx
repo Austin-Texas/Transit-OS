@@ -8,6 +8,7 @@ import VanStage from "./VanStage";
 import LocksPanel from "./LocksPanel";
 import QuickDock from "./QuickDock";
 import StatStrip from "./StatStrip";
+import WaterLevels from "./WaterLevels";
 import PhysicalToggle from "./PhysicalToggle";
 import ClimateControl from "./ClimateControl";
 import AlertStrip from "./AlertStrip";
@@ -60,6 +61,7 @@ export default function HomeScreen() {
             onClearFocus={() => setFocus(null)}
           />
           <StatStrip status={status} faultCount={faultCount} />
+          <WaterLevels status={status} />
 
           <div className="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-2">
             <PhysicalToggle
