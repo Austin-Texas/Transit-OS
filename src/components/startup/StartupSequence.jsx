@@ -24,9 +24,7 @@ export default function StartupSequence({ onDone }) {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const began = performance.now();
-    let raf;
-    const tick = now => { setElapsed(now - began); raf = requestAnimationFrame(tick); };
-    raf = requestAnimationFrame(tick);
+    // Keep the full React scene out of the 60-fps render loop. The canvas\n    // animates independently; 20-Hz UI updates are enough for the progress bar.\n    const timer = window.setInterval(() => setElapsed(performance.now() - began), 50);
     runStartupChecks((id, status) => {
       if (!controller.signal.aborted) setChecks(previous => ({ ...previous, [id]: status }));
     }, controller.signal).catch(() => {
@@ -34,7 +32,7 @@ export default function StartupSequence({ onDone }) {
     });
     return () => {
       controller.abort();
-      cancelAnimationFrame(raf);
+      window.clearInterval(timer);
       document.body.style.overflow = originalOverflow;
     };
   }, []);
