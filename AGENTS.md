@@ -175,3 +175,7 @@ const { messages, sendMessage, isLoading } = useChat({
 - `/api/apps/**`, `/api/app-logs/**` and `/ws-user-apps/**` belong to the Base44 platform API — never define routes under them.
 - When working locally, prefer the Base44 CLI (`base44 dev`, `base44 deploy`, `base44 secrets set`) over adding npm scripts for Base44 tasks.
 - Run `npm run lint` before finishing code changes. Write JavaScript/JSX only — no `.ts`/`.tsx` files and no type annotations (the generated `src/routeTree.gen.ts` is the sole exception and is never hand-edited).
+
+## Self-hosted deployment branch (November 16, 2026)
+
+A TPMCS-pattern Docker and GitHub Actions deployment scaffold is staged for this repository. Follow [docs/SELF_HOSTED_DEPLOYMENT.md](docs/SELF_HOSTED_DEPLOYMENT.md). Maintain the existing project-only owner approval workflow for UI, backend, documents and source sync. The current production deploy workflow is manual-only and fails closed without demonstrated Base44-independent runtime functionality. Do not interpret a Docker build or HTTP 200 as proof that the dashboard, data, authentication, simulations or vehicle hardware works. Do not change other apps, the Cloudflare tunnel, or merge/publish the scaffold until verification and approval. Preserve both master documents and reconcile the stale `Austin-Texas/TransitOS` repository references with this current `Austin-Texas/Transit-OS` deployment target during reviewed documentation finalization.
