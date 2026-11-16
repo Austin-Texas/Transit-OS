@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import { Toaster } from "@/components/ui/sonner";
-import StartupSequence from "@/components/startup/StartupSequence";
 import { AuthProvider } from "@/lib/AuthContext";
 import { Base44Scripts } from "base44:document";
 import appCss from "@/index.css?url";
@@ -32,13 +30,10 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  const [booting, setBooting] = useState(true);
-
   return (
     <AuthProvider>
       <Outlet />
       <Toaster />
-      {booting ? <StartupSequence onDone={() => setBooting(false)} /> : null}
     </AuthProvider>
   );
 }
