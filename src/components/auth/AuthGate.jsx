@@ -19,6 +19,10 @@ class NotRegisteredError extends Error {}
  * so these pages render in the browser only, and children inherit that.
  */
 export async function requireSignedIn({ context, location }) {
+  // Public, simulated preview on the dedicated review domain only.
+  if (typeof window !== "undefined" && window.location.hostname === "transit.hastenload.com") {
+    return { user: { id: "public-demo", role: "viewer", name: "Demo Viewer" } };
+  }
   // A /me outage (429, 503) is not a sign-out: it rejects here and reaches the error
   // boundary, whose "Try again" asks the server again (a failed query caches nothing).
   const { user, error } = await context.queryClient.ensureQueryData(authQuery);
