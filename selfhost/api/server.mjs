@@ -38,6 +38,21 @@ async function body(req) {
 function sessionCookie(value, age) {
   return `transitos_session=${value}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${age}`;
 }
+const attempts = new Map();
+function rateLimited(req) {
+  const key = req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  if (attempts.size > 10000) {
+    for (const [ip, value] of attempts) if (value.reset < now) attempts.delete(ip);
+  }
+  const entry = attempts.get(key);
+  if (!entry || entry.reset < now) {
+    attempts.set(key, { count: 1, reset: now + 60000 });
+    return false;
+  }
+  entry.count++;
+  return entry.count > 10;
+}
 const server = http.createServer(async (req, res) => {
   try {
     if (req.url === '/health' && req.method === 'GET') return json(res, 200, { status: 'ok' });
@@ -49,6 +64,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (['/api/auth/register', '/api/auth/login', '/api/auth/logout'].includes(req.url) && req.method === 'POST') {
       if (req.headers.origin !== origin) return json(res, 403, { error: 'Origin not allowed' });
+      if (rateLimited(req)) return json(res, 429, { error: 'Too many requests' }, { 'retry-after': '60' });
       if (req.url === '/api/auth/logout') {
         const token = cookies(req).transitos_session;
         if (token) await pool.query('DELETE FROM sessions WHERE token_hash=$1', [hash(token)]);
