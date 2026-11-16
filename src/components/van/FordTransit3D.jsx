@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { applyVanTextures, buildVanModel } from "@/lib/van3dModel";
 import { loadVanTextures } from "@/lib/vanTextures";
 import useVanPhotos from "@/hooks/useVanPhotos";
-import { heatPad, heatPadLine } from "@/lib/heatPad";
+import { heatPad } from "@/lib/heatPad";
 import { TANK_CAPACITY_GAL, gallonsFrom } from "@/lib/van";
 
 const RED = 0xff3131;
@@ -27,44 +27,65 @@ function markerPosition(warning) {
   return [0.1, 1.74, z];
 }
 
-// What hovering each tap target says, read from the latest telemetry.
+const reading = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const show = (value, digits, unit) =>
+  value === null ? "—" : `${value.toFixed(digits)}${unit ? ` ${unit}` : ""}`;
+
+// What hovering each tap target says, read straight from the latest telemetry:
+// a compact list of raw readings rather than a sentence.
 function hotspotTip(key, status) {
   if (key === "water_tank") {
-    const level = Number(status?.fresh_water);
-    const known = Number.isFinite(level);
+    const level = reading(status?.fresh_water);
     return {
-      title: known ? `Fresh tank ${Math.round(level)}%` : "Fresh tank · no reading",
-      detail: known
-        ? `${gallonsFrom(level, TANK_CAPACITY_GAL.fresh_water).toFixed(1)} gal · pump ${
-            status?.water_pump_on ? "on" : "off"
-          }`
-        : "The hub has not reported the tank level yet",
-      tone: known ? (level <= 20 ? "alert" : "ok") : "muted",
+      title: "Fresh water",
+      status: level === null ? "No report" : level <= 20 ? "Low" : "Nominal",
+      tone: level === null ? "muted" : level <= 20 ? "alert" : "ok",
+      rows: [
+        { k: "Level", v: level === null ? "—" : `${level.toFixed(1)} %` },
+        {
+          k: "Volume",
+          v: level === null ? "—" : `${gallonsFrom(level, TANK_CAPACITY_GAL.fresh_water).toFixed(1)} gal`,
+        },
+        { k: "Pump", v: status?.water_pump_on ? "On" : "Off" },
+        { k: "Heat pad", v: heatPad(status).label },
+      ],
     };
   }
+
   if (key === "battery") {
-    const percent = Number(status?.battery_percent);
-    const known = Number.isFinite(percent);
+    const volts = reading(status?.battery_voltage);
+    const percent = reading(status?.battery_percent);
+    const solar = reading(status?.solar_w);
+    const load = reading(status?.load_w);
     return {
-      title: known ? `House battery ${Math.round(percent)}%` : "House battery · no reading",
-      detail: known
-        ? `${Number(status?.battery_voltage ?? 0).toFixed(1)} V · solar ${Math.round(
-            status?.solar_w ?? 0
-          )} W · load ${Math.round(status?.load_w ?? 0)} W`
-        : "The hub has not reported the battery yet",
-      tone: known ? (percent <= 30 ? "alert" : "ok") : "muted",
+      title: "Electrical system",
+      status: percent === null ? "No report" : percent <= 30 ? "Low charge" : "Nominal",
+      tone: percent === null ? "muted" : percent <= 30 ? "alert" : "ok",
+      rows: [
+        { k: "Starter", v: show(volts, 2, "V") },
+        { k: "House", v: percent === null ? "—" : `${Math.round(percent)} %` },
+        { k: "Solar in", v: show(solar, 0, "W") },
+        { k: "Load", v: show(load, 0, "W") },
+      ],
     };
   }
+
   const pad = heatPad(status);
   return {
-    title:
-      pad.key === "fault"
-        ? "Heat pad fault"
-        : pad.key === "unknown"
-          ? "Heat pad · no report"
-          : `Heat pad ${pad.label.toLowerCase()}`,
-    detail: heatPadLine(pad) || "No heat pad readings from the hub yet",
+    title: "Heat pad",
+    status: pad.label,
     tone: pad.key === "fault" ? "alert" : pad.key === "unknown" ? "muted" : "ok",
+    rows: [
+      { k: "Pad temp", v: show(pad.temp, 1, "°F") },
+      { k: "Set point", v: show(pad.target, 0, "°F") },
+      { k: "Draw", v: show(pad.watts, 0, "W") },
+      { k: "Reported", v: pad.reportedAt ?? "—" },
+    ],
   };
 }
 
@@ -362,8 +383,10 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       if (!object) return null;
       const rect = renderer.domElement.getBoundingClientRect();
       return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top,
+        // Kept a bubble's width inside the stage, so it never clips at the edge.
+        x: Math.min(Math.max(event.clientX - rect.left, 96), Math.max(96, rect.width - 96)),
+        // And far enough below the top edge for the bubble to sit above the pin.
+        y: Math.max(event.clientY - rect.top, 122),
         ...hotspotTip(object.userData.hotspot, latest.current.status),
       };
     };

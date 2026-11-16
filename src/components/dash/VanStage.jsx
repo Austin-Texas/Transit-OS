@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Camera, Move } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import FordTransit3D from "@/components/van/FordTransit3D";
 import HotspotDialog from "@/components/van/HotspotDialog";
+import HotspotTip from "@/components/van/HotspotTip";
 import { cn } from "@/lib/utils";
 
 // The home stage: the neon wireframe van you can spin with a finger, plus a
@@ -78,33 +79,7 @@ export default function VanStage({
         <p className="text-[9.5px] uppercase leading-snug tracking-[0.18em] text-white/45">{trim}</p>
       </div>
 
-      {tip ? (
-        <div
-          className="pointer-events-none absolute z-30 w-[188px] -translate-x-1/2 -translate-y-[calc(100%+14px)]"
-          style={{ left: tip.x, top: tip.y }}
-        >
-          <div
-            className={cn(
-              "rounded-lg border bg-ink-950/95 px-2.5 py-1.5 backdrop-blur",
-              tip.tone === "alert"
-                ? "border-alert/70"
-                : tip.tone === "muted"
-                  ? "border-white/20"
-                  : "border-ok/50"
-            )}
-          >
-            <p
-              className={cn(
-                "text-[9.5px] font-semibold uppercase tracking-[0.1em]",
-                tip.tone === "alert" ? "text-alert" : tip.tone === "muted" ? "text-white/55" : "text-ok"
-              )}
-            >
-              {tip.title}
-            </p>
-            <p className="mt-0.5 text-[9.5px] leading-snug text-white/60">{tip.detail}</p>
-          </div>
-        </div>
-      ) : null}
+      <HotspotTip tip={tip} />
 
       <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
         <Move className="h-3 w-3" strokeWidth={2.2} />
