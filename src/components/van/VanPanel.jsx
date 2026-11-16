@@ -4,7 +4,7 @@ import { VAN_IMAGE } from "@/lib/van";
 
 export default function VanPanel({ status }) {
   return (
-    <section className="panel-surface flex flex-col overflow-hidden rounded-2xl border border-neon/15">
+    <section className="panel-surface photo-slot flex flex-col overflow-hidden rounded-2xl border">
       <div className="relative h-full w-full flex-1">
         <VanPhoto
           uri={status.van_photo_uri}

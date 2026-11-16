@@ -82,7 +82,6 @@ export default function HomeScreen() {
             vehicleName={status.vehicle_name}
             trim={status.trim}
             photoUri={status.van_photo_uri}
-            onPhoto={(uri) => van.update({ van_photo_uri: uri })}
             focus={focus}
             onClearFocus={() => setFocus(null)}
           />

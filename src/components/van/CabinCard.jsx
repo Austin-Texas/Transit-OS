@@ -6,7 +6,7 @@ export default function CabinCard({ temp, photoUri, onPhoto }) {
   return (
     <section
       id="card-cabin"
-      className="panel-surface relative overflow-hidden rounded-2xl border border-neon/15 transition-colors duration-300 hover:border-neon/35"
+      className="panel-surface photo-slot relative overflow-hidden rounded-2xl border transition-colors duration-300"
     >
       <div className="relative h-[132px] w-full">
         <VanPhoto

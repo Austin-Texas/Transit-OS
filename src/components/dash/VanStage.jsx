@@ -1,6 +1,5 @@
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import VanPhoto from "@/components/van/VanPhoto";
-import VanModel from "@/components/van/VanModel";
 import { VAN_STAGE_IMAGE } from "@/lib/van";
 
 function Marker({ className, tone, label }) {
@@ -17,11 +16,11 @@ function Marker({ className, tone, label }) {
   );
 }
 
-export default function VanStage({ cabinTemp, vehicleName, trim, photoUri, onPhoto, focus, onClearFocus }) {
+export default function VanStage({ cabinTemp, vehicleName, trim, photoUri, focus, onClearFocus }) {
   const side = focus?.side === "left" ? "left" : "right";
 
   return (
-    <section className="relative min-h-[220px] flex-1 overflow-hidden rounded-2xl border border-line/80 bg-surface lg:min-h-[190px]">
+    <section className="photo-slot relative min-h-[220px] flex-1 overflow-hidden rounded-2xl border bg-surface lg:min-h-[190px]">
       <span className="pointer-events-none absolute left-1/2 top-1/2 h-[380px] w-[620px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sys-blue/[0.08] blur-3xl" />
 
       <VanPhoto
@@ -29,7 +28,6 @@ export default function VanStage({ cabinTemp, vehicleName, trim, photoUri, onPho
         fallback={VAN_STAGE_IMAGE}
         alt="Your camper van"
         className="absolute inset-0 h-full w-full object-cover"
-        onPhoto={focus ? undefined : onPhoto}
       />
 
       {/* Neon grade over the photo so it reads as part of the dark interface. */}
@@ -38,8 +36,20 @@ export default function VanStage({ cabinTemp, vehicleName, trim, photoUri, onPho
 
       {focus ? (
         <>
-          <span className="pointer-events-none absolute inset-0 bg-ink-950/80" />
-          <VanModel side={side} title={focus.title} className="absolute inset-0" />
+          <span className="pointer-events-none absolute inset-0 bg-ink-950/55" />
+          {/* The flank the alert sits on lights up on the photo itself. */}
+          <span
+            className={`pointer-events-none absolute inset-y-0 w-2/5 ${
+              side === "left"
+                ? "left-0 bg-gradient-to-r from-alert/30 via-alert/[0.06] to-transparent"
+                : "right-0 bg-gradient-to-l from-alert/30 via-alert/[0.06] to-transparent"
+            }`}
+          />
+          <span
+            className={`pointer-events-none absolute inset-y-8 w-[2px] rounded-full bg-alert shadow-[0_0_26px_6px_rgba(255,59,48,0.45)] ${
+              side === "left" ? "left-4" : "right-4"
+            }`}
+          />
 
           <div className="absolute right-3 top-3 flex max-w-[72%] items-center gap-2 rounded-full border border-alert/55 bg-ink-950/85 px-2.5 py-1 backdrop-blur">
             <span className="inline-flex shrink-0 items-center gap-1 text-[8.5px] font-semibold uppercase tracking-[0.14em] text-alert">
@@ -70,7 +80,7 @@ export default function VanStage({ cabinTemp, vehicleName, trim, photoUri, onPho
 
       <div className="pointer-events-none absolute left-4 top-3.5 flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-white/35">
         <span className="h-1.5 w-1.5 rounded-full bg-sys-blue" />
-        {focus ? "3D view · turning" : "Live 3D"} · Interior {Math.round(cabinTemp)}°F
+        {focus ? "Live view · side focus" : "Live van"} · Interior {Math.round(cabinTemp)}°F
       </div>
 
       <div className="pointer-events-none absolute bottom-3.5 left-4">

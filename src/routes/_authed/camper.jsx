@@ -35,7 +35,7 @@ function CamperPage() {
   return (
     <ModuleShell title="Camper" subtitle="Living space, lighting and sleep comfort" status={status}>
       <div className="grid gap-3 lg:grid-cols-3">
-        <section className="relative overflow-hidden rounded-2xl border border-line/80 bg-surface lg:col-span-2">
+        <section className="photo-slot relative overflow-hidden rounded-2xl border bg-surface lg:col-span-2">
           <div className="relative h-[240px] w-full shadow-[inset_0_0_90px_rgba(2,10,20,0.9)]">
             <VanPhoto
               uri={status.cabin_photo_uri}
@@ -43,8 +43,6 @@ function CamperPage() {
               alt="Camper van cabin interior"
               className="absolute inset-0 h-full w-full object-cover"
               style={{ filter: `brightness(${luminance})`, transition: "filter 140ms linear" }}
-              onPhoto={(uri) => van.update({ cabin_photo_uri: uri })}
-              buttonPosition="top"
             />
             <div
               className="pointer-events-none absolute inset-0 bg-warn mix-blend-soft-light"

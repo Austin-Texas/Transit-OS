@@ -6,6 +6,7 @@ import useVanDashboard from "@/hooks/useVanDashboard";
 import { useAuth } from "@/lib/AuthContext";
 import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
+import PhotoSlots from "@/components/settings/PhotoSlots";
 
 export const Route = createFileRoute("/_authed/settings")({
   head: () => ({
@@ -101,6 +102,8 @@ function SettingsPage() {
         </ModuleCard>
 
         <div className="flex flex-col gap-3">
+          <PhotoSlots status={status} onUpdate={van.update} />
+
           <ModuleCard title="Hub" icon={SettingsIcon}>
             <p className="rounded-xl border border-line/80 bg-surface-raised px-3 py-3 text-[11px] leading-relaxed text-white/45">
               TransitOS hub connected over Bluetooth Low Energy. Current mode {status.active_mode}, climate{" "}
