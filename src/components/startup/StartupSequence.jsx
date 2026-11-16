@@ -1,119 +1,94 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { STARTUP_CHECKS, runStartupChecks } from "@/lib/startupReadiness";
-import "./StartupLive.css";
-import StartupWebGL from "./StartupWebGL";
+import "./StartupPremium.css";
 
-const MIN_VISUAL_MS = 6500;
-const EXIT_MS = 550;
-const initial = Object.fromEntries(STARTUP_CHECKS.map(check => [check.id, "pending"]));
-const isTerminal = status => ["ready", "offline", "simulated", "error"].includes(status);
+const initial = Object.fromEntries(STARTUP_CHECKS.map(item => [item.id, "pending"]));
+const finished = value => ["ready", "offline", "simulated", "error"].includes(value);
+const MIN_MS = 5800;
+const EXIT_MS = 650;
 
 export default function StartupSequence({ onDone }) {
-  const [checks, setChecks] = useState(initial);
   const [elapsed, setElapsed] = useState(0);
+  const [checks, setChecks] = useState(initial);
   const [closing, setClosing] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [webglFailed, setWebglFailed] = useState(false);
   const doneRef = useRef(onDone);
   doneRef.current = onDone;
-  const checksRef = useRef(initial);
-  const startRef = useRef(0);
+  const started = useRef(0);
 
   useEffect(() => {
-    const controller = new AbortController();
-    const oldOverflow = document.body.style.overflow;
+    const abort = new AbortController();
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
-    setReducedMotion(reduced);
-    startRef.current = performance.now();
-    const interval = window.setInterval(() => setElapsed(performance.now() - startRef.current), 60);
-    const update = (id, status) => {
-      if (controller.signal.aborted) return;
-      checksRef.current = { ...checksRef.current, [id]: status };
-      setChecks(checksRef.current);
-    };
-    runStartupChecks(update, controller.signal).catch(() => {
-      if (!controller.signal.aborted) update("application", "error");
+    started.current = performance.now();
+    let raf;
+    const tick = now => { setElapsed(now - started.current); raf = requestAnimationFrame(tick); };
+    raf = requestAnimationFrame(tick);
+    runStartupChecks((id, status) => {
+      if (!abort.signal.aborted) setChecks(current => ({ ...current, [id]: status }));
+    }, abort.signal).catch(() => {
+      if (!abort.signal.aborted) setChecks(current => ({ ...current, application: "error" }));
     });
     return () => {
-      controller.abort();
-      window.clearInterval(interval);
-      document.body.style.overflow = oldOverflow;
+      abort.abort();
+      cancelAnimationFrame(raf);
+      document.body.style.overflow = previousOverflow;
     };
   }, []);
 
-  const requiredComplete = STARTUP_CHECKS.filter(check => check.required)
-    .every(check => isTerminal(checks[check.id]));
-  const optionalComplete = STARTUP_CHECKS.filter(check => !check.required)
-    .every(check => isTerminal(checks[check.id]));
-  const allComplete = requiredComplete && optionalComplete;
-  const minDuration = reducedMotion ? 1000 : MIN_VISUAL_MS;
-  const canExit = elapsed >= minDuration && allComplete;
+  const complete = STARTUP_CHECKS.every(item => finished(checks[item.id]));
+  const ready = STARTUP_CHECKS.filter(item => finished(checks[item.id])).length;
+  const stage = elapsed < 1100 ? 0 : elapsed < 2200 ? 1 : elapsed < 3800 ? 2 : 3;
   useEffect(() => {
-    if (!canExit || closing) return;
-    setClosing(true);
-  }, [canExit, closing]);
-
+    if (complete && elapsed >= MIN_MS && !closing) setClosing(true);
+  }, [complete, elapsed, closing]);
   useEffect(() => {
     if (!closing) return;
-    const timer = window.setTimeout(() => doneRef.current?.(), EXIT_MS);
-    return () => window.clearTimeout(timer);
+    const timer = setTimeout(() => doneRef.current?.(), EXIT_MS);
+    return () => clearTimeout(timer);
   }, [closing]);
 
-  const readyCount = STARTUP_CHECKS.filter(check => isTerminal(checks[check.id])).length;
-  const progress = Math.round((readyCount / STARTUP_CHECKS.length) * 100);
-  const stage = reducedMotion ? 3 : elapsed < 1300 ? 0 : elapsed < 2500 ? 1 : elapsed < 5200 ? 2 : 3;
-  const mode = useMemo(() => {
-    if (checks.controller === "ready" && checks.sensors === "ready") return "VEHICLE CONNECTED";
-    if (checks.controller === "simulated" || checks.sensors === "simulated") return "SIMULATION MODE";
-    return "WEB LAB · VEHICLE HARDWARE OFFLINE";
-  }, [checks.controller, checks.sensors]);
-
-  const showWebGL = !reducedMotion && !webglFailed && stage < 3;
+  const hardware = checks.controller === "ready" && checks.sensors === "ready"
+    ? "VEHICLE CONNECTED" : checks.controller === "simulated" || checks.sensors === "simulated"
+      ? "SIMULATION MODE" : "WEB LAB · HARDWARE NOT CONNECTED";
 
   return (
-    <motion.section className={"transit-live transit-live--stage-" + stage + (showWebGL ? " transit-live--webgl" : "")} role="status" aria-label="TransitOS startup"
-      initial={false} animate={{ opacity: closing ? 0 : 1 }}
-      transition={{ duration: EXIT_MS / 1000 }}>
-      {!reducedMotion && !webglFailed && <StartupWebGL onFail={() => setWebglFailed(true)} />}
-      <div className="transit-live__halo" aria-hidden="true" />
-      <div className="transit-live__rays" aria-hidden="true" />
-      <div className="transit-live__ring transit-live__ring--outer" aria-hidden="true" />
-      <div className="transit-live__ring transit-live__ring--inner" aria-hidden="true" />
-      <div className="transit-live__scene">
-        <div className={"transit-live__brand transit-live__brand--stage-" + stage}>
-          <img src="/branding/tpmcs-logo.svg" alt="TPMCS original company logo" />
-          <strong>TPMCS</strong>
+    <motion.div className={"tp-boot tp-boot--" + stage} initial={false}
+      animate={{ opacity: closing ? 0 : 1 }} transition={{ duration: EXIT_MS / 1000 }}
+      role="status" aria-label="TransitOS startup">
+      <div className="tp-boot__grain" aria-hidden="true" />
+      <div className="tp-boot__aurora" aria-hidden="true" />
+      <div className="tp-boot__horizon" aria-hidden="true" />
+      <div className="tp-boot__platform" aria-hidden="true">
+        <i /><i /><i />
+      </div>
+      <div className="tp-boot__center">
+        <div className="tp-boot__identity">
+          <div className="tp-boot__mark">
+            <img src="/branding/tpmcs-logo.svg" alt="TPMCS official logo" />
+          </div>
+          <span className="tp-boot__company">T P M C S</span>
         </div>
-        <div className={"transit-live__product " + (stage >= 2 ? "transit-live__product--shown" : "")}>
-          <p>TPMCS PRESENTS</p>
+        <div className="tp-boot__title">
+          <span className="tp-boot__eyebrow">TPMCS PRESENTS</span>
           <h1>Transit<span>OS</span></h1>
-          <small>INTELLIGENT VEHICLE OPERATING SYSTEM</small>
+          <p>INTELLIGENT VEHICLE OPERATING SYSTEM</p>
         </div>
-        <div className={"transit-live__vehicle " + (stage >= 2 ? "transit-live__vehicle--shown" : "")} aria-hidden={stage < 2}>
-          <img src="/branding/transit-van.svg" alt="" />
-          <div className="transit-live__vehicle-shadow" />
-        </div>
-        <div className={"transit-live__diagnostics " + (stage === 3 ? "transit-live__diagnostics--shown" : "")}>
-          <h2>System Initialization</h2>
-          <div className="transit-live__checks">
-            {STARTUP_CHECKS.map(check => (
-              <div className="transit-live__check" key={check.id}>
-                <span>{check.label}</span>
-                <span className={"transit-live__state transit-live__state--" + checks[check.id]}>{checks[check.id]}</span>
-              </div>
-            ))}
+        <div className="tp-boot__status">
+          <div className="tp-boot__status-head"><span>INITIALIZING TRANSITOS</span><span>{Math.round(ready / STARTUP_CHECKS.length * 100)}%</span></div>
+          <div className="tp-boot__track"><div style={{ width: (ready / STARTUP_CHECKS.length * 100) + "%" }} /></div>
+          <div className="tp-boot__checks">
+            {STARTUP_CHECKS.map(item => <div key={item.id}>
+              <span>{item.label}</span>
+              <strong className={"tp-boot__state--" + checks[item.id]}>{checks[item.id]}</strong>
+            </div>)}
           </div>
-          <div className="transit-live__progress" aria-label={"Startup checks completed: " + progress + "%"}>
-            <span style={{ width: progress + "%" }} />
-          </div>
-          <div className="transit-live__mode">{mode}</div>
-          {!allComplete && <small>Checking application and available interfaces…</small>}
+          <small>{hardware}</small>
         </div>
       </div>
-      <div className="transit-live__footer">TPMCS · TRANSITOS · LIVE STARTUP</div>
-      <button type="button" className="transit-live__skip" onClick={() => setClosing(true)}>Skip intro</button>
-    </motion.section>
+      <div className="tp-boot__corner tp-boot__corner--left">TPMCS / TRANSITOS</div>
+      <div className="tp-boot__corner tp-boot__corner--right">SYSTEM STARTUP</div>
+      <button className="tp-boot__skip" type="button" onClick={() => setClosing(true)}>Skip intro</button>
+    </motion.div>
   );
 }
