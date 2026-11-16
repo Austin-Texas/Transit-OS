@@ -537,7 +537,7 @@ The owner explicitly requested that live browser testing and the existing projec
 
 The pre-edit check found preferred Base44 revision `a37ff6026785009b770a356695ad7de08b49a7b7` ready. The document contents in Base44 matched the saved master documents. GitHub main was `470a5d78007810116b99d5bdf925877751a10bcc`; the existing snapshot-versus-newer-Base44 distinction in section 24 remains in force.
 
-This update changes project instructions and documentation only. No new app/browser/hardware test or application feature is claimed. The owner directly authorized saving this policy; publication of this new policy batch to GitHub remains pending the review answer required above.
+This update changes project instructions and documentation only. No new app/browser/hardware test or application feature is claimed. The owner directly authorized saving this policy and then answered **Yes** to publishing this specific policy batch to **Austin-Texas/TransitOS**, branch **main**, after disclosure that the repository is public. The finalization recheck found preferred Base44 revision `3ae0b62015a30193126796ee4c3e107690deea38` ready and GitHub main still at `470a5d78007810116b99d5bdf925877751a10bcc`. The approved GitHub change includes only **AGENTS.md**, **document.md** and **TransitOS_Master_Project_Prompt.md**; unrelated application work is preserved. The actual verified publication commit is reported separately.
 
 **My immediate request for this new chat:** [Replace this line with the next change, question, or build task, or leave it blank for the read-only project review above.]
 
