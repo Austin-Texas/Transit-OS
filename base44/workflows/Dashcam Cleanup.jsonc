@@ -1,0 +1,45 @@
+{
+  "name": "Dashcam Cleanup",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "interval_value": 1,
+      "interval_unit": "days",
+      "interval_anchor": "2026-11-16T08:00:00Z",
+      "timezone": "America/New_York",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "description": "Deletes 360\u00b0 dashcam clips older than the retention window saved in Settings \u2192 Cameras, once a day.",
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "dashcam_cleanup",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "purge_clips": {
+          "call": "invoke_server_route",
+          "with": {
+            "path": "/api/clip-retention",
+            "method": "POST"
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Delete old clips",
+            "description": "Beyond the saved retention window"
+          }
+        }
+      }
+    ]
+  }
+}
