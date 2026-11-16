@@ -1,0 +1,115 @@
+name: TransitOS automatic deployment (Base44 backend)
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'selfhost/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: transit-os-production
+  cancel-in-progress: false
+
+jobs:
+  validate-and-deploy:
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 45
+    env:
+      VITE_BASE44_APP_ID: ${{ vars.TRANSITOS_BASE44_APP_ID }}
+      VITE_BASE44_APP_BASE_URL: ${{ vars.TRANSITOS_BASE44_APP_BASE_URL }}
+    steps:
+      - name: Confirm target host and prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(hostname -s)" = "app-host-01"
+          docker info >/dev/null
+          docker network inspect trade-app_default >/dev/null
+          test "$VITE_BASE44_APP_ID" = "6afa3d27af32e7eb7d4b7f76"
+          [[ "$VITE_BASE44_APP_BASE_URL" =~ ^https://[^/]+/?$ ]] || { echo "::error::Set verified HTTPS Base44 backend URL in repository variable TRANSITOS_BASE44_APP_BASE_URL"; exit 1; }
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Check Base44 backend reachability
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --max-time 15 \
+            "${VITE_BASE44_APP_BASE_URL%/}/api/apps/public/login-info/by-id/$VITE_BASE44_APP_ID" -o /tmp/transitos-login-info.json
+          node -e 'const fs=require("fs"); const j=JSON.parse(fs.readFileSync("/tmp/transitos-login-info.json")); if (!j || typeof j!=="object" || !j.auth_config) process.exit(1)'
+      - name: Validate application
+        run: |
+          npm ci
+          node --test tests/platform.test.mjs tests/simulation.test.mjs
+          npm run build
+      - name: Build candidate image with verified Base44 configuration
+        run: |
+          docker build --build-arg VITE_BASE44_APP_ID="$VITE_BASE44_APP_ID" \
+            --build-arg VITE_BASE44_APP_BASE_URL="$VITE_BASE44_APP_BASE_URL" \
+            -t "transit-os-web:${{ github.sha }}" .
+      - name: Stage candidate without changing production
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker rm -f transit-os-candidate >/dev/null 2>&1 || true
+          docker run -d --name transit-os-candidate --network trade-app_default \
+            "transit-os-web:${{ github.sha }}"
+          trap 'docker rm -f transit-os-candidate >/dev/null 2>&1 || true' EXIT
+          for i in $(seq 1 30); do
+            if docker run --rm --network trade-app_default curlimages/curl:8.11.1 \
+              -fsS --max-time 5 http://transit-os-candidate:80/login -o /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs --tail 80 transit-os-candidate
+          exit 1
+      - name: Deploy with automatic rollback on failed health check
+        shell: bash
+        run: |
+          set -euo pipefail
+          current=transit-os-web
+          previous=transit-os-web-previous
+          if docker container inspect "$previous" >/dev/null 2>&1; then
+            echo "::error::Existing rollback container $previous requires manual inspection"
+            exit 1
+          fi
+          had_previous=0
+          if docker container inspect "$current" >/dev/null 2>&1; then
+            had_previous=1
+            docker rename "$current" "$previous"
+            docker stop "$previous"
+          fi
+          rollback() {
+            docker rm -f "$current" >/dev/null 2>&1 || true
+            if [ "$had_previous" = 1 ]; then
+              docker rename "$previous" "$current"
+              docker start "$current"
+            fi
+          }
+          trap rollback ERR
+          docker run -d --name "$current" --restart unless-stopped \
+            --network trade-app_default --network-alias transitos-web \
+            -p 127.0.0.1:8091:80 "transit-os-web:${{ github.sha }}"
+          healthy=0
+          for i in $(seq 1 30); do
+            if curl -fsS --max-time 5 http://127.0.0.1:8091/login -o /dev/null; then
+              healthy=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$healthy" -ne 1 ]; then
+            docker logs --tail 80 "$current"
+            exit 1
+          fi
+          trap - ERR
+          docker rm -f "$previous" >/dev/null 2>&1 || true
+          echo "Deployed TransitOS ${{ github.sha }}; Base44 backend remains in use"
