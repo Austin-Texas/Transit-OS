@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import { useAuth } from "@/lib/AuthContext";
 import ModuleShell from "@/components/dash/ModuleShell";
+import { PlatformAccess } from "@/components/platform/shared";
 import ModuleCard from "@/components/dash/ModuleCard";
 import PhotoSlots from "@/components/settings/PhotoSlots";
 import SettingsCameras from "@/components/settings/SettingsCameras";
@@ -46,7 +47,7 @@ function SettingsPage() {
     });
   }, [statusId]);
 
-  if (!status) return <ModuleShell title="Settings" />;
+  if (!status) return <ModuleShell title="Settings"><PlatformAccess /></ModuleShell>;
 
   const save = async () => {
     setSaving(true);
@@ -75,6 +76,7 @@ function SettingsPage() {
 
   return (
     <ModuleShell title="Settings" subtitle="Vehicle details, hub sync and your account" status={status}>
+      <PlatformAccess />
       <div className="grid gap-3 lg:grid-cols-2">
         <ModuleCard title="Vehicle details" icon={Truck}>
           <div className="grid gap-2.5">
