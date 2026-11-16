@@ -2,6 +2,7 @@ import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-r
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import { Toaster } from "@/components/ui/sonner";
+import TransitStartup from "@/components/startup/TransitStartup";
 import { AuthProvider } from "@/lib/AuthContext";
 import { Base44Scripts } from "base44:document";
 import appCss from "@/index.css?url";
@@ -31,10 +32,12 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <AuthProvider>
-      <Outlet />
-      <Toaster />
-    </AuthProvider>
+    <TransitStartup>
+      <AuthProvider>
+        <Outlet />
+        <Toaster />
+      </AuthProvider>
+    </TransitStartup>
   );
 }
 
