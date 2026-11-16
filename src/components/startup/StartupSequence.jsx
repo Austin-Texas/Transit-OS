@@ -24,7 +24,8 @@ export default function StartupSequence({ onDone }) {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const began = performance.now();
-    // Keep the full React scene out of the 60-fps render loop. The canvas\n    // animates independently; 20-Hz UI updates are enough for the progress bar.\n    const timer = window.setInterval(() => setElapsed(performance.now() - began), 50);
+    // Canvas animates independently; update the UI at 20 Hz.
+    const timer = window.setInterval(() => setElapsed(performance.now() - began), 50);
     runStartupChecks((id, status) => {
       if (!controller.signal.aborted) setChecks(previous => ({ ...previous, [id]: status }));
     }, controller.signal).catch(() => {
@@ -38,18 +39,19 @@ export default function StartupSequence({ onDone }) {
   }, []);
   const stage = elapsed < BEATS[1] ? 0 : elapsed < BEATS[2] ? 1 : elapsed < BEATS[3] ? 2 : elapsed < BEATS[4] ? 3 : 4;
   const finished = STARTUP_CHECKS.every(item => settled(checks[item.id]));
+  const timedOut = elapsed >= MIN_DURATION + 4000;
   const ready = STARTUP_CHECKS.filter(item => settled(checks[item.id])).length;
   // Real checks are tracked independently; the display eases in over time so
   // fast checks never make the progress bar jump or disappear immediately.
-  const checkPercent = Math.round(ready / STARTUP_CHECKS.length * 100);
+  const checkPercent = timedOut ? 100 : Math.round(ready / STARTUP_CHECKS.length * 100);
   const animationPercent = Math.round(Math.min(1, Math.max(0, (elapsed - PROGRESS_START) / PROGRESS_DURATION)) * 100);
   const progress = Math.min(checkPercent, animationPercent);
   useEffect(() => {
-    if (!completed.current && finished && elapsed >= MIN_DURATION) {
+    if (!completed.current && elapsed >= MIN_DURATION && (finished || timedOut)) {
       completed.current = true;
       setClosing(true);
     }
-  }, [finished, elapsed]);
+  }, [finished, timedOut, elapsed]);
   useEffect(() => {
     if (!closing) return;
     const timer = setTimeout(() => onDoneRef.current?.(), EXIT_DURATION);
