@@ -17,6 +17,8 @@ import ModuleShell from "@/components/dash/ModuleShell";
 import ModuleCard from "@/components/dash/ModuleCard";
 import Metric from "@/components/dash/Metric";
 import VanStage from "@/components/dash/VanStage";
+import VoiceControl from "@/components/dash/home/VoiceControl";
+import useVanVoice from "@/hooks/useVanVoice";
 import DiagramViews, { viewFocus } from "@/components/van/DiagramViews";
 import { siteWarnings } from "@/lib/siteWarnings";
 import { clockTime, miles, openAlerts } from "@/lib/van";
@@ -42,6 +44,15 @@ function DiagnosticsPage() {
 
   const warnings = useMemo(() => siteWarnings(status), [status]);
 
+  const handleCommand = useVanVoice({
+    status,
+    alerts,
+    diagnostics,
+    update: van.update,
+    setMode: van.setMode,
+    adjustClimate: van.adjustClimate,
+  });
+
   if (!status) return <ModuleShell title="Diagnostics" />;
 
   const faults = openAlerts(alerts).length;
@@ -56,7 +67,8 @@ function DiagnosticsPage() {
     });
 
   return (
-    <ModuleShell
+    <>
+      <ModuleShell
       title="Diagnostics"
       subtitle={`${status.vehicle_name} · ${status.trim}`}
       status={status}
@@ -206,6 +218,9 @@ function DiagnosticsPage() {
           )}
         </ModuleCard>
       </div>
-    </ModuleShell>
+      </ModuleShell>
+
+      <VoiceControl onSubmit={handleCommand} />
+    </>
   );
 }

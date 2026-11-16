@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import useVanDashboard from "@/hooks/useVanDashboard";
 import { openAlerts } from "@/lib/van";
 import { siteWarnings } from "@/lib/siteWarnings";
-import { interpretCommand } from "@/lib/voiceCommands";
+import useVanVoice from "@/hooks/useVanVoice";
 import { cn } from "@/lib/utils";
 import HomeHeader from "./home/HomeHeader";
 import HomeDock from "./home/HomeDock";
@@ -36,6 +36,20 @@ export default function HomeScreen() {
     return () => clearTimeout(timer);
   }, [alertsPing]);
 
+  const handleCommand = useVanVoice({
+    status,
+    alerts,
+    diagnostics,
+    update: van.update,
+    setMode: van.setMode,
+    adjustClimate: van.adjustClimate,
+    onDiagnostics: () => setDiagnosticsOpen(true),
+    onAlerts: () => {
+      setAlertsPing(true);
+      document.getElementById("home-alerts")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    },
+  });
+
   if (!status) {
     return (
       <div className="flex min-h-[100dvh] flex-col">
@@ -57,27 +71,6 @@ export default function HomeScreen() {
   const active = openAlerts(alerts);
   const lightsOn = status.lights_on !== false;
   const locked = status.locks_locked !== false;
-
-  // One place where a spoken command becomes the same change the buttons make.
-  const handleCommand = (text) => {
-    const { reply, action } = interpretCommand(text, { status, alerts, diagnostics });
-
-    if (action?.type === "diagnostics") setDiagnosticsOpen(true);
-    if (action?.type === "alerts") {
-      setAlertsPing(true);
-      document.getElementById("home-alerts")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    if (action?.type === "lights") van.update({ lights_on: action.value }).catch(console.error);
-    if (action?.type === "locks") van.update({ locks_locked: action.value }).catch(console.error);
-    if (action?.type === "pump") van.update({ water_pump_on: action.value }).catch(console.error);
-    if (action?.type === "mode") van.setMode(action.value).catch(console.error);
-    if (action?.type === "climate") {
-      van.update({ climate_set: action.value, climate_temp: action.value }).catch(console.error);
-    }
-    if (action?.type === "climateDelta") van.adjustClimate(action.value);
-
-    return reply;
-  };
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col">

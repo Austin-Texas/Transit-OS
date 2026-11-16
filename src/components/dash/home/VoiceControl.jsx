@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Mic, Send, Sparkles, X } from "lucide-react";
+import { ArrowRight, Mic, Send, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import useSpeechRecognition from "@/hooks/useSpeechRecognition";
 import { VOICE_EXAMPLES } from "@/lib/voiceCommands";
 import { cn } from "@/lib/utils";
@@ -10,6 +10,7 @@ export default function VoiceControl({ onSubmit }) {
   const [heard, setHeard] = useState("");
   const [reply, setReply] = useState(null);
   const [typed, setTyped] = useState("");
+  const [spoken, setSpoken] = useState(true);
 
   const run = (text) => {
     const answer = onSubmit(text);
@@ -30,6 +31,18 @@ export default function VoiceControl({ onSubmit }) {
   useEffect(() => {
     if (speech.error) setReply(null);
   }, [speech.error]);
+
+  // Replies are read back aloud, so a command can be given and confirmed
+  // without looking at the screen.
+  useEffect(() => {
+    if (!reply || !spoken) return undefined;
+    if (typeof window === "undefined" || !window.speechSynthesis) return undefined;
+    const utterance = new SpeechSynthesisUtterance(reply);
+    utterance.rate = 1.02;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+    return undefined;
+  }, [reply, spoken]);
 
   const panelOpen = speech.listening || Boolean(heard) || Boolean(reply) || Boolean(speech.error);
 
@@ -53,18 +66,37 @@ export default function VoiceControl({ onSubmit }) {
                 ))}
               </span>
             ) : null}
-            <button
-              type="button"
-              onClick={() => {
-                speech.stop();
-                setHeard("");
-                setReply(null);
-              }}
-              aria-label="Close voice control"
-              className="ml-auto rounded-full p-1 text-white/40 transition hover:bg-white/10 hover:text-white"
-            >
-              <X className="h-4 w-4" strokeWidth={2.4} />
-            </button>
+            <span className="ml-auto flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  if (spoken) window.speechSynthesis?.cancel();
+                  setSpoken((value) => !value);
+                }}
+                aria-label={spoken ? "Mute spoken replies" : "Unmute spoken replies"}
+                aria-pressed={spoken}
+                className="rounded-full p-1 text-white/40 transition hover:bg-white/10 hover:text-white"
+              >
+                {spoken ? (
+                  <Volume2 className="h-4 w-4" strokeWidth={2} />
+                ) : (
+                  <VolumeX className="h-4 w-4" strokeWidth={2} />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  speech.stop();
+                  window.speechSynthesis?.cancel();
+                  setHeard("");
+                  setReply(null);
+                }}
+                aria-label="Close voice control"
+                className="rounded-full p-1 text-white/40 transition hover:bg-white/10 hover:text-white"
+              >
+                <X className="h-4 w-4" strokeWidth={2.4} />
+              </button>
+            </span>
           </header>
 
           <div className="space-y-2.5 px-4 py-3.5">

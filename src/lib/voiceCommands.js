@@ -18,6 +18,15 @@ export function interpretCommand(raw, { status = {}, alerts = [], diagnostics = 
 
   if (!said) return { reply: "I did not catch that. Tap the microphone and try again.", action: null };
 
+  // Moving between the main dashboard and diagnostics hands-free.
+  const moving = has(said, ["go", "open", "navigate", "switch", "show", "take me", "back", "page"]);
+  if (has(said, ["diagnostic", "diagnostics"]) && moving) {
+    return { reply: "Opening diagnostics.", action: { type: "navigate", value: "/diagnostics" } };
+  }
+  if (has(said, ["dashboard", "home screen", "main screen", "home page"]) || /(go|back|take me) home/.test(said)) {
+    return { reply: "Opening the main dashboard.", action: { type: "navigate", value: "/" } };
+  }
+
   if (has(said, ["pump"])) {
     const off = has(said, ["off", "stop"]);
     return {
@@ -138,20 +147,48 @@ export function interpretCommand(raw, { status = {}, alerts = [], diagnostics = 
     return { reply: `${miles(status.odometer)} miles on the van.`, action: null };
   }
 
+  if (
+    has(said, [
+      "status",
+      "system check",
+      "how is the van",
+      "how's the van",
+      "how is everything",
+      "how's everything",
+      "vehicle status",
+      "overview",
+    ])
+  ) {
+    const active = openAlerts(alerts);
+    const issues = diagnostics.filter((row) => row.state !== "ok").length;
+    const readings = [
+      `Interior ${Math.round(status.climate_temp ?? 72)} degrees`,
+      `battery ${Math.round(status.battery_percent ?? 0)} percent`,
+      `fresh water ${Math.round(status.fresh_water ?? 0)} percent`,
+      `propane ${Math.round(status.lpg_percent ?? 0)} percent`,
+    ].join(", ");
+    const tail = active.length
+      ? `${active.length} active alert${active.length > 1 ? "s" : ""}. ${active[0].title}.`
+      : issues
+        ? `${issues} system${issues > 1 ? "s" : ""} flagged in diagnostics.`
+        : "All systems nominal.";
+    return { reply: `${readings}. ${tail}`, action: null };
+  }
+
   return {
     reply:
-      "I can run diagnostics, show alerts, switch modes, set the climate, turn the lights or pump on and off, lock the van, or report water, battery and propane levels.",
+      "I can open the dashboard or diagnostics, check system status, show alerts, switch modes, set the climate, turn the lights or pump on and off, lock the van, or report water, battery and propane levels.",
     action: null,
   };
 }
 
 // Examples shown while the microphone panel is idle.
 export const VOICE_EXAMPLES = [
+  "Go to diagnostics",
+  "Open the dashboard",
+  "Check system status",
+  "How much fresh water do I have?",
   "Turn the cabin lights on",
   "Set the temperature to 72 degrees",
-  "How much fresh water do I have?",
-  "What is my battery level?",
-  "Run vehicle diagnostics",
   "Show me active alerts",
-  "Switch to Camping mode",
 ];
