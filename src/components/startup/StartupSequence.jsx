@@ -5,9 +5,11 @@ import "./StartupPremium.css";
 
 const initial = Object.fromEntries(STARTUP_CHECKS.map(check => [check.id, "pending"]));
 const settled = status => ["ready", "offline", "simulated", "error"].includes(status);
-const BEATS = [0, 1000, 2000, 3000, 4000];
-const MIN_DURATION = 5500;
-const EXIT_DURATION = 650;
+const BEATS = [0, 1300, 2800, 4300, 6000];
+const PROGRESS_START = 6000;
+const PROGRESS_DURATION = 6500;
+const MIN_DURATION = PROGRESS_START + PROGRESS_DURATION + 1100;
+const EXIT_DURATION = 1200;
 
 export default function StartupSequence({ onDone }) {
   const [elapsed, setElapsed] = useState(0);
@@ -38,7 +40,7 @@ export default function StartupSequence({ onDone }) {
   const stage = elapsed < BEATS[1] ? 0 : elapsed < BEATS[2] ? 1 : elapsed < BEATS[3] ? 2 : elapsed < BEATS[4] ? 3 : 4;
   const finished = STARTUP_CHECKS.every(item => settled(checks[item.id]));
   const ready = STARTUP_CHECKS.filter(item => settled(checks[item.id])).length;
-  const progress = Math.round(ready / STARTUP_CHECKS.length * 100);
+  // Real checks are tracked independently; the display eases in over time so\n  // fast checks never make the progress bar jump or disappear immediately.\n  const checkPercent = Math.round(ready / STARTUP_CHECKS.length * 100);\n  const animationPercent = Math.round(Math.min(1, Math.max(0, (elapsed - PROGRESS_START) / PROGRESS_DURATION)) * 100);\n  const progress = Math.min(checkPercent, animationPercent);
   useEffect(() => {
     if (!completed.current && finished && elapsed >= MIN_DURATION) {
       completed.current = true;
@@ -57,7 +59,7 @@ export default function StartupSequence({ onDone }) {
 
   return (
     <motion.div className={`tp-cinema tp-cinema--${stage}`} initial={false}
-      animate={{ opacity: closing ? 0 : 1 }} transition={{ duration: EXIT_DURATION / 1000 }}
+      animate={{ opacity: closing ? 0 : 1 }} transition={{ duration: EXIT_DURATION / 1000, ease: "easeInOut" }}
       role="status" aria-label="TPMCS TransitOS cinematic startup">
       <div className="tp-cinema__grain" aria-hidden="true" />
       <div className="tp-cinema__atmosphere" aria-hidden="true" />
