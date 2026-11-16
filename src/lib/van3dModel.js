@@ -89,34 +89,6 @@ export function buildVanModel() {
   shell.translate(0, 0, -1.01);
   wire(shell, materials.shell, materials.shellEdge, 28);
 
-  // Photo skin: the imported Ford Transit photo, cut to the body outline and
-  // laid on both flanks. It starts blank and fades in once the texture loads.
-  const skinShape = new THREE.ShapeGeometry(bodyShape(), 14);
-  skinShape.computeBoundingBox();
-  const bounds = skinShape.boundingBox;
-  const skinUv = skinShape.attributes.uv;
-  for (let i = 0; i < skinUv.count; i += 1) {
-    skinUv.setXY(
-      i,
-      (skinShape.attributes.position.getX(i) - bounds.min.x) / (bounds.max.x - bounds.min.x),
-      (skinShape.attributes.position.getY(i) - bounds.min.y) / (bounds.max.y - bounds.min.y)
-    );
-  }
-  skinUv.needsUpdate = true;
-  const skinMaterial = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0,
-    side: THREE.DoubleSide,
-    depthWrite: false,
-  });
-  [-1.02, 1.02].forEach((z) => {
-    const skin = new THREE.Mesh(skinShape, skinMaterial);
-    skin.position.z = z;
-    skin.renderOrder = 1;
-    group.add(skin);
-  });
-
   // Glazing outlines on both flanks.
   [
     [1.34, 2.16, 0.94, 0.6],
@@ -217,6 +189,5 @@ export function buildVanModel() {
     hotspots,
     padMaterial: materials.pad,
     padDotMaterial: materials.padDot,
-    skinMaterial,
   };
 }

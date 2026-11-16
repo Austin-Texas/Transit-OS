@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { buildVanModel } from "@/lib/van3dModel";
-import { VAN_SKIN_IMAGE } from "@/lib/van";
 
 const RED = 0xff3131;
 const GREEN = 0x00ff41;
@@ -111,21 +110,8 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
 
-    const { group: van, hotspots, padMaterial, padDotMaterial, skinMaterial } = buildVanModel();
+    const { group: van, hotspots, padMaterial, padDotMaterial } = buildVanModel();
     scene.add(van);
-
-    // The Transit diagnostic render is the van's look, wrapped on both flanks.
-    new THREE.TextureLoader().load(
-      VAN_SKIN_IMAGE,
-      (texture) => {
-        texture.colorSpace = THREE.SRGBColorSpace;
-        skinMaterial.map = texture;
-        skinMaterial.opacity = 0.92;
-        skinMaterial.needsUpdate = true;
-      },
-      undefined,
-      () => {}
-    );
 
     // Status callouts, as in the reference: one on the rear cabin, one on the
     // habitation panel.
