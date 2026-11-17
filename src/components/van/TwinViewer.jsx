@@ -16,6 +16,8 @@ export default function TwinViewer({ src, alt, className }) {
   const drag = useRef(null);
   const pointers = useRef(new Map());
   const pinch = useRef(null);
+  const lastInput = useRef(0);
+  const sway = useRef({ offset: 0, phase: 0 });
 
   const paint = useCallback(() => {
     const el = stageRef.current;
@@ -49,6 +51,7 @@ export default function TwinViewer({ src, alt, className }) {
     if (!el) return undefined;
     const onWheel = (event) => {
       event.preventDefault();
+      lastInput.current = Date.now();
       view.current.zoom = clamp(view.current.zoom * (1 - event.deltaY * 0.0012), 0.75, 2.6);
       paint();
     };
@@ -56,9 +59,33 @@ export default function TwinViewer({ src, alt, className }) {
     return () => el.removeEventListener("wheel", onWheel);
   }, [paint]);
 
+  // Idle life: once nobody has touched it for a moment the twin turns gently
+  // side to side on its own, and stops the instant a drag or a gesture starts.
+  useEffect(() => {
+    let raf = 0;
+    let last = 0;
+    const loop = (now) => {
+      const dt = last ? Math.min(48, now - last) : 16;
+      last = now;
+      const idle = Date.now() - lastInput.current > 1200;
+      if (idle && !drag.current && !inertia.current && pointers.current.size === 0) {
+        sway.current.phase += dt * 0.00055;
+        const target = Math.sin(sway.current.phase) * 13;
+        const delta = (target - sway.current.offset) * 0.055;
+        sway.current.offset += delta;
+        view.current.spin += delta;
+        paint();
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [paint]);
+
   useEffect(() => stopInertia, [stopInertia]);
 
   const zoomBy = (factor) => {
+    lastInput.current = Date.now();
     view.current.zoom = clamp(view.current.zoom * factor, 0.75, 2.6);
     paint();
   };
@@ -66,7 +93,14 @@ export default function TwinViewer({ src, alt, className }) {
   const onPointerDown = (event) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     event.preventDefault();
-    event.currentTarget.setPointerCapture?.(event.pointerId);
+    lastInput.current = Date.now();
+    // Capture keeps the spin going if the finger slides off the picture; it is
+    // not available for every pointer, so a failure must not cancel the drag.
+    try {
+      event.currentTarget.setPointerCapture?.(event.pointerId);
+    } catch {
+      /* pointer already released */
+    }
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     stopInertia();
     spinVelocity.current = 0;
@@ -86,6 +120,7 @@ export default function TwinViewer({ src, alt, className }) {
 
   const onPointerMove = (event) => {
     if (!pointers.current.has(event.pointerId)) return;
+    lastInput.current = Date.now();
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
 
     if (pointers.current.size >= 2 && pinch.current) {
@@ -108,6 +143,7 @@ export default function TwinViewer({ src, alt, className }) {
   };
 
   const onPointerEnd = (event) => {
+    lastInput.current = Date.now();
     pointers.current.delete(event.pointerId);
     if (pointers.current.size < 2) pinch.current = null;
 
@@ -119,7 +155,7 @@ export default function TwinViewer({ src, alt, className }) {
 
     if (pointers.current.size === 0) {
       drag.current = null;
-      if (Math.abs(spinVelocity.current) > 0.6) glide();
+      if (!inertia.current && Math.abs(spinVelocity.current) > 0.6) glide();
     }
   };
 
@@ -127,6 +163,7 @@ export default function TwinViewer({ src, alt, className }) {
   const flip = () => {
     const el = stageRef.current;
     if (!el) return;
+    lastInput.current = Date.now();
     stopInertia();
     spinVelocity.current = 0;
     view.current.spin += 180;
@@ -140,6 +177,7 @@ export default function TwinViewer({ src, alt, className }) {
   const reset = () => {
     const el = stageRef.current;
     if (!el) return;
+    lastInput.current = Date.now();
     stopInertia();
     spinVelocity.current = 0;
     view.current = { spin: 0, tilt: 0, zoom: 1 };
@@ -157,6 +195,7 @@ export default function TwinViewer({ src, alt, className }) {
       onPointerMove={onPointerMove}
       onPointerUp={onPointerEnd}
       onPointerCancel={onPointerEnd}
+      onLostPointerCapture={onPointerEnd}
       onDoubleClick={reset}
       onDragStart={(event) => event.preventDefault()}
       style={{ perspective: "1400px" }}
