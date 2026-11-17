@@ -21,11 +21,11 @@ export default function PowerCard({ percent = 0, voltage, solar = 0, load = 0 })
           <p className="mt-0.5 text-[12px] text-white/35">{Math.round(load)} W load</p>
         </div>
 
-        <div className="relative h-[72px] w-[104px] shrink-0 text-center">
+        <div className="relative h-[118px] w-[104px] shrink-0 text-center">
           <div className="absolute left-0 top-[18px]" aria-hidden="true">
             <ArcGauge value={percent} size={104} thickness={7} color={color} />
           </div>
-          <div className="relative z-10 flex flex-col items-center">
+          <div className="absolute inset-x-0 top-[73px] z-10 flex flex-col items-center">
             <p className="text-[22px] font-semibold leading-none tracking-tight text-white">
               {percent}
               <span className="text-[13px] font-medium text-white/40">%</span>
