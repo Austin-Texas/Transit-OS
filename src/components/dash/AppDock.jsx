@@ -42,7 +42,7 @@ export default function AppDock({ status, onVoice }) {
   return (
     <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-2">
       {status ? (
-        <div className="glass no-scrollbar flex items-center gap-2 overflow-x-auto rounded-[22px] px-3 py-2">
+        <div className="glass no-scrollbar flex items-center gap-2 overflow-x-auto rounded-[22px] px-3 py-2 shadow-[0_14px_34px_-20px_rgba(0,0,0,0.95)]">
           <span className="shrink-0 text-[12px] font-medium text-white/40">Quick modes</span>
           <div className="no-scrollbar flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
             {MODES.map((mode) => {
@@ -54,10 +54,10 @@ export default function AppDock({ status, onVoice }) {
                   onClick={() => setMode(mode.id)}
                   aria-pressed={isActive}
                   className={cn(
-                    "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition duration-200 active:scale-[0.98]",
+                    "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-semibold tracking-[0.01em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition duration-200 active:scale-[0.98]",
                     isActive
-                      ? "bg-white text-[#0b0b0f] shadow-[0_10px_26px_-14px_rgba(255,255,255,0.8)]"
-                      : "bg-white/[0.07] text-white/55 ring-1 ring-inset ring-white/[0.08] hover:bg-white/[0.12] hover:text-white"
+                      ? "bg-white text-[#0b0b0f] shadow-[0_5px_14px_rgba(0,0,0,0.45),0_0_16px_rgba(255,255,255,0.15)]"
+                      : "bg-white/[0.07] text-white/65 shadow-[0_5px_12px_-5px_rgba(0,0,0,0.8)] ring-1 ring-inset ring-white/[0.08] hover:bg-white/[0.12] hover:text-white"
                   )}
                 >
                   {mode.label}
@@ -80,7 +80,7 @@ export default function AppDock({ status, onVoice }) {
 
       <nav
         aria-label="TransitOS modules"
-        className="glass no-scrollbar flex items-stretch gap-0.5 overflow-x-auto rounded-[26px] px-2 py-2"
+        className="glass no-scrollbar flex items-stretch gap-0.5 overflow-x-auto rounded-[26px] px-2 py-2 shadow-[0_18px_40px_-20px_rgba(0,0,0,0.95)]"
       >
         {DOCK.map(({ id, label, icon: Icon, to, hash }) => {
           const isActive = to === "/" ? pathname === "/" : pathname.startsWith(to);
@@ -90,21 +90,21 @@ export default function AppDock({ status, onVoice }) {
               to={to}
               hash={hash}
               aria-current={isActive ? "page" : undefined}
-              className="group flex min-w-[62px] flex-1 flex-col items-center gap-1 rounded-[18px] px-1 py-1 transition duration-200"
+              className="group flex min-w-[62px] flex-1 flex-col items-center gap-1 rounded-[18px] px-1 py-1 transition duration-200 hover:bg-white/[0.04]"
             >
               <span
                 className={cn(
                   "grid h-8 w-8 place-items-center rounded-[11px] transition duration-200",
                   isActive
-                    ? "bg-white text-[#0b0b0f] shadow-[0_10px_24px_-14px_rgba(255,255,255,0.9)]"
-                    : "bg-white/[0.06] text-white/55 group-hover:bg-white/[0.1] group-hover:text-white/80"
+                    ? "bg-white text-[#0b0b0f] shadow-[0_6px_16px_rgba(0,0,0,0.5),0_0_14px_rgba(255,255,255,0.2)]"
+                    : "bg-white/[0.06] text-white/55 shadow-[0_5px_12px_-5px_rgba(0,0,0,0.85)] group-hover:bg-white/[0.1] group-hover:text-white/80"
                 )}
               >
                 <Icon className="h-[16px] w-[16px]" strokeWidth={2} />
               </span>
               <span
                 className={cn(
-                  "truncate text-[9.5px] font-medium transition-colors",
+                  "truncate text-[9.5px] font-semibold tracking-[0.01em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] transition-colors",
                   isActive ? "text-white" : "text-white/40 group-hover:text-white/70"
                 )}
               >
