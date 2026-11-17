@@ -332,3 +332,33 @@
 @media(prefers-reduced-motion:reduce){
   .tp-cinema .tp-cinema__symbol{animation:none!important;transform:none!important;opacity:1}
 }
+
+/* Keep the moving identity safely within the cinematic viewport.
+   Previously -27vh/-30vh plus scaled transform pushed it against browser chrome. */
+.tp-cinema--2 .tp-cinema__brand,
+.tp-cinema--3 .tp-cinema__brand{
+  transform:translate(-50%,-50%) translate3d(0,-15vh,0) scale(.55)!important;
+}
+.tp-cinema--4 .tp-cinema__brand{
+  transform:translate(-50%,-50%) translate3d(0,-19vh,0) scale(.48)!important;
+}
+.tp-cinema__presentation{top:54%!important}
+.tp-cinema--2 .tp-cinema__presentation,
+.tp-cinema--3 .tp-cinema__presentation{top:54%!important}
+.tp-cinema__presentation h1{margin-top:8px}
+@media(max-height:650px){
+  .tp-cinema--2 .tp-cinema__brand,
+  .tp-cinema--3 .tp-cinema__brand{
+    transform:translate(-50%,-50%) translate3d(0,-13vh,0) scale(.49)!important;
+  }
+  .tp-cinema__presentation,.tp-cinema--2 .tp-cinema__presentation,
+  .tp-cinema--3 .tp-cinema__presentation{top:51%!important}
+}
+@media(max-width:550px){
+  .tp-cinema--2 .tp-cinema__brand,
+  .tp-cinema--3 .tp-cinema__brand{
+    transform:translate(-50%,-50%) translate3d(0,-14vh,0) scale(.5)!important;
+  }
+  .tp-cinema__presentation,.tp-cinema--2 .tp-cinema__presentation,
+  .tp-cinema--3 .tp-cinema__presentation{top:52%!important}
+}
