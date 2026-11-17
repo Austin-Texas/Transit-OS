@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   MapPin,
   Mic,
+  Clapperboard,
   Snowflake,
   Zap,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const DOCK = [
   { id: "automation", label: "Automation", icon: Layers, to: "/automation" },
   { id: "cameras", label: "Cameras", icon: Camera, to: "/settings", hash: "cameras" },
   { id: "maps", label: "Maps", icon: MapPin, to: "/tracking" },
+  { id: "theater", label: "Theater", icon: Clapperboard, to: "/theater" },
 ];
 
 // The bar shared by every screen: quick modes with the microphone on the top
