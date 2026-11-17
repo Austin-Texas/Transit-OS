@@ -66,24 +66,7 @@ export default function CinematicLightField({ stage }) {
         context.lineWidth = 1 + (i % 4);
         context.stroke();
       }
-      // Elliptical energy ring, with multiple bright layered strokes.
-      const rx = Math.min(width * .31, 370);
-      const ry = Math.max(11, Math.min(height * .052, 37));
-      const pulse = 1 + .018 * Math.sin(t * 1.5);
-      for (const [thickness, alpha, color] of [[32,.06,"0,154,255"],[16,.13,"0,199,255"],[6,.65,"0,216,255"],[2,.98,"178,251,255"]]) {
-        context.beginPath();
-        context.ellipse(cx, horizon, rx * pulse, ry * pulse, 0, 0, Math.PI * 2);
-        context.strokeStyle = "rgba(" + color + "," + alpha + ")";
-        context.lineWidth = thickness;
-        context.stroke();
-      }
-      // Ground reflection beneath the ring.
-      const reflection = context.createRadialGradient(cx,horizon+15,3,cx,horizon+15,rx);
-      reflection.addColorStop(0,"rgba(0,210,255,.21)");
-      reflection.addColorStop(.4,"rgba(0,82,255,.07)");
-      reflection.addColorStop(1,"rgba(0,0,0,0)");
-      context.fillStyle=reflection;
-      context.fillRect(cx-rx,horizon,rx*2,height-horizon);
+      // Ring and its floor reflection intentionally removed from every scene.
       // Initialization stage has a luminous dotted perspective grid.
       if (stageNow === 6) {
         for (let row=0;row<20;row++) {
