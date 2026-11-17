@@ -15,7 +15,7 @@ export default function ArcGauge({
   const radius = (size - thickness) / 2;
   const center = size / 2;
   const ring = mode === "ring";
-  const height = ring ? size : size / 2;
+  const height = ring ? size : Math.round(size * 0.94);
   const path = ring
     ? `M ${center} ${center - radius} A ${radius} ${radius} 0 1 1 ${center - 0.01} ${center - radius}`
     : `M ${center - radius} ${center} A ${radius} ${radius} 0 0 1 ${center + radius} ${center}`;
@@ -39,7 +39,7 @@ export default function ArcGauge({
           }}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">{children}</div>
+      <div className="absolute inset-x-0 flex flex-col items-center text-center" style={ring ? { insetBlock: 0, justifyContent: "center" } : { top: size * 0.43 }}>{children}</div>
     </div>
   );
 }
