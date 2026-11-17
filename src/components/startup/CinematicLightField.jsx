@@ -33,7 +33,7 @@ export default function CinematicLightField({ stage }) {
     resize();
     const started = performance.now();
     function draw(now) {
-      const t = (now - started) / 1000;
+      const t = (now - started) / 1500; // Match 1.5x slower cinematic timeline.
       const stageNow = stageRef.current;
       // Match the storyboard: black for the first 0.5s, then energy grows.
       const reveal = Math.max(0, Math.min(1, (t - 0.5) / 0.85));
