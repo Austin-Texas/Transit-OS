@@ -49,7 +49,13 @@ export default function VanStage({
       )}
     >
       {view === "3d" && spin && mode === "3d" ? (
-        <VanSpin side={side} />
+        <VanSpin
+          side={side}
+          onPick={(key) => {
+            const to = PART_MODULES[key];
+            if (to) navigate({ to });
+          }}
+        />
       ) : view === "3d" ? (
         <FordTransit3D
           className="absolute inset-0 h-full w-full"

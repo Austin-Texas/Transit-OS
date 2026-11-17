@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Move } from "lucide-react";
 import { Image } from "@/components/ui/image";
+import { spinZones } from "@/lib/vanSpinZones";
 import { cn } from "@/lib/utils";
 
 // The van as a 360 turnaround: one photo every 45°, dragged like a turntable.
@@ -22,9 +23,10 @@ const PX_PER_FRAME = 90;
 
 const wrap = (index) => ((index % FRAMES.length) + FRAMES.length) % FRAMES.length;
 
-export default function VanSpin({ side, className }) {
+export default function VanSpin({ side, className, onPick }) {
   const [frame, setFrame] = useState(0);
   const drag = useRef(null);
+  const moved = useRef(0);
 
   // A fault on one flank turns the van round to show that side.
   useEffect(() => {
@@ -35,13 +37,16 @@ export default function VanSpin({ side, className }) {
   const nudge = (delta) => setFrame((current) => wrap(current + delta));
 
   const onDown = (event) => {
+    moved.current = 0;
     drag.current = { x: event.clientX, frame };
     event.currentTarget.setPointerCapture?.(event.pointerId);
   };
 
   const onMove = (event) => {
     if (!drag.current) return;
-    const steps = Math.round((event.clientX - drag.current.x) / PX_PER_FRAME);
+    const dx = event.clientX - drag.current.x;
+    moved.current = Math.max(moved.current, Math.abs(dx));
+    const steps = Math.round(dx / PX_PER_FRAME);
     setFrame(wrap(drag.current.frame - steps));
   };
 
@@ -81,9 +86,32 @@ export default function VanSpin({ side, className }) {
         />
       ))}
 
+      {/* Every part of the van opens its module. A drag never counts as a tap. */}
+      {spinZones(frame).map((zone) => (
+        <button
+          key={zone.key}
+          type="button"
+          aria-label={`Open ${zone.label}`}
+          onClick={() => {
+            if (moved.current < 8) onPick?.(zone.key);
+          }}
+          style={{
+            left: `${zone.left}%`,
+            top: `${zone.top}%`,
+            width: `${zone.right - zone.left}%`,
+            height: `${zone.bottom - zone.top}%`,
+          }}
+          className="group absolute rounded-2xl outline-none transition hover:bg-white/[0.07] hover:ring-1 hover:ring-inset hover:ring-neon/40 focus-visible:ring-2 focus-visible:ring-neon"
+        >
+          <span className="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2 whitespace-nowrap rounded-full border border-white/15 bg-ink-950/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-white/80 opacity-0 backdrop-blur transition group-hover:opacity-100 group-focus-visible:opacity-100">
+            {zone.label}
+          </span>
+        </button>
+      ))}
+
       <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/40 backdrop-blur sm:flex">
         <Move className="h-3 w-3" strokeWidth={2.2} />
-        Drag to spin · {frame + 1}/{FRAMES.length}
+        Drag to spin · tap a part to open its module
       </div>
     </div>
   );
