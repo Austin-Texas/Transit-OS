@@ -1,6 +1,6 @@
-import { ArrowLeft, ArrowRight, Camera } from "lucide-react";
+import { ArrowLeft, ArrowRight, Camera, Move, ZoomIn } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { Image } from "@/components/ui/image";
+import TwinViewer from "@/components/van/TwinViewer";
 import { DIGITAL_TWIN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
@@ -16,11 +16,10 @@ export default function VanStage({ focus, onClearFocus }) {
         focus ? "border-ios-pink/50" : "border-white/10"
       )}
     >
-      <Image
+      <TwinViewer
         src={DIGITAL_TWIN_IMAGE}
         alt="2026 Ford Transit digital twin"
-        fittingType="fill"
-        className="absolute inset-0 h-full w-full"
+        className="absolute inset-0"
       />
 
       {focus ? (
@@ -44,6 +43,14 @@ export default function VanStage({ focus, onClearFocus }) {
           </button>
         </div>
       ) : null}
+
+      <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-ink-950/70 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/45 backdrop-blur sm:flex">
+        <Move className="h-3 w-3" strokeWidth={2.2} />
+        Drag to spin
+        <span className="text-white/20">·</span>
+        <ZoomIn className="h-3 w-3" strokeWidth={2.2} />
+        Scroll to zoom
+      </div>
 
       <Link
         to="/settings"
