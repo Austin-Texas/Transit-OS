@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   MapPin,
   Mic,
+  Orbit,
   Clapperboard,
   Snowflake,
   Zap,
@@ -29,6 +30,7 @@ const DOCK = [
   { id: "cameras", label: "Cameras", icon: Camera, to: "/settings", hash: "cameras" },
   { id: "maps", label: "Maps", icon: MapPin, to: "/tracking" },
   { id: "theater", label: "Theater", icon: Clapperboard, to: "/theater" },
+  { id: "surround", label: "360°", icon: Orbit, to: "/surround" },
 ];
 
 // The bar shared by every screen: quick modes with the microphone on the top
