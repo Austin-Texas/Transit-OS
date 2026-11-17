@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { VAN_IMAGE } from "@/lib/van";
 
 const isRemote = (value) => typeof value === "string" && /^https?:\/\//i.test(value);
 
@@ -33,10 +32,9 @@ function useResolved(uri) {
 
 // The owner's own photos of the van: the exterior shot skins the flanks, the
 // cabin shot lines the living space. Private uploads are signed on demand, so
-// the 3D stage gets a plain URL either way. Without an upload both fall back to
-// the bundled van photography, so the model always looks like the real van.
+// the 3D stage gets a plain URL either way.
 export default function useVanPhotos(status) {
-  const uploadedExterior = useResolved(status?.van_photo_uri);
+  const exterior = useResolved(status?.van_photo_uri);
   const cabin = useResolved(status?.cabin_photo_uri);
-  return { exterior: uploadedExterior ?? VAN_IMAGE, cabin };
+  return { exterior, cabin };
 }

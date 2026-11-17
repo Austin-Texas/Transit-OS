@@ -7,8 +7,6 @@ import useVanVoice from "@/hooks/useVanVoice";
 import { cn } from "@/lib/utils";
 import HomeHeader from "./home/HomeHeader";
 import AppDock from "@/components/dash/AppDock";
-import CabinGlow from "@/components/dash/CabinGlow";
-import CabinIgnite from "@/components/dash/CabinIgnite";
 import VoiceControl from "./home/VoiceControl";
 import HardwareLink from "./home/HardwareLink";
 import VanPanel from "@/components/van/VanPanel";
@@ -72,92 +70,67 @@ export default function HomeScreen() {
 
   const active = openAlerts(alerts);
   const lightsOn = status.lights_on !== false;
-  const lightLevel = Math.round(Number(status.light_level ?? 70));
   const locked = status.locks_locked !== false;
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col">
-      <CabinGlow status={status} />
       <HomeHeader status={status} offline={van.offline} />
       <VehicleAlertToast alerts={alerts} warnings={warnings} onLocate={() => navigate({ to: "/diagnostics" })} />
 
       <main className="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-4 px-3 pb-[156px] pt-4 sm:px-4">
         <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,352px)]">
           <div className="flex min-w-0 flex-col gap-4">
-            <CabinIgnite index={0}>
-              <VanPanel status={status} offline={van.offline} className="h-[240px] sm:h-[310px] lg:h-[340px]" />
-            </CabinIgnite>
+            <VanPanel status={status} offline={van.offline} className="h-[240px] sm:h-[310px] lg:h-[340px]" />
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              <CabinIgnite index={1} className="h-full">
-                <ClimateCard
-                  temp={status.climate_temp ?? 72}
-                  set={status.climate_set ?? 72}
-                  mode={status.climate_mode}
-                  onAdjust={van.adjustClimate}
-                  onChangeMode={(mode) => van.update({ climate_mode: mode })}
-                />
-              </CabinIgnite>
-              <CabinIgnite index={2} className="h-full">
-                <WaterCard status={status} />
-              </CabinIgnite>
-              <CabinIgnite index={3} className="h-full">
-                <LpgCard
-                  percent={Math.round(Number(status.lpg_percent ?? 0))}
-                  gallons={Number(status.lpg_gallons ?? 0)}
-                />
-              </CabinIgnite>
-              <CabinIgnite index={4} className="h-full">
-                <PowerCard
-                  percent={Math.round(Number(status.battery_percent ?? 0))}
-                  voltage={Number(status.battery_voltage ?? 0)}
-                  solar={Number(status.solar_w ?? 0)}
-                  load={Number(status.load_w ?? 0)}
-                />
-              </CabinIgnite>
-              <CabinIgnite index={5} className="h-full">
-                <CabinCard
-                  temp={status.cabin_temp ?? status.climate_temp ?? 72}
-                  photoUri={status.cabin_photo_uri}
-                  lightsOn={lightsOn}
-                  lightLevel={lightLevel}
-                  locksLocked={locked}
-                  onLights={(value) => van.update({ lights_on: value })}
-                  onLightLevel={(value) => van.update({ light_level: value, lights_on: value > 0 })}
-                  onLocks={(value) => van.update({ locks_locked: value })}
-                />
-              </CabinIgnite>
-              <CabinIgnite index={6} className="h-full">
-                <VehicleCard
-                  odometer={status.odometer}
-                  alertCount={active.length + warnings.length}
-                  topAlert={active[0]?.title ?? warnings[0]?.title}
-                  onDiagnostics={() => setDiagnosticsOpen(true)}
-                />
-              </CabinIgnite>
+              <ClimateCard
+                temp={status.climate_temp ?? 72}
+                set={status.climate_set ?? 72}
+                mode={status.climate_mode}
+                onAdjust={van.adjustClimate}
+                onChangeMode={(mode) => van.update({ climate_mode: mode })}
+              />
+              <WaterCard status={status} />
+              <LpgCard percent={Math.round(Number(status.lpg_percent ?? 0))} gallons={Number(status.lpg_gallons ?? 0)} />
+              <PowerCard
+                percent={Math.round(Number(status.battery_percent ?? 0))}
+                voltage={Number(status.battery_voltage ?? 0)}
+                solar={Number(status.solar_w ?? 0)}
+                load={Number(status.load_w ?? 0)}
+              />
+              <CabinCard
+                temp={status.cabin_temp ?? status.climate_temp ?? 72}
+                photoUri={status.cabin_photo_uri}
+                lightsOn={lightsOn}
+                locksLocked={locked}
+                onLights={(value) => van.update({ lights_on: value })}
+                onLocks={(value) => van.update({ locks_locked: value })}
+              />
+              <VehicleCard
+                odometer={status.odometer}
+                alertCount={active.length + warnings.length}
+                topAlert={active[0]?.title ?? warnings[0]?.title}
+                onDiagnostics={() => setDiagnosticsOpen(true)}
+              />
             </div>
           </div>
 
           <div className="flex flex-col gap-4 lg:sticky lg:top-[92px] lg:self-start">
-            <CabinIgnite index={7} className="h-full">
-              <div
-                id="home-alerts"
-                className={cn(
-                  "rounded-[26px] transition-shadow",
-                  alertsPing && "ring-2 ring-ios-blue/70 ring-offset-2 ring-offset-background"
-                )}
-              >
-                <AlertsPanel
-                  alerts={alerts}
-                  warnings={warnings}
-                  onResolve={(alert) => van.resolveAlert(alert.id)}
-                  onDiagnostics={() => setDiagnosticsOpen(true)}
-                />
-              </div>
-            </CabinIgnite>
-            <CabinIgnite index={8} className="h-full">
-              <HardwareLink status={status} offline={van.offline} />
-            </CabinIgnite>
+            <div
+              id="home-alerts"
+              className={cn(
+                "rounded-[26px] transition-shadow",
+                alertsPing && "ring-2 ring-ios-blue/70 ring-offset-2 ring-offset-background"
+              )}
+            >
+              <AlertsPanel
+                alerts={alerts}
+                warnings={warnings}
+                onResolve={(alert) => van.resolveAlert(alert.id)}
+                onDiagnostics={() => setDiagnosticsOpen(true)}
+              />
+            </div>
+            <HardwareLink status={status} offline={van.offline} />
           </div>
         </div>
       </main>

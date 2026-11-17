@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { BatteryMedium } from "lucide-react";
 import VanPhoto from "@/components/van/VanPhoto";
-import LiveBadge from "@/components/dash/home/LiveBadge";
 import { VAN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +39,15 @@ export default function VanPanel({ status, offline = false, className }) {
       </div>
 
       <div className="flex flex-wrap items-center gap-2 border-t border-white/[0.08] bg-black/20 px-4 py-3 backdrop-blur-xl">
-        <LiveBadge live={!offline} label={offline ? "System offline" : "Live"} />
+        <span
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold",
+            offline ? "bg-ios-pink/15 text-ios-pink" : "bg-ios-green/15 text-ios-green"
+          )}
+        >
+          <span className={cn("h-1.5 w-1.5 rounded-full bg-current", !offline && "animate-soft-pulse")} />
+          {offline ? "System offline" : "System online"}
+        </span>
 
         <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-medium capitalize text-white/65">
           {status.active_mode ?? "camping"} mode

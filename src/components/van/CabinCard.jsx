@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { BedDouble, Lightbulb, Lock } from "lucide-react";
 import VanPhoto from "@/components/van/VanPhoto";
 import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
 import { CABIN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
@@ -27,25 +25,16 @@ function ControlRow({ icon: Icon, label, sub, checked, onChange, tone = "text-io
   );
 }
 
-// Cabin card: the interior photo, the dimmer that lights it, and the two
-// controls used most while parked.
+// Cabin card: the interior photo plus the two controls used most while parked.
 export default function CabinCard({
   temp,
   photoUri,
   onPhoto,
   lightsOn = false,
-  lightLevel = 70,
   locksLocked = true,
   onLights,
-  onLightLevel,
   onLocks,
 }) {
-  const [level, setLevel] = useState(lightLevel);
-
-  useEffect(() => setLevel(lightLevel), [lightLevel]);
-
-  const glow = lightsOn ? 0.22 + (level / 100) * 0.5 : 0;
-
   return (
     <section
       id="card-cabin"
@@ -61,18 +50,6 @@ export default function CabinCard({
           onPhoto={onPhoto}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#06070c] via-[#06070c]/25 to-transparent" />
-
-        {/* The cabin photo is lit by the same dimmer as the real ceiling lights. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 transition-opacity duration-700 ease-out"
-          style={{
-            opacity: glow,
-            backgroundImage:
-              "radial-gradient(62% 62% at 50% 8%, rgba(255,205,142,0.72), transparent 72%), radial-gradient(40% 40% at 82% 46%, rgba(255,176,96,0.5), transparent 76%)",
-            mixBlendMode: "screen",
-          }}
-        />
 
         <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-2 p-4">
           <Link
@@ -109,32 +86,11 @@ export default function CabinCard({
         <ControlRow
           icon={Lightbulb}
           label="Cabin lights"
-          sub={lightsOn ? `${level}% brightness` : "All zones off"}
+          sub={lightsOn ? "On" : "All zones off"}
           checked={lightsOn}
           onChange={onLights}
           tone="text-ios-teal"
         />
-
-        <div
-          className={cn(
-            "flex items-center gap-3 overflow-hidden transition-all duration-300 ease-out",
-            lightsOn ? "max-h-12 pb-2.5 opacity-100" : "max-h-0 opacity-0"
-          )}
-        >
-          <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/35">Dim</span>
-          <Slider
-            value={[level]}
-            min={5}
-            max={100}
-            step={1}
-            aria-label="Cabin light brightness"
-            onValueChange={([value]) => setLevel(value)}
-            onValueCommit={([value]) => onLightLevel?.(value)}
-            className="flex-1"
-          />
-          <span className="w-8 text-right text-[11.5px] font-semibold text-white/60">{level}%</span>
-        </div>
-
         <ControlRow
           icon={Lock}
           label="Lockers & doors"

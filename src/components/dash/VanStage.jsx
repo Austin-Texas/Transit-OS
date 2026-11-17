@@ -1,13 +1,37 @@
-import { ArrowLeft, ArrowRight, Camera, Move, ZoomIn } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import TwinViewer from "@/components/van/TwinViewer";
-import { DIGITAL_TWIN_IMAGE } from "@/lib/van";
+import { useState } from "react";
+import { ArrowLeft, ArrowRight, Camera, Move } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import FordTransit3D from "@/components/van/FordTransit3D";
+import HotspotTip from "@/components/van/HotspotTip";
+import VanPhoto from "@/components/van/VanPhoto";
+import { VAN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
-// The diagnostics stage: the digital twin view of the van, with the system
-// callouts drawn on it. A located fault is flagged in the corner.
-export default function VanStage({ focus, onClearFocus }) {
+// Every part of the van opens the module that looks after it.
+const PART_MODULES = {
+  water_tank: "/water",
+  heat_pad: "/water",
+  battery: "/electrical",
+  engine: "/maintenance",
+  climate: "/climate",
+  cabin: "/camper",
+};
+
+// The home stage: the neon wireframe van you can spin with a finger, plus a
+// photo view, exactly like the reference dashboard layout.
+export default function VanStage({
+  cabinTemp,
+  vehicleName,
+  trim,
+  warnings = [],
+  focus,
+  status,
+  onClearFocus,
+}) {
   const side = focus?.side;
+  const navigate = useNavigate();
+  const [view, setView] = useState("3d");
+  const [tip, setTip] = useState(null);
 
   return (
     <section
@@ -16,14 +40,59 @@ export default function VanStage({ focus, onClearFocus }) {
         focus ? "border-ios-pink/50" : "border-white/10"
       )}
     >
-      <TwinViewer
-        src={DIGITAL_TWIN_IMAGE}
-        alt="2026 Ford Transit digital twin"
-        className="absolute inset-0"
-      />
+      {view === "3d" ? (
+        <FordTransit3D
+          className="absolute inset-0 h-full w-full"
+          focus={focus}
+          warnings={warnings}
+          status={status}
+          onTip={setTip}
+          onPick={(key) => {
+            if (!key) return;
+            const to = PART_MODULES[key];
+            if (!to) return;
+            setTip(null);
+            navigate({ to });
+          }}
+        />
+      ) : (
+        <VanPhoto
+          uri={status?.van_photo_uri}
+          fallback={VAN_IMAGE}
+          alt="Your camper van"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
+
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(78%_68%_at_50%_44%,transparent_42%,rgba(2,6,11,0.6)_100%)]" />
+
+      <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-medium text-white/70 ring-1 ring-inset ring-white/10 backdrop-blur">
+        <span className="h-1.5 w-1.5 rounded-full bg-ios-teal" />
+        {view === "3d" ? "Live 3D" : "Owner photo"} · Interior {Math.round(cabinTemp)}°F
+      </div>
+
+      <div className="absolute right-3 top-3 z-20 flex items-center gap-0.5 rounded-full bg-black/45 p-0.5 ring-1 ring-inset ring-white/15 backdrop-blur">
+        {[
+          ["3d", "3D"],
+          ["photo", "Photo"],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setView(id)}
+            aria-pressed={view === id}
+            className={cn(
+              "rounded-full px-2.5 py-1 text-[10.5px] font-semibold transition",
+              view === id ? "bg-white/90 text-ink-950" : "text-white/60 hover:text-white"
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
       {focus ? (
-        <div className="absolute right-3 top-3 z-10 flex max-w-[74%] items-center gap-2 rounded-full border border-alert/60 bg-ink-950/90 px-2.5 py-1 backdrop-blur">
+        <div className="absolute right-3 top-12 z-10 flex max-w-[74%] items-center gap-2 rounded-full border border-alert/60 bg-ink-950/90 px-2.5 py-1 backdrop-blur">
           <span className="inline-flex shrink-0 items-center gap-1 text-[8.5px] font-semibold uppercase tracking-[0.14em] text-alert">
             {side === "left" ? (
               <ArrowLeft className="h-3 w-3" strokeWidth={2.4} />
@@ -42,15 +111,25 @@ export default function VanStage({ focus, onClearFocus }) {
             <span className="text-[11px] leading-none">×</span>
           </button>
         </div>
+      ) : warnings.length ? (
+        <span className="absolute right-3 top-12 z-10 inline-flex items-center gap-1.5 rounded-full border border-alert/50 bg-ink-950/85 px-2.5 py-1 text-[8.5px] font-semibold uppercase tracking-[0.14em] text-alert backdrop-blur">
+          {warnings.length} warning{warnings.length > 1 ? "s" : ""}
+        </span>
       ) : null}
 
-      <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-ink-950/70 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/45 backdrop-blur sm:flex">
-        <Move className="h-3 w-3" strokeWidth={2.2} />
-        Swipe or drag to spin
-        <span className="text-white/20">·</span>
-        <ZoomIn className="h-3 w-3" strokeWidth={2.2} />
-        Pinch or scroll to zoom
+      <div className="pointer-events-none absolute bottom-3.5 left-4 z-10 min-w-0 max-w-[68%]">
+        <p className="text-[15px] font-semibold leading-tight tracking-tight text-white">{vehicleName}</p>
+        <p className="text-[9.5px] uppercase leading-snug tracking-[0.18em] text-white/45">{trim}</p>
       </div>
+
+      <HotspotTip tip={tip} />
+
+      {view === "3d" ? (
+        <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
+          <Move className="h-3 w-3" strokeWidth={2.2} />
+          Swipe to spin · tap a part to open its module
+        </div>
+      ) : null}
 
       <Link
         to="/settings"
