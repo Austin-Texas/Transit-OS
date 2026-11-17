@@ -69,7 +69,7 @@ export default function AppDock({ status, onVoice }) {
             <button
               type="button"
               onClick={onVoice}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/[0.07] px-3 py-1.5 text-[12px] font-semibold text-white/70 ring-1 ring-inset ring-white/[0.08] transition hover:bg-white/[0.12] hover:text-white"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-white/[0.07] px-3 py-1.5 text-[12px] font-semibold text-white/70 shadow-[0_5px_14px_rgba(0,0,0,0.55)] ring-1 ring-inset ring-white/[0.08] transition hover:bg-white/[0.12] hover:text-white"
             >
               <Mic className="h-3.5 w-3.5 text-ios-teal" strokeWidth={2.2} />
               Voice
@@ -90,7 +90,12 @@ export default function AppDock({ status, onVoice }) {
               to={to}
               hash={hash}
               aria-current={isActive ? "page" : undefined}
-              className="group flex min-w-[62px] flex-1 flex-col items-center gap-1 rounded-[18px] px-1 py-1 transition duration-200 hover:bg-white/[0.04]"
+              className={cn(
+                "group flex min-w-[62px] flex-1 flex-col items-center gap-1 rounded-[18px] px-1 py-1.5 transition-[background-color,box-shadow,transform] duration-200",
+                isActive
+                  ? "bg-white/[0.12] shadow-[0_7px_18px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.15)]"
+                  : "bg-white/[0.035] shadow-[0_5px_14px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 hover:bg-white/[0.09] hover:shadow-[0_9px_20px_rgba(0,0,0,0.7)]"
+              )}
             >
               <span
                 className={cn(
