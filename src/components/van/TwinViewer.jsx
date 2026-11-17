@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
+import { RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 
@@ -57,8 +58,14 @@ export default function TwinViewer({ src, alt, className }) {
 
   useEffect(() => stopInertia, [stopInertia]);
 
+  const zoomBy = (factor) => {
+    view.current.zoom = clamp(view.current.zoom * factor, 0.75, 2.6);
+    paint();
+  };
+
   const onPointerDown = (event) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
+    event.preventDefault();
     event.currentTarget.setPointerCapture?.(event.pointerId);
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     stopInertia();
@@ -137,6 +144,7 @@ export default function TwinViewer({ src, alt, className }) {
       onPointerUp={onPointerEnd}
       onPointerCancel={onPointerEnd}
       onDoubleClick={reset}
+      onDragStart={(event) => event.preventDefault()}
       style={{ perspective: "1400px" }}
       className={cn(
         "relative h-full w-full cursor-grab touch-none select-none active:cursor-grabbing",
@@ -151,14 +159,14 @@ export default function TwinViewer({ src, alt, className }) {
         style={{ transformStyle: "preserve-3d" }}
       >
         <div
-          className="absolute inset-0 overflow-hidden rounded-[18px] shadow-[0_34px_70px_-28px_rgba(0,0,0,0.95)] ring-1 ring-white/15"
+          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[18px] shadow-[0_34px_70px_-28px_rgba(0,0,0,0.95)] ring-1 ring-white/15"
           style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
         >
-          <Image src={src} alt={alt} fittingType="fill" className="h-full w-full" />
+          <Image src={src} alt={alt} fittingType="fill" draggable={false} className="h-full w-full" />
         </div>
 
         <div
-          className="absolute inset-0 overflow-hidden rounded-[18px] bg-[#04070d] ring-1 ring-white/10"
+          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[18px] bg-[#04070d] ring-1 ring-white/10"
           style={{
             transform: "rotateY(180deg)",
             backfaceVisibility: "hidden",
@@ -166,13 +174,33 @@ export default function TwinViewer({ src, alt, className }) {
           }}
         >
           <div className="absolute inset-0 scale-x-[-1] opacity-55">
-            <Image src={src} alt="" fittingType="fill" className="h-full w-full" />
+            <Image src={src} alt="" fittingType="fill" draggable={false} className="h-full w-full" />
           </div>
           <div className="absolute inset-0 bg-ink-950/50" />
           <span className="absolute inset-0 grid place-items-center text-[10px] font-semibold uppercase tracking-[0.32em] text-white/45">
             Back view
           </span>
         </div>
+      </div>
+
+      <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1 rounded-full border border-white/10 bg-ink-950/70 p-1 backdrop-blur">
+        {[
+          { key: "out", label: "Zoom out", icon: <ZoomOut className="h-3.5 w-3.5" strokeWidth={2.2} />, onClick: () => zoomBy(0.85) },
+          { key: "in", label: "Zoom in", icon: <ZoomIn className="h-3.5 w-3.5" strokeWidth={2.2} />, onClick: () => zoomBy(1.18) },
+          { key: "reset", label: "Reset view", icon: <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.2} />, onClick: reset },
+        ].map((button) => (
+          <button
+            key={button.key}
+            type="button"
+            aria-label={button.label}
+            title={button.label}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={button.onClick}
+            className="grid h-7 w-7 place-items-center rounded-full text-white/70 transition hover:bg-white/15 hover:text-white"
+          >
+            {button.icon}
+          </button>
+        ))}
       </div>
     </div>
   );
