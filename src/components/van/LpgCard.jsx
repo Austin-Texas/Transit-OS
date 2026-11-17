@@ -4,7 +4,7 @@ import ArcGauge from "./ArcGauge";
 
 export default function LpgCard({ percent, gallons }) {
   return (
-    <Panel id="card-lpg" title="Propane" icon={Flame} accent="text-ios-orange">
+    <Panel id="card-lpg" title="Propane" icon={Flame} accent="text-ios-orange" to="/lpg">
       <div className="flex items-center justify-between gap-3">
         <div className="relative h-[122px] w-[112px] shrink-0 text-center">
           <div className="absolute left-0 top-[18px]" aria-hidden="true">

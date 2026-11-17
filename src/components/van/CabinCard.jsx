@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { BedDouble, Lightbulb, Lock } from "lucide-react";
 import VanPhoto from "@/components/van/VanPhoto";
 import { Switch } from "@/components/ui/switch";
@@ -51,12 +52,16 @@ export default function CabinCard({
         <div className="absolute inset-0 bg-gradient-to-t from-[#06070c] via-[#06070c]/25 to-transparent" />
 
         <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-2 p-4">
-          <div className="flex items-center gap-2">
+          <Link
+            to="/camper"
+            aria-label="Open cabin"
+            className="-m-1 flex items-center gap-2 rounded-full p-1 transition hover:bg-white/10"
+          >
             <span className="grid h-8 w-8 place-items-center rounded-full bg-white/15 text-white ring-1 ring-inset ring-white/15 backdrop-blur">
               <BedDouble className="h-4 w-4" strokeWidth={1.9} />
             </span>
             <span className="text-[13px] font-semibold tracking-tight text-white">Cabin</span>
-          </div>
+          </Link>
           <span
             className={cn(
               "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur",

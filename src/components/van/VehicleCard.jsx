@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 export default function VehicleCard({ odometer, alertCount = 0, topAlert, onDiagnostics }) {
   return (
-    <Panel id="card-vehicle" title="Vehicle" icon={Car} accent="text-ios-purple">
+    <Panel id="card-vehicle" title="Vehicle" icon={Car} accent="text-ios-purple" to="/diagnostics">
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-[22px] font-semibold leading-none tracking-tight text-white">{miles(odometer)}</p>

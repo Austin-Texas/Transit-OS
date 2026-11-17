@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -7,10 +8,27 @@ export default function Panel({
   title,
   icon: Icon,
   action,
+  to,
   children,
   className,
   accent = "text-ios-teal",
 }) {
+  const heading = (
+    <div className="flex min-w-0 items-center gap-2.5">
+      {Icon ? (
+        <span
+          className={cn(
+            "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 ring-1 ring-inset ring-white/10",
+            accent
+          )}
+        >
+          <Icon className="h-4 w-4" strokeWidth={1.9} />
+        </span>
+      ) : null}
+      <h2 className="truncate text-[13px] font-semibold tracking-[-0.01em] text-white">{title}</h2>
+    </div>
+  );
+
   return (
     <section
       id={id}
@@ -23,20 +41,25 @@ export default function Panel({
       <span className="sheen" aria-hidden="true" />
 
       <header className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2.5">
-          {Icon ? (
-            <span
-              className={cn(
-                "grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 ring-1 ring-inset ring-white/10",
-                accent
-              )}
-            >
-              <Icon className="h-4 w-4" strokeWidth={1.9} />
-            </span>
-          ) : null}
-          <h2 className="truncate text-[13px] font-semibold tracking-[-0.01em] text-white">{title}</h2>
-        </div>
-        {action ?? <ChevronRight className="h-4 w-4 shrink-0 text-white/25" strokeWidth={2} />}
+        {to ? (
+          <Link
+            to={to}
+            aria-label={`Open ${title}`}
+            className="group/head -m-1 flex min-w-0 flex-1 items-center justify-between gap-2 rounded-2xl p-1 transition hover:bg-white/[0.05]"
+          >
+            {heading}
+            <ChevronRight
+              className="h-4 w-4 shrink-0 text-white/25 transition duration-200 group-hover/head:translate-x-0.5 group-hover/head:text-white/60"
+              strokeWidth={2}
+            />
+          </Link>
+        ) : (
+          <>
+            {heading}
+            {action ?? <ChevronRight className="h-4 w-4 shrink-0 text-white/25" strokeWidth={2} />}
+          </>
+        )}
+        {to && action ? action : null}
       </header>
 
       <div className="mt-4 flex flex-1 flex-col">{children}</div>

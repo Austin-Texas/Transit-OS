@@ -7,7 +7,7 @@ export default function PowerCard({ percent = 0, voltage, solar = 0, load = 0 })
   const color = percent < 30 ? "#ff375f" : "#30d158";
 
   return (
-    <Panel id="card-power" title="Power" icon={Zap} accent="text-ios-green">
+    <Panel id="card-power" title="Power" icon={Zap} accent="text-ios-green" to="/electrical">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[22px] font-semibold leading-none tracking-tight text-white">

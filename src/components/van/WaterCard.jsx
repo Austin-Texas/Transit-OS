@@ -9,7 +9,7 @@ const LEVELS = [
 
 export default function WaterCard({ status }) {
   return (
-    <Panel id="card-water" title="Water" icon={Droplets} accent="text-ios-blue">
+    <Panel id="card-water" title="Water" icon={Droplets} accent="text-ios-blue" to="/water">
       <div className="grid grid-cols-3 gap-3">
         {LEVELS.map(({ key, label, color }) => {
           const value = Math.round(Number(status[key] ?? 0));

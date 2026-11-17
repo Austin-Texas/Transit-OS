@@ -24,7 +24,7 @@ const MODES = [
 
 export default function ClimateCard({ temp, set, mode = "auto", onAdjust, onChangeMode }) {
   return (
-    <Panel id="card-climate" title="Climate" icon={Snowflake} accent="text-ios-teal">
+    <Panel id="card-climate" title="Climate" icon={Snowflake} accent="text-ios-teal" to="/climate">
       <div className="flex items-end justify-between gap-3">
         <div className="pb-1">
           <p className="text-[12.5px] font-medium text-white/45">Set to</p>
