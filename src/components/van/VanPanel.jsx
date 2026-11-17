@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { BatteryMedium } from "lucide-react";
-import FordTransit3D from "@/components/van/FordTransit3D";
+import VanPhoto from "@/components/van/VanPhoto";
+import { VAN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
-// The hero vehicle panel: the same neon wireframe van as the main vehicle view,
-// turning on its own. Tapping it opens the full 3D diagnostics stage.
-export default function VanPanel({ status, warnings = [], offline = false, className }) {
+// The hero vehicle panel: the owner's van photo, its build, and whether the hub
+// is reachable right now. Tapping the panel opens the 3D diagnostics view.
+export default function VanPanel({ status, offline = false, className }) {
   return (
     <Link
       to="/diagnostics"
@@ -16,29 +17,25 @@ export default function VanPanel({ status, warnings = [], offline = false, class
       )}
     >
       <span className="sheen z-10" aria-hidden="true" />
-      <div className="relative min-h-0 flex-1 overflow-hidden bg-[radial-gradient(125%_120%_at_50%_-10%,#122841_0%,#0a1220_55%,#05070c_100%)]">
-        <div className="pointer-events-none absolute inset-0">
-          <FordTransit3D className="h-full w-full" status={status} warnings={warnings} />
-        </div>
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(82%_72%_at_50%_42%,transparent_46%,rgba(2,6,11,0.62)_100%)]" />
+      <div className="relative min-h-0 flex-1 overflow-hidden">
+        <VanPhoto
+          uri={status.van_photo_uri}
+          fallback={VAN_IMAGE}
+          alt="Your camper van"
+          className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.02]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#04060c] via-[#04060c]/35 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#04060c] via-transparent to-transparent" />
 
-        <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-medium text-white/70 ring-1 ring-inset ring-white/10 backdrop-blur">
-          <span className="h-1.5 w-1.5 rounded-full bg-ios-teal" />
-          Live 3D · {status.active_mode ?? "camping"} mode
-        </div>
-
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 sm:p-6">
-          <p className="text-[22px] font-semibold leading-tight tracking-tight text-white sm:text-[26px]">
+        <div className="relative flex h-full flex-col justify-end p-5 sm:p-6">
+          <span className="w-fit rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80 ring-1 ring-inset ring-white/15 backdrop-blur">
+            Ford
+          </span>
+          <p className="mt-3 text-[26px] font-semibold leading-tight tracking-tight text-white sm:text-[32px]">
             {status.vehicle_name}
           </p>
-          <p className="mt-0.5 truncate text-[10.5px] font-medium uppercase tracking-[0.18em] text-white/45">
-            {status.trim}
-          </p>
+          <p className="mt-1 truncate text-[13px] font-medium text-white/50">{status.trim}</p>
         </div>
-
-        <span className="pointer-events-none absolute bottom-4 right-4 z-10 inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1.5 text-[11px] font-semibold text-white/80 ring-1 ring-inset ring-white/15 backdrop-blur">
-          Open 3D view
-        </span>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 border-t border-white/[0.08] bg-black/20 px-4 py-3 backdrop-blur-xl">

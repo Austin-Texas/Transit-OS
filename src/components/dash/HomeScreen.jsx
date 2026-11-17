@@ -80,12 +80,7 @@ export default function HomeScreen() {
       <main className="mx-auto flex w-full max-w-[1500px] flex-1 flex-col gap-4 px-3 pb-[156px] pt-4 sm:px-4">
         <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,352px)]">
           <div className="flex min-w-0 flex-col gap-4">
-            <VanPanel
-              status={status}
-              warnings={warnings}
-              offline={van.offline}
-              className="h-[240px] sm:h-[310px] lg:h-[340px]"
-            />
+            <VanPanel status={status} offline={van.offline} className="h-[240px] sm:h-[310px] lg:h-[340px]" />
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               <ClimateCard
