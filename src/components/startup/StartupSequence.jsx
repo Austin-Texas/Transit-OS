@@ -4,99 +4,102 @@ import CinematicLightField from "./CinematicLightField";
 import { STARTUP_CHECKS, runStartupChecks } from "@/lib/startupReadiness";
 import "./StartupPremium.css";
 
-const initial = Object.fromEntries(STARTUP_CHECKS.map(check => [check.id, "pending"]));
-const settled = status => ["ready", "offline", "simulated", "error"].includes(status);
-const BEATS = [0, 3300, 5100, 6800, 8800];
-const PROGRESS_START = 8800;
-const PROGRESS_DURATION = 6500;
-const MIN_DURATION = PROGRESS_START + PROGRESS_DURATION + 1100;
-const EXIT_DURATION = 1200;
+const INITIAL = Object.fromEntries(STARTUP_CHECKS.map(item => [item.id, "pending"]));
+const TERMINAL = new Set(["ready", "offline", "simulated", "error"]);
+const MOVIE_LENGTH = 6000;
+const MAX_BOOT_WAIT = 10000;
+const FADE_MS = 650;
 
 export default function StartupSequence({ onDone }) {
   const [elapsed, setElapsed] = useState(0);
-  const [checks, setChecks] = useState(initial);
+  const [checks, setChecks] = useState(INITIAL);
   const [closing, setClosing] = useState(false);
   const completed = useRef(false);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
+
   useEffect(() => {
     const controller = new AbortController();
-    const originalOverflow = document.body.style.overflow;
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    const began = performance.now();
-    // Canvas animates independently; update the UI at 20 Hz.
-    const timer = window.setInterval(() => setElapsed(performance.now() - began), 50);
+    const started = performance.now();
+    const timer = window.setInterval(() => setElapsed(performance.now() - started), 50);
     runStartupChecks((id, status) => {
       if (!controller.signal.aborted) setChecks(previous => ({ ...previous, [id]: status }));
     }, controller.signal).catch(() => {
-      if (!controller.signal.aborted) setChecks(previous => ({ ...previous, application: "error", controller: "offline", sensors: "offline" }));
+      if (!controller.signal.aborted) {
+        setChecks(previous => Object.fromEntries(STARTUP_CHECKS.map(item =>
+          [item.id, TERMINAL.has(previous[item.id]) ? previous[item.id] : "offline"])));
+      }
     });
     return () => {
       controller.abort();
-      window.clearInterval(timer);
-      document.body.style.overflow = originalOverflow;
+      clearInterval(timer);
+      document.body.style.overflow = previousOverflow;
     };
   }, []);
-  const stage = elapsed < BEATS[1] ? 0 : elapsed < BEATS[2] ? 1 : elapsed < BEATS[3] ? 2 : elapsed < BEATS[4] ? 3 : 4;
-  const finished = STARTUP_CHECKS.every(item => settled(checks[item.id]));
-  const timedOut = elapsed >= MIN_DURATION + 4000;
-  const ready = STARTUP_CHECKS.filter(item => settled(checks[item.id])).length;
-  // Real checks are tracked independently; the display eases in over time so
-  // fast checks never make the progress bar jump or disappear immediately.
-  const checkPercent = timedOut ? 100 : Math.round(ready / STARTUP_CHECKS.length * 100);
-  const animationPercent = Math.round(Math.min(1, Math.max(0, (elapsed - PROGRESS_START) / PROGRESS_DURATION)) * 100);
-  const progress = Math.min(checkPercent, animationPercent);
+
+  const stage = elapsed < 500 ? 0 : elapsed < 1500 ? 1 : elapsed < 2500 ? 2
+    : elapsed < 3000 ? 3 : elapsed < 3500 ? 4 : elapsed < 4500 ? 5
+    : elapsed < 5500 ? 6 : 7;
+  const complete = STARTUP_CHECKS.every(item => TERMINAL.has(checks[item.id]));
+  const readyCount = STARTUP_CHECKS.filter(item => TERMINAL.has(checks[item.id])).length;
+  const visualProgress = Math.min(100, Math.max(0, (elapsed - 4500) / 1000 * 100));
+  const progress = Math.round(Math.min(visualProgress, readyCount / STARTUP_CHECKS.length * 100));
+  const timedOut = elapsed >= MAX_BOOT_WAIT;
   useEffect(() => {
-    if (!completed.current && elapsed >= MIN_DURATION && (finished || timedOut)) {
+    if (!completed.current && elapsed >= MOVIE_LENGTH && (complete || timedOut)) {
       completed.current = true;
       setClosing(true);
     }
-  }, [finished, timedOut, elapsed]);
+  }, [elapsed, complete, timedOut]);
   useEffect(() => {
     if (!closing) return;
-    const timer = setTimeout(() => onDoneRef.current?.(), EXIT_DURATION);
+    const timer = setTimeout(() => onDoneRef.current?.(), FADE_MS);
     return () => clearTimeout(timer);
   }, [closing]);
+
   const hardware = checks.controller === "ready" && checks.sensors === "ready"
-    ? "VEHICLE HARDWARE CONNECTED"
-    : checks.controller === "simulated" || checks.sensors === "simulated"
-      ? "SIMULATION MODE" : "WEB LAB · HARDWARE OFFLINE";
+    ? "VEHICLE SYSTEMS CONNECTED"
+    : "VEHICLE HARDWARE OFFLINE · WEB LAB MODE";
 
   return (
-    <motion.div className={`tp-cinema tp-cinema--${stage}`} initial={false}
-      animate={{ opacity: closing ? 0 : 1 }} transition={{ duration: EXIT_DURATION / 1000, ease: "easeInOut" }}
-      role="status" aria-label="TPMCS TransitOS cinematic startup">
+    <motion.div className={`tp-movie tp-movie--${stage}`} initial={false}
+      animate={{ opacity: closing ? 0 : 1 }}
+      transition={{ duration: FADE_MS / 1000, ease: "easeInOut" }}
+      role="status" aria-label="TPMCS TransitOS startup">
       <CinematicLightField stage={stage} />
-      <div className="tp-cinema__grain" aria-hidden="true" />
-      <div className="tp-cinema__atmosphere" aria-hidden="true" />
-      <div className="tp-cinema__floor" aria-hidden="true" />
-      <div className="tp-cinema__beams" aria-hidden="true"><i/><i/><i/><i/><i/></div>
-      <div className="tp-cinema__ring" aria-hidden="true"><i/><i/><i/></div>
-      <div className="tp-cinema__streak tp-cinema__streak--blue" aria-hidden="true" />
-      <div className="tp-cinema__streak tp-cinema__streak--violet" aria-hidden="true" />
-      <div className="tp-cinema__brand">
-        <img className="tp-cinema__symbol" src="/branding/tpmcs-logo.svg" alt="TPMCS company logo" />
-        <div className="tp-cinema__company">TPMCS</div>
+      <div className="tp-movie__veil" aria-hidden="true" />
+      <div className="tp-movie__flare" aria-hidden="true" />
+      <div className="tp-movie__tagline">POWERING A SMARTER TOMORROW</div>
+      <div className="tp-movie__identity">
+        <img src="/branding/tpmcs-logo.svg" alt="TPMCS company logo" />
+        <div className="tp-movie__company">TPMCS</div>
+        <div className="tp-movie__presents"><i />PRESENTS<i /></div>
       </div>
-      <div className="tp-cinema__presentation">
-        <div className="tp-cinema__presents"><i/>PRESENTS<i/></div>
+      <div className="tp-movie__product">
         <h1>Transit<span>OS</span></h1>
         <p>INTELLIGENT VEHICLE OPERATING SYSTEM</p>
       </div>
-      <div className="tp-cinema__initialize">
-        <h2>Transit<span>OS</span></h2>
-        <p>SYSTEM INITIALIZATION</p>
-        <div className="tp-cinema__init-panel">
-          <div className="tp-cinema__init-label"><span className="tp-cinema__gear" aria-hidden="true">⚙</span><span>Initializing TransitOS...</span></div>
-          <div className="tp-cinema__progress-row"><div className="tp-cinema__progress-track"><div style={{ width: progress + "%" }} /></div><strong>{progress}%</strong></div>
-          <div className="tp-cinema__checks">
-            {STARTUP_CHECKS.map(item => <div key={item.id}><span>{item.label}</span><b className={"tp-cinema__check--" + checks[item.id]}>{checks[item.id]}</b></div>)}
-          </div>
-          <small>{hardware}</small>
+      <div className="tp-movie__initializing">
+        <h2>Initializing Transit<span>OS</span>...</h2>
+        <div className="tp-movie__progress"><div style={{ width: progress + "%" }} /></div>
+        <strong>{progress}%</strong>
+        <div className="tp-movie__tasks">
+          {STARTUP_CHECKS.map(item => <div key={item.id}>
+            <span className="tp-movie__task-icon">◇</span>
+            <span>{item.label}</span>
+            <small>{checks[item.id]}</small>
+          </div>)}
         </div>
+        <div className="tp-movie__hardware">{hardware}</div>
       </div>
-      <div className="tp-cinema__footer"><span>TPMCS / TRANSITOS</span><span>INTELLIGENT SYSTEM STARTUP</span></div>
-      <button className="tp-cinema__skip" type="button" onClick={() => setClosing(true)}>Skip intro</button>
+      <div className="tp-movie__ready">
+        <div className="tp-movie__check">✓</div>
+        <h2>Transit<span>OS</span></h2>
+        <p>READY</p>
+      </div>
+      <button className="tp-movie__skip" type="button" onClick={() => setClosing(true)}>Skip intro</button>
     </motion.div>
   );
 }
