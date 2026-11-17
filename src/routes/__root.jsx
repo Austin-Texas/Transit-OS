@@ -5,6 +5,7 @@ import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/AuthContext";
+import { markBooted } from "@/lib/bootSignal";
 import { Base44Scripts } from "base44:document";
 import appCss from "@/index.css?url";
 
@@ -37,7 +38,14 @@ function RootComponent() {
     <AuthProvider>
       <Outlet />
       <Toaster />
-      {booting ? <StartupSequence onDone={() => setBooting(false)} /> : null}
+      {booting ? (
+        <StartupSequence
+          onDone={() => {
+            setBooting(false);
+            markBooted();
+          }}
+        />
+      ) : null}
     </AuthProvider>
   );
 }

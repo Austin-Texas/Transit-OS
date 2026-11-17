@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Settings, Thermometer, Waypoints } from "lucide-react";
 import Clock from "@/components/van/Clock";
-import { cn } from "@/lib/utils";
+import LiveBadge from "@/components/dash/home/LiveBadge";
 
 // Floating branding bar: brand, screen name and the health of the van link.
 export default function HomeHeader({ status, offline }) {
@@ -20,15 +20,11 @@ export default function HomeHeader({ status, offline }) {
           <p className="truncate text-[11.5px] font-medium text-white/40">Main Dashboard</p>
         </div>
 
-        <span
-          className={cn(
-            "ml-1 hidden items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold sm:inline-flex",
-            offline ? "bg-ios-pink/15 text-ios-pink" : "bg-ios-green/15 text-ios-green"
-          )}
-        >
-          <span className={cn("h-1.5 w-1.5 rounded-full bg-current", !offline && "animate-soft-pulse")} />
-          {offline ? "System offline" : "System online"}
-        </span>
+        <LiveBadge
+          live={!offline}
+          label={offline ? "System offline" : "Live"}
+          className="ml-1 hidden sm:inline-flex"
+        />
 
         <div className="ml-auto flex items-center gap-2 text-white/65">
           <span className="hidden items-center gap-1.5 rounded-full bg-white/[0.08] px-2.5 py-1.5 ring-1 ring-inset ring-white/[0.08] sm:inline-flex">

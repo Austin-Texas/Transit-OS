@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
+import { FlipHorizontal, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 
@@ -123,6 +123,20 @@ export default function TwinViewer({ src, alt, className }) {
     }
   };
 
+  // One tap turns the van all the way round, handy on a phone.
+  const flip = () => {
+    const el = stageRef.current;
+    if (!el) return;
+    stopInertia();
+    spinVelocity.current = 0;
+    view.current.spin += 180;
+    el.style.transition = "transform 620ms cubic-bezier(0.32, 1.12, 0.4, 1)";
+    paint();
+    window.setTimeout(() => {
+      if (stageRef.current) stageRef.current.style.transition = "";
+    }, 660);
+  };
+
   const reset = () => {
     const el = stageRef.current;
     if (!el) return;
@@ -187,6 +201,7 @@ export default function TwinViewer({ src, alt, className }) {
         {[
           { key: "out", label: "Zoom out", icon: <ZoomOut className="h-3.5 w-3.5" strokeWidth={2.2} />, onClick: () => zoomBy(0.85) },
           { key: "in", label: "Zoom in", icon: <ZoomIn className="h-3.5 w-3.5" strokeWidth={2.2} />, onClick: () => zoomBy(1.18) },
+          { key: "flip", label: "Turn the van around", icon: <FlipHorizontal className="h-3.5 w-3.5" strokeWidth={2.2} />, onClick: flip },
           { key: "reset", label: "Reset view", icon: <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.2} />, onClick: reset },
         ].map((button) => (
           <button

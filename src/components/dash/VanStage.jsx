@@ -46,10 +46,10 @@ export default function VanStage({ focus, onClearFocus }) {
 
       <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-ink-950/70 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/45 backdrop-blur sm:flex">
         <Move className="h-3 w-3" strokeWidth={2.2} />
-        Drag to spin
+        Swipe or drag to spin
         <span className="text-white/20">·</span>
         <ZoomIn className="h-3 w-3" strokeWidth={2.2} />
-        Scroll to zoom
+        Pinch or scroll to zoom
       </div>
 
       <Link

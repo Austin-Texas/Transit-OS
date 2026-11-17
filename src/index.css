@@ -136,6 +136,31 @@
       inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   }
 
+  /* Live telemetry beacon: three quick blinks, then a rest. */
+  .live-dot {
+    animation: live-blink 1.8s ease-in-out infinite;
+  }
+
+  @keyframes live-blink {
+    0%,
+    38% {
+      opacity: 1;
+    }
+    46% {
+      opacity: 0.25;
+    }
+    54% {
+      opacity: 1;
+    }
+    62% {
+      opacity: 0.25;
+    }
+    70%,
+    100% {
+      opacity: 1;
+    }
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
