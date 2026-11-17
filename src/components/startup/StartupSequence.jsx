@@ -41,11 +41,10 @@ export default function StartupSequence({ onDone }) {
 
   const stage = elapsed < 750 ? 0 : elapsed < 2250 ? 1 : elapsed < 3750 ? 2
     : elapsed < 4500 ? 3 : elapsed < 5250 ? 4 : elapsed < 6750 ? 5
-    : elapsed < 15750 ? 6 : 7;
+    : 6;
   const complete = STARTUP_CHECKS.every(item => TERMINAL.has(checks[item.id]));
-  const readyCount = STARTUP_CHECKS.filter(item => TERMINAL.has(checks[item.id])).length;
   const visualProgress = Math.min(100, Math.max(0, (elapsed - 6750) / 9000 * 100));
-  const progress = Math.round(Math.min(visualProgress, readyCount / STARTUP_CHECKS.length * 100));
+  const progress = Math.round(visualProgress);
   const timedOut = elapsed >= MAX_BOOT_WAIT;
   useEffect(() => {
     if (!completed.current && elapsed >= MOVIE_LENGTH && (complete || timedOut)) {
@@ -58,10 +57,6 @@ export default function StartupSequence({ onDone }) {
     const timer = setTimeout(() => onDoneRef.current?.(), FADE_MS);
     return () => clearTimeout(timer);
   }, [closing]);
-
-  const hardware = checks.controller === "ready" && checks.sensors === "ready"
-    ? "VEHICLE SYSTEMS CONNECTED"
-    : "VEHICLE HARDWARE OFFLINE · WEB LAB MODE";
 
   return (
     <motion.div className={`tp-movie tp-movie--${stage}`} initial={false}
@@ -82,22 +77,17 @@ export default function StartupSequence({ onDone }) {
         <p>INTELLIGENT VEHICLE OPERATING SYSTEM</p>
       </div>
       <div className="tp-movie__initializing">
-        <h2>Initializing Transit<span>OS</span>...</h2>
-        <div className="tp-movie__progress"><div style={{ width: progress + "%" }} /></div>
-        <strong>{progress}%</strong>
-        <div className="tp-movie__tasks">
-          {STARTUP_CHECKS.map(item => <div key={item.id}>
-            <span className="tp-movie__task-icon">◇</span>
-            <span>{item.label}</span>
-            <small>{checks[item.id]}</small>
-          </div>)}
+        <h2 className="tp-movie__init-title">Transit<span>OS</span></h2>
+        <p className="tp-movie__init-subtitle">SYSTEM INITIALIZATION</p>
+        <div className="tp-movie__init-panel">
+          <div className="tp-movie__init-label"><span className="tp-movie__init-gear" aria-hidden="true">⚙</span>Initializing Transit<span>OS</span>...</div>
+          <div className="tp-movie__progress-row">
+            <div className="tp-movie__progress" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="TransitOS startup progress">
+              <div style={{ width: progress + "%" }} />
+            </div>
+            <strong>{progress}%</strong>
+          </div>
         </div>
-        <div className="tp-movie__hardware">{hardware}</div>
-      </div>
-      <div className="tp-movie__ready">
-        <div className="tp-movie__check">✓</div>
-        <h2>Transit<span>OS</span></h2>
-        <p>READY</p>
       </div>
       <button className="tp-movie__skip" type="button" onClick={() => setClosing(true)}>Skip intro</button>
     </motion.div>
