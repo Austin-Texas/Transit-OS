@@ -4,6 +4,8 @@ import { Link } from "@tanstack/react-router";
 import FordTransit3D from "@/components/van/FordTransit3D";
 import HotspotDialog from "@/components/van/HotspotDialog";
 import HotspotTip from "@/components/van/HotspotTip";
+import VanPhoto from "@/components/van/VanPhoto";
+import { VAN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
 // The home stage: the neon wireframe van you can spin with a finger, plus a
@@ -18,6 +20,7 @@ export default function VanStage({
   onClearFocus,
 }) {
   const side = focus?.side;
+  const [view, setView] = useState("3d");
   const [tip, setTip] = useState(null);
   const [hotspot, setHotspot] = useState(null);
 
@@ -28,24 +31,53 @@ export default function VanStage({
         focus ? "border-ios-pink/50" : "border-white/10"
       )}
     >
-      <FordTransit3D
-        className="absolute inset-0 h-full w-full"
-        focus={focus}
-        warnings={warnings}
-        status={status}
-        onTip={setTip}
-        onPick={(key) => {
-          if (!key) return;
-          setTip(null);
-          setHotspot(key);
-        }}
-      />
+      {view === "3d" ? (
+        <FordTransit3D
+          className="absolute inset-0 h-full w-full"
+          focus={focus}
+          warnings={warnings}
+          status={status}
+          onTip={setTip}
+          onPick={(key) => {
+            if (!key) return;
+            setTip(null);
+            setHotspot(key);
+          }}
+        />
+      ) : (
+        <VanPhoto
+          uri={status?.van_photo_uri}
+          fallback={VAN_IMAGE}
+          alt="Your camper van"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      )}
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(78%_68%_at_50%_44%,transparent_42%,rgba(2,6,11,0.6)_100%)]" />
 
       <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-medium text-white/70 ring-1 ring-inset ring-white/10 backdrop-blur">
         <span className="h-1.5 w-1.5 rounded-full bg-ios-teal" />
-        Live 3D · Interior {Math.round(cabinTemp)}°F
+        {view === "3d" ? "Live 3D" : "Owner photo"} · Interior {Math.round(cabinTemp)}°F
+      </div>
+
+      <div className="absolute right-3 top-3 z-20 flex items-center gap-0.5 rounded-full bg-black/45 p-0.5 ring-1 ring-inset ring-white/15 backdrop-blur">
+        {[
+          ["3d", "3D"],
+          ["photo", "Photo"],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setView(id)}
+            aria-pressed={view === id}
+            className={cn(
+              "rounded-full px-2.5 py-1 text-[10.5px] font-semibold transition",
+              view === id ? "bg-white/90 text-ink-950" : "text-white/60 hover:text-white"
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       {focus ? (
@@ -81,10 +113,12 @@ export default function VanStage({
 
       <HotspotTip tip={tip} />
 
-      <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
-        <Move className="h-3 w-3" strokeWidth={2.2} />
-        Swipe to spin · tap parts for readings
-      </div>
+      {view === "3d" ? (
+        <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
+          <Move className="h-3 w-3" strokeWidth={2.2} />
+          Swipe to spin · tap parts for readings
+        </div>
+      ) : null}
 
       <Link
         to="/settings"
