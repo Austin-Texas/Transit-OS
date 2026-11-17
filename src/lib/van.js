@@ -1,8 +1,6 @@
 // Imported online photo of the current Ford Transit van.
 export const VAN_IMAGE = "https://media.base44.com/images/public/6afa3d27af32e7eb7d4b7f76/9ab3d9b86_ford-transit-2026-online.jpg";
 export const CABIN_IMAGE = "https://media.base44.com/images/public/6afa3d27af32e7eb7d4b7f76/fc43d02d0_generated_image.png";
-// Digital-twin artwork shown on the dashboard hero; it opens the 3D vehicle view.
-export const TWIN_IMAGE = "https://base44.app/api/apps/6afa3d27af32e7eb7d4b7f76/files/mp/public/6afa3d27af32e7eb7d4b7f76/85b58491a_transit-digital-twin.png";
 
 // Tank sizes of the camper build, used to show every level in gallons.
 export const TANK_CAPACITY_GAL = { fresh_water: 30, gray_water: 24, black_water: 15 };
