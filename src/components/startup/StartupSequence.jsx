@@ -1,79 +1,104 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { STAGES, STARTUP_EXIT_MS, STARTUP_TOTAL_MS } from "@/lib/startupStages";
-import StageBoot from "./StageBoot";
-import ReferenceFrames from "./ReferenceFrames";
+import CinematicLightField from "./CinematicLightField";
+import { STARTUP_CHECKS, runStartupChecks } from "@/lib/startupReadiness";
+import "./StartupPremium.css";
 
-// The cinematic startup: the approved nine-frame artwork plays the intro, then
-// the initialization interface, then a fade into the dashboard.
+const initial = Object.fromEntries(STARTUP_CHECKS.map(check => [check.id, "pending"]));
+const settled = status => ["ready", "offline", "simulated", "error"].includes(status);
+const BEATS = [0, 3300, 5100, 6800, 8800];
+const PROGRESS_START = 8800;
+const PROGRESS_DURATION = 6500;
+const MIN_DURATION = PROGRESS_START + PROGRESS_DURATION + 1100;
+const EXIT_DURATION = 1200;
+
 export default function StartupSequence({ onDone }) {
-  const [phase, setPhase] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+  const [checks, setChecks] = useState(initial);
   const [closing, setClosing] = useState(false);
-  const [gone, setGone] = useState(false);
-  const doneRef = useRef(onDone);
-  doneRef.current = onDone;
-
+  const completed = useRef(false);
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
   useEffect(() => {
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const previousOverflow = document.body.style.overflow;
+    const controller = new AbortController();
+    const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
-    if (reduced) {
-      const timer = setTimeout(() => setClosing(true), 900);
-      return () => {
-        clearTimeout(timer);
-        document.body.style.overflow = previousOverflow;
-      };
-    }
-
-    const beacons = STAGES.slice(1).map((stage, index) =>
-      setTimeout(() => setPhase(index + 1), stage.at * 1000),
-    );
-    const timer = setTimeout(() => setClosing(true), STARTUP_TOTAL_MS);
-
+    const began = performance.now();
+    // Canvas animates independently; update the UI at 20 Hz.
+    const timer = window.setInterval(() => setElapsed(performance.now() - began), 50);
+    runStartupChecks((id, status) => {
+      if (!controller.signal.aborted) setChecks(previous => ({ ...previous, [id]: status }));
+    }, controller.signal).catch(() => {
+      if (!controller.signal.aborted) setChecks(previous => ({ ...previous, application: "error", controller: "offline", sensors: "offline" }));
+    });
     return () => {
-      beacons.forEach(clearTimeout);
-      clearTimeout(timer);
-      document.body.style.overflow = previousOverflow;
+      controller.abort();
+      window.clearInterval(timer);
+      document.body.style.overflow = originalOverflow;
     };
   }, []);
-
+  const stage = elapsed < BEATS[1] ? 0 : elapsed < BEATS[2] ? 1 : elapsed < BEATS[3] ? 2 : elapsed < BEATS[4] ? 3 : 4;
+  const finished = STARTUP_CHECKS.every(item => settled(checks[item.id]));
+  const timedOut = elapsed >= MIN_DURATION + 4000;
+  const ready = STARTUP_CHECKS.filter(item => settled(checks[item.id])).length;
+  // Real checks are tracked independently; the display eases in over time so
+  // fast checks never make the progress bar jump or disappear immediately.
+  const checkPercent = timedOut ? 100 : Math.round(ready / STARTUP_CHECKS.length * 100);
+  const animationPercent = Math.round(Math.min(1, Math.max(0, (elapsed - PROGRESS_START) / PROGRESS_DURATION)) * 100);
+  const progress = Math.min(checkPercent, animationPercent);
   useEffect(() => {
-    if (!closing) return undefined;
-    const timer = setTimeout(() => {
-      setGone(true);
-      doneRef.current?.();
-    }, STARTUP_EXIT_MS);
+    if (!completed.current && elapsed >= MIN_DURATION && (finished || timedOut)) {
+      completed.current = true;
+      setClosing(true);
+    }
+  }, [finished, timedOut, elapsed]);
+  useEffect(() => {
+    if (!closing) return;
+    const timer = setTimeout(() => onDoneRef.current?.(), EXIT_DURATION);
     return () => clearTimeout(timer);
   }, [closing]);
 
-  if (gone) return null;
+  const hardware = checks.controller === "ready" && checks.sensors === "ready"
+    ? "VEHICLE HARDWARE CONNECTED"
+    : checks.controller === "simulated" || checks.sensors === "simulated"
+      ? "SIMULATION MODE" : "WEB LAB · HARDWARE OFFLINE";
 
   return (
-    <motion.div
-      className="fixed inset-0 z-[130] overflow-hidden bg-[#01040d]"
-      animate={{ opacity: closing ? 0 : 1 }}
-      transition={{ duration: STARTUP_EXIT_MS / 1000, ease: "easeInOut" }}
-    >
-      {phase < 4 ? <ReferenceFrames /> : null}
-
-      <motion.div
-        className="absolute inset-0 bg-[#01040d]/92"
-        initial={false}
-        animate={{ opacity: phase >= 4 ? 1 : 0 }}
-        transition={{ duration: 0.6 }}
-        style={{ pointerEvents: phase >= 4 ? "auto" : "none" }}
-      >
-        {phase >= 4 ? <StageBoot /> : null}
-      </motion.div>
-
-      <button
-        type="button"
-        onClick={() => setClosing(true)}
-        className="absolute bottom-5 right-5 z-20 rounded-full border border-white/12 bg-white/[0.06] px-4 py-2 text-[10px] font-medium uppercase tracking-[0.22em] text-white/45 backdrop-blur-xl transition hover:border-white/25 hover:text-white/80"
-      >
-        Skip intro
-      </button>
+    <motion.div className={`tp-cinema tp-cinema--${stage}`} initial={false}
+      animate={{ opacity: closing ? 0 : 1 }} transition={{ duration: EXIT_DURATION / 1000, ease: "easeInOut" }}
+      role="status" aria-label="TPMCS TransitOS cinematic startup">
+      <CinematicLightField stage={stage} />
+      <div className="tp-cinema__grain" aria-hidden="true" />
+      <div className="tp-cinema__atmosphere" aria-hidden="true" />
+      <div className="tp-cinema__floor" aria-hidden="true" />
+      <div className="tp-cinema__beams" aria-hidden="true"><i/><i/><i/><i/><i/></div>
+      <div className="tp-cinema__ring" aria-hidden="true"><i/><i/><i/></div>
+      <div className="tp-cinema__streak tp-cinema__streak--blue" aria-hidden="true" />
+      <div className="tp-cinema__streak tp-cinema__streak--violet" aria-hidden="true" />
+      <div className="tp-cinema__brand">
+        <img className="tp-cinema__symbol" src="/branding/tpmcs-logo.svg" alt="TPMCS company logo" />
+        <div className="tp-cinema__company">TPMCS</div>
+      </div>
+      <div className="tp-cinema__presentation">
+        <div className="tp-cinema__presents"><i/>PRESENTS<i/></div>
+        <h1>Transit<span>OS</span></h1>
+        <p>INTELLIGENT VEHICLE OPERATING SYSTEM</p>
+      </div>
+      <div className="tp-cinema__initialize">
+        <h2>Transit<span>OS</span></h2>
+        <p>SYSTEM INITIALIZATION</p>
+        <div className="tp-cinema__init-panel">
+          <div className="tp-cinema__init-label"><span className="tp-cinema__gear" aria-hidden="true">⚙</span><span>Initializing TransitOS...</span></div>
+          <div className="tp-cinema__progress-row"><div className="tp-cinema__progress-track"><div style={{ width: progress + "%" }} /></div><strong>{progress}%</strong></div>
+          <div className="tp-cinema__checks">
+            {STARTUP_CHECKS.map(item => <div key={item.id}><span>{item.label}</span><b className={"tp-cinema__check--" + checks[item.id]}>{checks[item.id]}</b></div>)}
+          </div>
+          <small>{hardware}</small>
+        </div>
+      </div>
+      <div className="tp-cinema__footer"><span>TPMCS / TRANSITOS</span><span>INTELLIGENT SYSTEM STARTUP</span></div>
+      <button className="tp-cinema__skip" type="button" onClick={() => setClosing(true)}>Skip intro</button>
     </motion.div>
   );
 }
