@@ -278,3 +278,57 @@
 @media(prefers-reduced-motion:reduce){
  .tp-cinema__brand,.tp-cinema__presentation{transition:none!important}
 }
+
+/* Film-continuity fix: the logo animation is bound to the element, not a
+   stage selector. Stage changes cannot restart its keyframes or change size. */
+.tp-cinema .tp-cinema__symbol{
+  width:clamp(120px,25vh,210px)!important;
+  height:clamp(140px,30vh,250px)!important;
+  animation:tp-logo-continuous-arrival 3.05s cubic-bezier(.22,.58,.22,1) both!important;
+  transform-origin:center center;
+  backface-visibility:hidden;
+  will-change:transform,opacity;
+  filter:drop-shadow(0 0 14px #00bdff72);
+}
+@keyframes tp-logo-continuous-arrival{
+  0%{opacity:0;transform:translate3d(0,55px,0) scale(.24)}
+  25%{opacity:.5;transform:translate3d(0,38px,0) scale(.43)}
+  65%{opacity:.95;transform:translate3d(0,12px,0) scale(.79)}
+  100%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+/* Lettering joins the moving logo during stage 2, not on the first reveal. */
+.tp-cinema .tp-cinema__company{
+  opacity:0!important;
+  transform:translate3d(0,18px,0)!important;
+  transition:opacity 1250ms ease,transform 1500ms cubic-bezier(.22,.61,.22,1)!important;
+}
+.tp-cinema--2 .tp-cinema__company,
+.tp-cinema--3 .tp-cinema__company{
+  opacity:1!important;
+  transform:translate3d(0,0,0)!important;
+}
+.tp-cinema--4 .tp-cinema__company{opacity:0!important}
+.tp-cinema .tp-cinema__brand{
+  transition:transform 2000ms cubic-bezier(.25,.6,.25,1),opacity 1100ms ease!important;
+  will-change:transform,opacity;
+}
+.tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{
+  transform:translate(-50%,-50%) translate3d(0,0,0) scale(1)!important;
+}
+.tp-cinema--2 .tp-cinema__brand,.tp-cinema--3 .tp-cinema__brand{
+  transform:translate(-50%,-50%) translate3d(0,-27vh,0) scale(.42)!important;
+}
+.tp-cinema--4 .tp-cinema__brand{
+  transform:translate(-50%,-50%) translate3d(0,-30vh,0) scale(.38)!important;
+}
+.tp-cinema--2 .tp-cinema__presentation{
+  transition:opacity 1900ms ease!important;
+}
+@media(max-height:650px){
+  .tp-cinema--2 .tp-cinema__brand,.tp-cinema--3 .tp-cinema__brand{
+    transform:translate(-50%,-50%) translate3d(0,-24vh,0) scale(.34)!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .tp-cinema .tp-cinema__symbol{animation:none!important;transform:none!important;opacity:1}
+}
