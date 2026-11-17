@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { Activity, BatteryCharging, Droplets, Thermometer, Wifi, ShieldCheck, Truck, Gauge } from "lucide-react";
+import { Activity, BatteryCharging, Droplets, Thermometer, Wifi, ShieldCheck, Truck } from "lucide-react";
+import BrandMark from "@/components/brand/BrandMark";
 
 // Public design preview only. No authenticated APIs, user records, cameras, or hardware commands.
 const cards = [
@@ -20,7 +21,7 @@ export function LoginPage() {
       <div className="mx-auto max-w-6xl">
         <header className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-cyan-900/50 pb-5">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-cyan-400 p-3 text-slate-950"><Gauge size={26} /></div>
+            <BrandMark variant="light" className="h-12 w-12 rounded-xl" />
             <div><h1 className="text-2xl font-bold tracking-tight">TransitOS</h1><p className="text-sm text-slate-400">Ford Transit Smart Camper</p></div>
           </div>
           <span className="rounded-full border border-cyan-700/60 bg-cyan-950/40 px-4 py-2 text-sm text-cyan-300">Public design preview · No login</span>
