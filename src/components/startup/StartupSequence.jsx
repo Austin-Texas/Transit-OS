@@ -79,7 +79,6 @@ export default function StartupSequence({ onDone }) {
         <div className="tp-cinema__company">TPMCS</div>
       </div>
       <div className="tp-cinema__presentation">
-        <div className="tp-cinema__presented-by"><img src="/branding/tpmcs-logo.svg" alt="" /><span>TPMCS</span></div>
         <div className="tp-cinema__presents"><i/>PRESENTS<i/></div>
         <h1>Transit<span>OS</span></h1>
         <p>INTELLIGENT VEHICLE OPERATING SYSTEM</p>
