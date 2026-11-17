@@ -1,11 +1,12 @@
 import { ArrowLeft, ArrowRight, Camera, Move, ZoomIn } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import FordTransit3D from "@/components/van/FordTransit3D";
+import TwinViewer from "@/components/van/TwinViewer";
+import { DIGITAL_TWIN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
-// The diagnostics stage: the live 3D van, turntable-spinning on its own and
-// draggable by hand, with fault markers drawn where the readings point.
-export default function VanStage({ focus, onClearFocus, status, warnings = [] }) {
+// The diagnostics stage: the digital twin view of the van, with the system
+// callouts drawn on it. A located fault is flagged in the corner.
+export default function VanStage({ focus, onClearFocus }) {
   const side = focus?.side;
 
   return (
@@ -15,11 +16,10 @@ export default function VanStage({ focus, onClearFocus, status, warnings = [] })
         focus ? "border-ios-pink/50" : "border-white/10"
       )}
     >
-      <FordTransit3D
+      <TwinViewer
+        src={DIGITAL_TWIN_IMAGE}
+        alt="2026 Ford Transit digital twin"
         className="absolute inset-0"
-        focus={focus}
-        warnings={warnings}
-        status={status}
       />
 
       {focus ? (
