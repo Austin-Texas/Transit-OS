@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Camera, Move } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import FordTransit3D from "@/components/van/FordTransit3D";
-import HotspotTip from "@/components/van/HotspotTip";
+import Van3DImageStage from "@/components/van/Van3DImageStage";
 import VanPhoto from "@/components/van/VanPhoto";
 import { VAN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
@@ -31,7 +30,6 @@ export default function VanStage({
   const side = focus?.side;
   const navigate = useNavigate();
   const [view, setView] = useState("3d");
-  const [tip, setTip] = useState(null);
 
   return (
     <section
@@ -41,17 +39,11 @@ export default function VanStage({
       )}
     >
       {view === "3d" ? (
-        <FordTransit3D
-          className="absolute inset-0 h-full w-full"
-          focus={focus}
-          warnings={warnings}
+        <Van3DImageStage
           status={status}
-          onTip={setTip}
           onPick={(key) => {
-            if (!key) return;
             const to = PART_MODULES[key];
             if (!to) return;
-            setTip(null);
             navigate({ to });
           }}
         />
@@ -122,12 +114,10 @@ export default function VanStage({
         <p className="text-[9.5px] uppercase leading-snug tracking-[0.18em] text-white/45">{trim}</p>
       </div>
 
-      <HotspotTip tip={tip} />
-
       {view === "3d" ? (
         <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
           <Move className="h-3 w-3" strokeWidth={2.2} />
-          Swipe to spin · tap a part to open its module
+          Tap a part to open its module
         </div>
       ) : null}
 
