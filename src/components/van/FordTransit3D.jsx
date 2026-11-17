@@ -193,7 +193,16 @@ function paintTag(sprite, text, alert) {
   texture.needsUpdate = true;
 }
 
-export default function FordTransit3D({ focus, warnings = [], status, className, onReady, onTip, onPick }) {
+export default function FordTransit3D({
+  focus,
+  warnings = [],
+  status,
+  mode = "3d",
+  className,
+  onReady,
+  onTip,
+  onPick,
+}) {
   const hostRef = useRef(null);
   const api = useRef(null);
   const tipRef = useRef(onTip);
@@ -201,8 +210,8 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
   const pickRef = useRef(onPick);
   pickRef.current = onPick;
   const photos = useVanPhotos(status);
-  const latest = useRef({ focus, warnings, status, photos });
-  latest.current = { focus, warnings, status, photos };
+  const latest = useRef({ focus, warnings, status, photos, mode });
+  latest.current = { focus, warnings, status, photos, mode };
 
   useEffect(() => {
     const host = hostRef.current;
@@ -227,7 +236,16 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
 
-    const { group: van, hotspots, padMaterial, padDotMaterial, padDot, textured, skins } = buildVanModel();
+    const {
+      group: van,
+      hotspots,
+      materials,
+      padMaterial,
+      padDotMaterial,
+      padDot,
+      textured,
+      skins,
+    } = buildVanModel();
     scene.add(van);
 
     // Light for the textured panels: a soft sky fill, a warm key from the front
@@ -396,6 +414,131 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
           pinGroup.add(dot, ring);
           rings.push(ring);
         });
+    };
+
+    // Diagnostic modes: the same model, dressed five ways. Base values are kept
+    // once so every switch starts from the untouched wireframe.
+    const matBase = new Map();
+    const texturedMaterials = new Set(textured.map((entry) => entry.material));
+    van.traverse((node) => {
+      const list = Array.isArray(node.material) ? node.material : node.material ? [node.material] : [];
+      list.forEach((material) => {
+        if (matBase.has(material) || material === padMaterial || material === padDotMaterial) return;
+        matBase.set(material, {
+          opacity: material.opacity,
+          color: texturedMaterials.has(material) ? new THREE.Color(0xffffff) : material.color.clone(),
+        });
+      });
+    });
+
+    // Systems: a faint halo around every monitored point on the van.
+    const haloGroup = new THREE.Group();
+    haloGroup.visible = false;
+    van.add(haloGroup);
+    const halos = hotspots.map((spot) => {
+      const halo = new THREE.Mesh(
+        new THREE.SphereGeometry(spot.geometry.parameters.radius, 18, 12),
+        new THREE.MeshBasicMaterial({
+          color: 0x64d2ff,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.16,
+          depthWrite: false,
+        })
+      );
+      halo.position.copy(spot.position);
+      haloGroup.add(halo);
+      return halo;
+    });
+
+    // Flow: water from the tank to the galley, power from the battery to the
+    // roof unit, each drawn as a route with dots travelling along it.
+    const flowGroup = new THREE.Group();
+    flowGroup.visible = false;
+    van.add(flowGroup);
+    const travellers = [];
+    [
+      {
+        color: 0x00f0ff,
+        speed: 0.16,
+        points: [
+          [-2.35, 0.42, 0],
+          [-1.7, 0.62, -0.2],
+          [-0.95, 1.05, -0.5],
+          [-0.55, 1.3, -0.72],
+        ],
+      },
+      {
+        color: 0x00ff41,
+        speed: 0.12,
+        points: [
+          [-0.7, 0.62, 0.34],
+          [-0.6, 1.3, 0.4],
+          [-0.1, 2.1, 0.3],
+          [0.35, 2.72, 0.16],
+          [0.35, 2.94, 0.16],
+        ],
+      },
+    ].forEach((route) => {
+      const curve = new THREE.CatmullRomCurve3(
+        route.points.map(([x, y, z]) => new THREE.Vector3(x, y, z))
+      );
+      flowGroup.add(
+        new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints(curve.getPoints(64)),
+          new THREE.LineBasicMaterial({ color: route.color, transparent: true, opacity: 0.5 })
+        )
+      );
+      [0, 0.34, 0.67].forEach((offset) => {
+        const dot = new THREE.Mesh(
+          new THREE.SphereGeometry(0.055, 10, 10),
+          new THREE.MeshBasicMaterial({ color: route.color })
+        );
+        dot.userData = { curve, offset, speed: route.speed };
+        flowGroup.add(dot);
+        travellers.push(dot);
+      });
+    });
+
+    const applyMode = (next) => {
+      matBase.forEach((base, material) => {
+        material.opacity = base.opacity;
+        material.color.copy(base.color);
+      });
+      haloGroup.visible = next === "systems";
+      flowGroup.visible = next === "flow";
+
+      if (next === "systems") {
+        texturedMaterials.forEach((material) => {
+          material.opacity = Math.min(material.opacity, 0.07);
+        });
+        materials.shell.opacity = 0.03;
+        materials.inner.opacity = 0.06;
+        materials.glass.opacity = 0.05;
+        materials.shellEdge.opacity = 0.28;
+        materials.innerEdge.opacity = 0.9;
+        materials.frame.opacity = 0.85;
+      } else if (next === "xray") {
+        texturedMaterials.forEach((material) => {
+          material.opacity = Math.min(material.opacity, 0.14);
+        });
+        materials.shell.opacity = 0.015;
+        materials.shellEdge.opacity = 0.16;
+        materials.inner.opacity = 0.34;
+        materials.innerEdge.opacity = 1;
+        materials.glass.opacity = 0.05;
+      } else if (next === "thermal") {
+        textured.forEach(({ material, key }) => {
+          material.color.set(key === "paint" ? 0xff4d17 : 0x123fa8);
+          material.opacity = Math.max(material.opacity, 0.9);
+        });
+        materials.shell.color.set(0xff4d17);
+        materials.shell.opacity = 0.22;
+        materials.inner.color.set(0x1840c4);
+        materials.inner.opacity = 0.28;
+        materials.shellEdge.color.set(0xffb03a);
+        materials.innerEdge.color.set(0x76d8ff);
+      }
     };
 
     const state = {
@@ -583,6 +726,19 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
         });
       }
 
+      // System halos breathe, and the flow dots run their routes.
+      if (haloGroup.visible) {
+        halos.forEach((halo, index) => {
+          halo.material.opacity = 0.09 + (Math.sin(time * 2 + index * 0.9) + 1) * 0.09;
+        });
+      }
+      if (flowGroup.visible) {
+        travellers.forEach((dot) => {
+          const t = (time * dot.userData.speed + dot.userData.offset) % 1;
+          dot.position.copy(dot.userData.curve.getPointAt(t));
+        });
+      }
+
       renderer.render(scene, camera);
       if (!reported) {
         reported = true;
@@ -616,6 +772,7 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     applyFocus(latest.current.focus);
     rebuildPins(latest.current.warnings);
     applyPhoto(latest.current.photos);
+    applyMode(latest.current.mode);
 
     api.current = {
       focus: applyFocus,
@@ -626,6 +783,7 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
       tags: updateTags,
       heat: applyHeat,
       photo: applyPhoto,
+      mode: applyMode,
     };
 
     return () => {
@@ -680,6 +838,12 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
   useEffect(() => {
     api.current?.photo(latest.current.photos);
   }, [photoKey]);
+
+  useEffect(() => {
+    api.current?.mode(mode);
+    // A diagnostic mode needs the model, so the photo view steps aside.
+    if (mode !== "3d") tipRef.current?.(null);
+  }, [mode]);
 
   return <div ref={hostRef} className={className} style={{ touchAction: "none" }} />;
 }

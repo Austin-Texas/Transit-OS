@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Camera, Move } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import FordTransit3D from "@/components/van/FordTransit3D";
@@ -26,12 +26,18 @@ export default function VanStage({
   warnings = [],
   focus,
   status,
+  mode = "3d",
   onClearFocus,
 }) {
   const side = focus?.side;
   const navigate = useNavigate();
   const [view, setView] = useState("3d");
   const [tip, setTip] = useState(null);
+
+  // A diagnostic mode always has something to show, so it takes the stage.
+  useEffect(() => {
+    if (mode !== "3d") setView("3d");
+  }, [mode]);
 
   return (
     <section
@@ -46,6 +52,7 @@ export default function VanStage({
           focus={focus}
           warnings={warnings}
           status={status}
+          mode={mode}
           onTip={setTip}
           onPick={(key) => {
             if (!key) return;
@@ -68,7 +75,8 @@ export default function VanStage({
 
       <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-medium text-white/70 ring-1 ring-inset ring-white/10 backdrop-blur">
         <span className="h-1.5 w-1.5 rounded-full bg-ios-teal" />
-        {view === "3d" ? "Live 3D" : "Owner photo"} · Interior {Math.round(cabinTemp)}°F
+        {view === "3d" ? (mode === "3d" ? "Live 3D" : mode.toUpperCase()) : "Owner photo"} · Interior{" "}
+        {Math.round(cabinTemp)}°F
       </div>
 
       <div className="absolute right-3 top-3 z-20 flex items-center gap-0.5 rounded-full bg-black/45 p-0.5 ring-1 ring-inset ring-white/15 backdrop-blur">

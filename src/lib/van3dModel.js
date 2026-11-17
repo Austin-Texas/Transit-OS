@@ -261,6 +261,7 @@ export function buildVanModel() {
   return {
     group,
     hotspots,
+    materials,
     padMaterial: materials.pad,
     padDotMaterial: materials.padDot,
     padDot,

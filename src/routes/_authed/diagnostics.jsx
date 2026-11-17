@@ -20,6 +20,7 @@ import VanStage from "@/components/dash/VanStage";
 import useVanVoice from "@/hooks/useVanVoice";
 import DiagramViews, { viewFocus } from "@/components/van/DiagramViews";
 import QuickChecks from "@/components/van/QuickChecks";
+import TwinModeBar from "@/components/van/TwinModeBar";
 import { siteWarnings } from "@/lib/siteWarnings";
 import { clockTime, miles, openAlerts } from "@/lib/van";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ function DiagnosticsPage() {
   const van = useVanDashboard();
   const { status, alerts, diagnostics } = van;
   const [focus, setFocus] = useState(null);
+  const [mode, setMode] = useState("3d");
 
   const warnings = useMemo(() => siteWarnings(status), [status]);
 
@@ -87,7 +89,8 @@ function DiagnosticsPage() {
     >
       <div className="grid gap-4 lg:grid-cols-2">
         <ModuleCard title="Live 3D diagnostics" icon={Box} className="lg:col-span-2">
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_250px]">
+          <div className="grid gap-3 lg:grid-cols-[140px_minmax(0,1fr)_250px]">
+            <TwinModeBar mode={mode} onSelect={setMode} />
             <VanStage
               cabinTemp={status.cabin_temp ?? status.climate_temp}
               vehicleName={status.vehicle_name}
@@ -95,6 +98,7 @@ function DiagnosticsPage() {
               warnings={warnings}
               focus={focus}
               status={status}
+              mode={mode}
               onClearFocus={() => setFocus(null)}
             />
             <DiagramViews
