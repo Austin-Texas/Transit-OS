@@ -5,13 +5,13 @@ import { cn } from "@/lib/utils";
 // The System Diagram (3D) picker: each entry turns the wireframe van to that
 // part of the vehicle and lists the readings that belong to it.
 const VIEWS = [
-  { id: "full", label: "Full Vehicle", hint: "Chassis, cabin, utilities", side: null, zone: null, dot: "bg-ios-teal" },
-  { id: "drivetrain", label: "Drivetrain", hint: "Engine, tires, fuel", side: "right", zone: "front", dot: "bg-ios-blue" },
-  { id: "electrical", label: "Electrical", hint: "House bank, solar", side: "left", zone: "underbody", dot: "bg-warn" },
-  { id: "water", label: "Water & Plumbing", hint: "Fresh, gray, black, heat pad", side: "left", zone: "rear", dot: "bg-ios-teal" },
-  { id: "lpg", label: "LPG / Gas", hint: "Propane tank", side: "left", zone: "fuel", dot: "bg-alert" },
-  { id: "climate", label: "HVAC / Climate", hint: "Cabin air", side: "right", zone: null, dot: "bg-ios-green" },
-  { id: "interior", label: "Interior (Cabin)", hint: "Living space", side: "left", zone: null, dot: "bg-ios-purple" },
+  { id: "full", label: "Full Vehicle", hint: "Chassis, cabin, utilities", side: null, zone: null },
+  { id: "drivetrain", label: "Drivetrain", hint: "Engine, tires, fuel", side: "right", zone: "front" },
+  { id: "electrical", label: "Electrical", hint: "House bank, solar", side: "left", zone: "underbody" },
+  { id: "water", label: "Water & Plumbing", hint: "Fresh, gray, black, heat pad", side: "left", zone: "rear" },
+  { id: "lpg", label: "LPG / Gas", hint: "Propane tank", side: "left", zone: "fuel" },
+  { id: "climate", label: "HVAC / Climate", hint: "Cabin air", side: "right", zone: null },
+  { id: "interior", label: "Interior (Cabin)", hint: "Living space", side: "left", zone: null },
 ];
 
 export const DIAGRAM_VIEWS = VIEWS;
@@ -95,17 +95,15 @@ export default function DiagramViews({ active = "full", onSelect, status }) {
                 className={cn(
                   "flex w-full items-center gap-2.5 rounded-2xl px-3 py-2.5 text-left ring-1 ring-inset transition duration-200",
                   isActive
-                    ? "bg-ios-blue/20 text-white ring-ios-blue/40"
-                    : "bg-white/[0.04] text-white/55 ring-white/[0.07] hover:bg-white/[0.08] hover:text-white/85"
+                    ? "bg-white/[0.14] text-white ring-white/20"
+                    : "bg-white/[0.04] text-white/60 ring-white/[0.07] hover:bg-white/[0.08] hover:text-white/90"
                 )}
               >
                 <span
                   className={cn(
-                    "h-2 w-2 shrink-0 rounded-full transition",
-                    isActive ? view.dot : "bg-white/20",
-                    isActive && "ring-2 ring-white/25"
+                    "h-6 w-6 shrink-0 rounded-full",
+                    isActive ? "bg-white" : "bg-white/10 ring-1 ring-inset ring-white/10"
                   )}
-                  aria-hidden="true"
                 />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[12px] font-semibold leading-tight">{view.label}</span>

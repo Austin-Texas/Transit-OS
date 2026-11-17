@@ -6,7 +6,7 @@ import AppDock from "./AppDock";
 import VoiceControl from "./home/VoiceControl";
 import useVanVoice from "@/hooks/useVanVoice";
 
-export default function ModuleShell({ title, subtitle, meta, status, voiceHandler, bare = false, children }) {
+export default function ModuleShell({ title, subtitle, meta, status, voiceHandler, children }) {
   const [voiceSignal, setVoiceSignal] = useState(0);
 
   // Pages that bring their own richer voice handler (diagnostics) pass it in;
@@ -38,15 +38,13 @@ export default function ModuleShell({ title, subtitle, meta, status, voiceHandle
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-3 lg:overflow-y-auto lg:pr-1">
-          {bare ? null : (
-            <div className="flex flex-wrap items-end justify-between gap-2">
-              <div className="min-w-0">
-                <h1 className="truncate text-[19px] font-semibold tracking-tight text-white">{title}</h1>
-                {subtitle ? <p className="truncate text-[11.5px] text-white/40">{subtitle}</p> : null}
-              </div>
-              {meta}
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div className="min-w-0">
+              <h1 className="truncate text-[19px] font-semibold tracking-tight text-white">{title}</h1>
+              {subtitle ? <p className="truncate text-[11.5px] text-white/40">{subtitle}</p> : null}
             </div>
-          )}
+            {meta}
+          </div>
 
           {children ?? (
             <div className="flex items-center gap-3 self-start rounded-full border border-line bg-surface px-5 py-2.5">
