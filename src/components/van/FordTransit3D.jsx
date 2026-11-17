@@ -8,6 +8,12 @@ import { TANK_CAPACITY_GAL, gallonsFrom } from "@/lib/van";
 
 const RED = 0xff3131;
 const GREEN = 0x00ff41;
+const CYAN = 0x33ccff;
+const GREY = 0x8e8e93;
+
+// Callout tones: the reference reads faults in red, healthy parts in green and
+// anything that is a measurement rather than a state in cyan.
+const TONES = { ok: "#00ff41", alert: "#ff3b30", info: "#33ccff", muted: "#8e8e93" };
 
 // Camera angle that puts a fault in view: the flank it sits on, angled toward
 // the corner it belongs to. Underbody faults drop the camera below the van.
@@ -153,10 +159,10 @@ function roundRect(ctx, x, y, w, h, r) {
 
 // The black callout box from the reference view, drawn into a canvas sprite so
 // it always faces the camera.
-function createTag() {
+function createTag(flip = false) {
   const canvas = document.createElement("canvas");
   canvas.width = 512;
-  canvas.height = 128;
+  canvas.height = 140;
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   const material = new THREE.SpriteMaterial({
@@ -166,30 +172,35 @@ function createTag() {
     depthWrite: false,
   });
   const sprite = new THREE.Sprite(material);
-  sprite.center.set(0, 0.5);
-  sprite.scale.set(1.95, 0.49, 1);
+  // A box on the left of the van grows leftward so it never covers the body.
+  sprite.center.set(flip ? 1 : 0, 0.5);
+  sprite.scale.set(2.05, 0.56, 1);
   sprite.renderOrder = 20;
   sprite.userData.canvas = canvas;
   sprite.userData.texture = texture;
   return sprite;
 }
 
-function paintTag(sprite, text, alert) {
+function paintTag(sprite, title, value, tone = "ok") {
   const { canvas, texture } = sprite.userData;
   const ctx = canvas.getContext("2d");
+  const accent = TONES[tone] ?? TONES.ok;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  roundRect(ctx, 3, 12, 506, 104, 26);
-  ctx.fillStyle = "rgba(4, 10, 16, 0.84)";
+  roundRect(ctx, 3, 6, 506, 128, 26);
+  ctx.fillStyle = "rgba(3, 9, 16, 0.86)";
   ctx.fill();
   ctx.lineWidth = 3;
-  ctx.strokeStyle = "rgba(150, 226, 255, 0.34)";
+  ctx.strokeStyle = "rgba(120, 210, 255, 0.32)";
   ctx.stroke();
-  ctx.fillStyle = alert ? "#ff3b30" : "#00ff41";
-  ctx.fillRect(22, 42, 7, 44);
-  ctx.font = "600 40px Inter, Arial, sans-serif";
-  ctx.fillStyle = "#eaf7ff";
+  ctx.fillStyle = accent;
+  ctx.fillRect(22, 28, 7, 84);
   ctx.textBaseline = "middle";
-  ctx.fillText(text, 46, 66);
+  ctx.font = "600 38px Inter, Arial, sans-serif";
+  ctx.fillStyle = "#eaf7ff";
+  ctx.fillText(title, 46, 52);
+  ctx.font = "600 31px Inter, Arial, sans-serif";
+  ctx.fillStyle = accent;
+  ctx.fillText(value, 46, 96);
   texture.needsUpdate = true;
 }
 
@@ -257,6 +268,38 @@ export default function FordTransit3D({
     rimLight.position.set(-5, 3, -4.5);
     scene.add(keyLight, rimLight);
 
+    // The glowing pedestal from the reference: a dim disc under the van inside
+    // two concentric rings, so the twin stands on a holographic base.
+    const base = new THREE.Group();
+    base.position.y = 0.03;
+    const disc = new THREE.Mesh(
+      new THREE.CircleGeometry(3.4, 72),
+      new THREE.MeshBasicMaterial({ color: 0x0a84ff, transparent: true, opacity: 0.1, depthWrite: false })
+    );
+    disc.rotation.x = -Math.PI / 2;
+    base.add(disc);
+    const baseRings = [
+      [3.4, 0.05, 0.5],
+      [2.75, 0.02, 0.22],
+      [1.95, 0.012, 0.13],
+    ].map(([radius, width, opacity]) => {
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(radius - width, radius, 96),
+        new THREE.MeshBasicMaterial({
+          color: 0x64d2ff,
+          transparent: true,
+          opacity,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        })
+      );
+      ring.rotation.x = -Math.PI / 2;
+      ring.userData.baseOpacity = opacity;
+      base.add(ring);
+      return ring;
+    });
+    scene.add(base);
+
     // The maps download in the background; the stage shows its wireframe until
     // they land, then dresses every panel at once.
     let disposed = false;
@@ -314,32 +357,74 @@ export default function FordTransit3D({
       });
     };
 
-    // Status callouts, as in the reference: one on the rear cabin, one on the
-    // habitation panel.
-    const rearTag = createTag();
-    rearTag.position.set(-0.55, 2.3, -1.12);
-    const rearDot = new THREE.Mesh(
-      new THREE.SphereGeometry(0.075, 14, 14),
-      new THREE.MeshBasicMaterial({ color: RED })
-    );
-    rearDot.position.copy(rearTag.position);
-    const cabinTag = createTag();
-    cabinTag.position.set(0.8, 1.28, 1.1);
-    const cabinDot = new THREE.Mesh(
-      new THREE.SphereGeometry(0.075, 14, 14),
-      new THREE.MeshBasicMaterial({ color: GREEN })
-    );
-    cabinDot.position.copy(cabinTag.position);
-    scene.add(rearTag, rearDot, cabinTag, cabinDot);
+    // The holographic callouts from the reference: one panel per monitored part,
+    // pinned to the spot it reports on and carrying that part's live reading.
+    const CALLOUTS = [
+      { key: "engine", title: "Engine", at: [2.3, 1.15, 1.06], flip: false },
+      { key: "solar", title: "Solar Panels", at: [0.15, 3.05, -0.45], flip: false },
+      { key: "aircon", title: "Roof AC", at: [0.5, 2.7, 0.62], flip: true },
+      { key: "fresh", title: "Fresh Water", at: [-2.35, 1.15, -1.08], flip: true },
+      { key: "inverter", title: "Inverter", at: [-0.72, 0.85, 1.12], flip: false },
+      { key: "gray", title: "Gray Water", at: [-2.5, 0.26, 1.12], flip: false },
+      { key: "house", title: "House Battery", at: [-0.7, 0.46, -1.12], flip: true },
+    ].map((entry) => {
+      const tag = createTag(entry.flip);
+      tag.position.set(entry.at[0], entry.at[1], entry.at[2]);
+      const dot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.075, 14, 14),
+        new THREE.MeshBasicMaterial({ color: GREEN })
+      );
+      dot.position.copy(tag.position);
+      scene.add(tag, dot);
+      return { ...entry, tag, dot };
+    });
 
     const updateTags = () => {
-      const rearAlert = latest.current.warnings.length > 0;
-      paintTag(rearTag, rearAlert ? "REAR CABIN" : "REAR CABIN OK", rearAlert);
-      rearDot.material.color.set(rearAlert ? RED : GREEN);
-      const temp = Number(latest.current.status?.cabin_temp ?? 72);
-      const cabinAlert = temp < 58 || temp > 82;
-      paintTag(cabinTag, cabinAlert ? "CABIN FAULT" : "CABIN OK", cabinAlert);
-      cabinDot.material.color.set(cabinAlert ? RED : GREEN);
+      const data = latest.current.status ?? {};
+      const warn = latest.current.warnings ?? [];
+      const number = (value) => {
+        if (value === null || value === undefined || value === "") return null;
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : null;
+      };
+      const levelTone = (value) => {
+        const parsed = number(value);
+        if (parsed === null) return "muted";
+        return parsed <= 20 ? "alert" : "info";
+      };
+      const levelText = (value) =>
+        number(value) === null ? "No report" : `${Math.round(number(value))} %`;
+
+      const volts = number(data.battery_voltage);
+      const house = number(data.battery_percent);
+      const solar = number(data.solar_w);
+      const load = number(data.load_w);
+
+      const values = {
+        engine: warn.length ? ["Fault detected", "alert"] : ["OK", "ok"],
+        solar: solar === null ? ["No report", "muted"] : [`${Math.round(solar)} W · OK`, "ok"],
+        aircon:
+          data.climate_mode === "off"
+            ? ["Off", "muted"]
+            : number(data.climate_temp) === null
+              ? ["No report", "muted"]
+              : [`${Math.round(number(data.climate_temp))}°F · OK`, "ok"],
+        fresh: [levelText(data.fresh_water), levelTone(data.fresh_water)],
+        inverter: load === null ? ["No report", "muted"] : [`${Math.round(load)} W · OK`, "ok"],
+        gray: [levelText(data.gray_water), levelTone(data.gray_water)],
+        house: [
+          `${show(volts, 1, "V")} · ${house !== null && house <= 30 ? "Low" : "OK"}`,
+          volts === null ? "muted" : house !== null && house <= 30 ? "alert" : "ok",
+        ],
+      };
+
+      CALLOUTS.forEach((callout) => {
+        const [value, tone] = values[callout.key] ?? ["—", "muted"];
+        paintTag(callout.tag, callout.title, value, tone);
+        callout.dot.material.color.set(
+          tone === "alert" ? RED : tone === "info" ? CYAN : tone === "muted" ? GREY : GREEN
+        );
+      });
     };
 
     // The pad is tinted by what the controller reported: heating amber, holding
@@ -378,9 +463,9 @@ export default function FordTransit3D({
       padAlert.add(ring);
       return ring;
     });
-    const padAlertTag = createTag();
+    const padAlertTag = createTag(true);
     padAlertTag.position.set(-3.15, 0.46, 0.92);
-    paintTag(padAlertTag, "HEAT PAD FAILURE", true);
+    paintTag(padAlertTag, "Heat pad", "Failure", "alert");
     padAlert.add(padAlertTag);
     scene.add(padAlert);
 
@@ -713,8 +798,12 @@ export default function FordTransit3D({
         ring.scale.setScalar(1 + Math.sin(time * 3 + ring.userData.phase) * 0.22);
         ring.material.opacity = pulse;
       });
-      rearDot.scale.setScalar(1 + Math.sin(time * 2.4) * 0.18);
-      cabinDot.scale.setScalar(1 + Math.sin(time * 2.4 + 1) * 0.18);
+      CALLOUTS.forEach((callout, index) => {
+        callout.dot.scale.setScalar(1 + Math.sin(time * 2.4 + index * 0.7) * 0.16);
+      });
+      baseRings.forEach((ring, index) => {
+        ring.material.opacity = ring.userData.baseOpacity * (0.7 + Math.abs(Math.sin(time * 1.3 + index)) * 0.55);
+      });
       padMaterial.opacity = 0.72 + Math.sin(time * 2) * 0.18;
       // A faulted heat pad pulses, so the red dot is easy to find under the van.
       padDot.scale.setScalar(faulted ? 1.5 + Math.abs(Math.sin(time * 3.4)) * 0.7 : 1);
@@ -829,7 +918,7 @@ export default function FordTransit3D({
 
   useEffect(() => {
     api.current?.tags();
-  }, [warningKey, status?.cabin_temp]);
+  }, [warningKey, status]);
 
   useEffect(() => {
     api.current?.heat(padKey);

@@ -151,7 +151,7 @@ export default function VanStage({
       {view === "3d" && !(spin && mode === "3d") ? (
         <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
           <Move className="h-3 w-3" strokeWidth={2.2} />
-          Swipe to spin · tap a part to open its module
+          Drag to spin · tap a part to open its module
         </div>
       ) : null}
 

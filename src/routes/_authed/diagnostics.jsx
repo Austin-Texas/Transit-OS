@@ -99,7 +99,6 @@ function DiagnosticsPage() {
               focus={focus}
               status={status}
               mode={mode}
-              spin
               onClearFocus={() => setFocus(null)}
             />
             <DiagramViews
