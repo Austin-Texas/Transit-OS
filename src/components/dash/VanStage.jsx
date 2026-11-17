@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Camera, Move } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import FordTransit3D from "@/components/van/FordTransit3D";
+import VanSpin from "@/components/van/VanSpin";
 import HotspotTip from "@/components/van/HotspotTip";
 import VanPhoto from "@/components/van/VanPhoto";
 import { VAN_IMAGE } from "@/lib/van";
@@ -27,6 +28,7 @@ export default function VanStage({
   focus,
   status,
   mode = "3d",
+  spin = false,
   onClearFocus,
 }) {
   const side = focus?.side;
@@ -46,7 +48,9 @@ export default function VanStage({
         focus ? "border-ios-pink/50" : "border-white/10"
       )}
     >
-      {view === "3d" ? (
+      {view === "3d" && spin && mode === "3d" ? (
+        <VanSpin side={side} />
+      ) : view === "3d" ? (
         <FordTransit3D
           className="absolute inset-0 h-full w-full"
           focus={focus}
@@ -75,8 +79,14 @@ export default function VanStage({
 
       <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-medium text-white/70 ring-1 ring-inset ring-white/10 backdrop-blur">
         <span className="h-1.5 w-1.5 rounded-full bg-ios-teal" />
-        {view === "3d" ? (mode === "3d" ? "Live 3D" : mode.toUpperCase()) : "Owner photo"} · Interior{" "}
-        {Math.round(cabinTemp)}°F
+        {view === "3d"
+          ? mode !== "3d"
+            ? mode.toUpperCase()
+            : spin
+              ? "360 spin"
+              : "Live 3D"
+          : "Owner photo"}{" "}
+        · Interior {Math.round(cabinTemp)}°F
       </div>
 
       <div className="absolute right-3 top-3 z-20 flex items-center gap-0.5 rounded-full bg-black/45 p-0.5 ring-1 ring-inset ring-white/15 backdrop-blur">
@@ -132,7 +142,7 @@ export default function VanStage({
 
       <HotspotTip tip={tip} />
 
-      {view === "3d" ? (
+      {view === "3d" && !(spin && mode === "3d") ? (
         <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
           <Move className="h-3 w-3" strokeWidth={2.2} />
           Swipe to spin · tap a part to open its module

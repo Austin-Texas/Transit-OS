@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 // The ways the digital twin can be looked at, in the order the reference
 // layout lists them.
 export const TWIN_MODES = [
-  { id: "3d", label: "3D view", icon: Box, hint: "Drag to spin · tap a part to open its module" },
+  { id: "3d", label: "3D view", icon: Box, hint: "Drag the van to spin it through a full turn" },
   { id: "systems", label: "Systems", icon: Network, hint: "Every monitored system lit on the body" },
   { id: "xray", label: "X-ray", icon: Scan, hint: "Outer panels drop away, the build shows through" },
   { id: "thermal", label: "Thermal", icon: Thermometer, hint: "Warm zones glowing, cool zones blue" },
