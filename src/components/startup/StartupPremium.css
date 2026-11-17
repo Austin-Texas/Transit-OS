@@ -4,18 +4,18 @@
 .tp-movie *{box-sizing:border-box}
 .tp-movie__light-field{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 .tp-movie__veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 78%,transparent 0%,#0008 60%,#000e 100%)}
-.tp-movie__flare{position:absolute;z-index:2;top:57%;left:50%;width:min(46vw,550px);height:2px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,#008dff,#dcffff,#008dff,transparent);box-shadow:0 0 18px 4px #008cff,0 0 75px 18px #007bff80;opacity:0;animation:tp-flare 6s ease-in-out both;pointer-events:none}
-.tp-movie__tagline{position:absolute;z-index:3;top:80%;left:0;width:100%;text-align:center;font-size:clamp(8px,1vw,13px);letter-spacing:.36em;color:#b5c4d8;opacity:0;animation:tp-tagline 6s ease both}
-.tp-movie__identity{position:absolute;z-index:3;left:50%;top:45%;width:min(70vw,470px);display:flex;flex-direction:column;align-items:center;gap:10px;transform:translate(-50%,-50%);animation:tp-identity 6s cubic-bezier(.3,.2,.3,1) both;will-change:transform,opacity}
-.tp-movie__identity img{width:clamp(100px,17vh,190px);height:clamp(125px,24vh,230px);object-fit:contain;filter:drop-shadow(0 0 22px #007bff55);opacity:0;animation:tp-symbol 6s cubic-bezier(.25,.6,.25,1) both;will-change:transform,opacity}
-.tp-movie__company{font-size:clamp(25px,3.5vw,49px);font-weight:750;letter-spacing:.24em;padding-left:.24em;opacity:0;animation:tp-company 6s ease both}
-.tp-movie__presents{display:flex;align-items:center;justify-content:center;gap:15px;letter-spacing:.48em;font-size:clamp(10px,1.2vw,16px);margin-top:5px;opacity:0;animation:tp-presents 6s ease both}
+.tp-movie__flare{position:absolute;z-index:2;top:57%;left:50%;width:min(46vw,550px);height:2px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,#008dff,#dcffff,#008dff,transparent);box-shadow:0 0 18px 4px #008cff,0 0 75px 18px #007bff80;opacity:0;animation:tp-flare 9s ease-in-out both;pointer-events:none}
+.tp-movie__tagline{position:absolute;z-index:3;top:80%;left:0;width:100%;text-align:center;font-size:clamp(8px,1vw,13px);letter-spacing:.36em;color:#b5c4d8;opacity:0;animation:tp-tagline 9s ease both}
+.tp-movie__identity{position:absolute;z-index:3;left:50%;top:45%;width:min(70vw,470px);display:flex;flex-direction:column;align-items:center;gap:10px;transform:translate(-50%,-50%);animation:tp-identity 9s cubic-bezier(.3,.2,.3,1) both;will-change:transform,opacity}
+.tp-movie__identity img{width:clamp(100px,17vh,190px);height:clamp(125px,24vh,230px);object-fit:contain;filter:drop-shadow(0 0 22px #007bff55);opacity:0;animation:tp-symbol 9s cubic-bezier(.25,.6,.25,1) both;will-change:transform,opacity}
+.tp-movie__company{font-size:clamp(25px,3.5vw,49px);font-weight:750;letter-spacing:.24em;padding-left:.24em;opacity:0;animation:tp-company 9s ease both}
+.tp-movie__presents{display:flex;align-items:center;justify-content:center;gap:15px;letter-spacing:.48em;font-size:clamp(10px,1.2vw,16px);margin-top:5px;opacity:0;animation:tp-presents 9s ease both}
 .tp-movie__presents i{height:1px;width:clamp(25px,6vw,80px);background:#4aa9d4}
-.tp-movie__product{position:absolute;z-index:3;top:45%;left:50%;width:min(94vw,1000px);transform:translate(-50%,-50%);text-align:center;opacity:0;animation:tp-product 6s cubic-bezier(.2,.7,.2,1) both}
+.tp-movie__product{position:absolute;z-index:3;top:45%;left:50%;width:min(94vw,1000px);transform:translate(-50%,-50%);text-align:center;opacity:0;animation:tp-product 9s cubic-bezier(.2,.7,.2,1) both}
 .tp-movie__product h1,.tp-movie__ready h2{font-weight:800;font-style:italic;letter-spacing:-.055em;font-size:clamp(54px,10vw,128px);margin:0;text-shadow:0 0 30px #fff5}
 .tp-movie__product h1 span,.tp-movie__ready h2 span,.tp-movie__initializing h2 span{color:#00d9ff;text-shadow:0 0 22px #00aaff88}
 .tp-movie__product p{font-size:clamp(9px,1.25vw,17px);letter-spacing:.16em;color:#c8e3ff;margin:14px 0}
-.tp-movie__initializing{position:absolute;z-index:3;top:50%;left:50%;width:min(84vw,650px);transform:translate(-50%,-50%);opacity:0;animation:tp-initialize 6s ease both}
+.tp-movie__initializing{position:absolute;z-index:3;top:50%;left:50%;width:min(84vw,650px);transform:translate(-50%,-50%);opacity:0;animation:tp-initialize 9s ease both}
 .tp-movie__initializing h2{font-size:clamp(20px,3.2vw,38px);font-weight:500;margin:0 0 18px}
 .tp-movie__progress{width:83%;height:19px;display:inline-block;vertical-align:middle;background:#07172b;border:1px solid #2b4763;border-radius:30px;overflow:hidden}
 .tp-movie__progress>div{height:100%;background:linear-gradient(90deg,#1473ff,#00e3ff);border-radius:30px;box-shadow:0 0 15px #00baff;transition:width .15s linear}
@@ -25,7 +25,7 @@
 .tp-movie__task-icon{color:#39baff;font-size:20px}
 .tp-movie__tasks small{margin-left:auto;text-transform:uppercase;color:#6dd8ff;font-size:10px}
 .tp-movie__hardware{margin-top:15px;font-size:10px;letter-spacing:.13em;color:#7a9db9}
-.tp-movie__ready{position:absolute;z-index:3;left:50%;top:50%;width:90%;text-align:center;transform:translate(-50%,-50%);opacity:0;animation:tp-ready 6s ease both}
+.tp-movie__ready{position:absolute;z-index:3;left:50%;top:50%;width:90%;text-align:center;transform:translate(-50%,-50%);opacity:0;animation:tp-ready 9s ease both}
 .tp-movie__check{display:grid;place-items:center;width:74px;height:74px;border:3px solid #00dfff;border-radius:50%;margin:0 auto 20px;color:#c7ffff;font-size:42px;box-shadow:0 0 24px #00aaff8c}
 .tp-movie__ready h2{font-size:clamp(52px,8vw,100px)}
 .tp-movie__ready p{letter-spacing:.45em;font-size:clamp(13px,1.7vw,20px);margin:12px 0}
@@ -83,4 +83,4 @@
   94%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
 }
 @media(max-width:600px){.tp-movie__identity{top:44%}.tp-movie__product{top:48%}.tp-movie__initializing{width:88vw}.tp-movie__progress{width:78%}.tp-movie__tasks{gap:7px}.tp-movie__hardware{font-size:8px}}
-@media(prefers-reduced-motion:reduce){.tp-movie__identity,.tp-movie__identity img,.tp-movie__company,.tp-movie__presents,.tp-movie__product,.tp-movie__initializing,.tp-movie__ready,.tp-movie__flare,.tp-movie__tagline{animation-duration:6s!important}}
+@media(prefers-reduced-motion:reduce){.tp-movie__identity,.tp-movie__identity img,.tp-movie__company,.tp-movie__presents,.tp-movie__product,.tp-movie__initializing,.tp-movie__ready,.tp-movie__flare,.tp-movie__tagline{animation-duration:9s!important}}
