@@ -23,7 +23,6 @@ export default function StartupSequence({ onDone }) {
     const controller = new AbortController();
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
     const began = performance.now();
     // Canvas animates independently; update the UI at 20 Hz.
     const timer = window.setInterval(() => setElapsed(performance.now() - began), 50);
@@ -58,7 +57,6 @@ export default function StartupSequence({ onDone }) {
     const timer = setTimeout(() => onDoneRef.current?.(), EXIT_DURATION);
     return () => clearTimeout(timer);
   }, [closing]);
-
   const hardware = checks.controller === "ready" && checks.sensors === "ready"
     ? "VEHICLE HARDWARE CONNECTED"
     : checks.controller === "simulated" || checks.sensors === "simulated"

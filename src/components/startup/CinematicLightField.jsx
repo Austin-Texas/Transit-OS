@@ -101,7 +101,7 @@ export default function CinematicLightField({ stage }) {
         const distance = particle.distance * Math.min(width, height) * .65;
         const x = cx + Math.cos(particle.angle) * distance;
         const y = horizon - Math.abs(Math.sin(particle.angle)) * distance * .95;
-        const flicker = .15 + .35 * (0.5 + 0.5 * Math.sin(t * .8 + particle.phase));
+        const flicker = .15 + .35 * (0.5 + .5 * Math.sin(t * .8 + particle.phase));
         context.beginPath();
         context.arc(x,y,particle.radius,0,Math.PI*2);
         context.fillStyle="rgba(58,192,255,"+flicker+")";
