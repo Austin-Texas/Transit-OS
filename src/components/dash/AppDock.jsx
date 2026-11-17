@@ -10,6 +10,7 @@ import {
   MapPin,
   Mic,
   Orbit,
+  Box,
   Clapperboard,
   Snowflake,
   Zap,
@@ -20,6 +21,7 @@ import { cn } from "@/lib/utils";
 
 const DOCK = [
   { id: "home", label: "Home", icon: LayoutGrid, to: "/" },
+  { id: "digital-twin", label: "Twin", icon: Box, to: "/digital-twin" },
   { id: "diagnostics", label: "Diagnostics", icon: Activity, to: "/diagnostics" },
   { id: "cabin", label: "Cabin", icon: BedDouble, to: "/camper" },
   { id: "climate", label: "Climate", icon: Snowflake, to: "/climate" },
