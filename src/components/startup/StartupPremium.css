@@ -84,3 +84,20 @@
 }
 @media(max-width:600px){.tp-movie__identity{top:44%}.tp-movie__product{top:48%}.tp-movie__initializing{width:88vw}.tp-movie__progress{width:78%}.tp-movie__tasks{gap:7px}.tp-movie__hardware{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.tp-movie__identity,.tp-movie__identity img,.tp-movie__company,.tp-movie__presents,.tp-movie__product,.tp-movie__initializing,.tp-movie__ready,.tp-movie__flare,.tp-movie__tagline{animation-duration:9s!important}}
+
+/* Long boot-progress scene: keep the existing logo reveal timing unchanged. */
+.tp-movie__initializing{animation:tp-long-initialize 10s ease both;animation-delay:6.75s}
+.tp-movie__ready{animation:tp-long-ready 1.25s ease both;animation-delay:15.75s}
+@keyframes tp-long-initialize{
+  0%{opacity:0;transform:translate(-50%,-47%)}
+  8%,89%{opacity:1;transform:translate(-50%,-50%)}
+  97%,100%{opacity:0;transform:translate(-50%,-52%)}
+}
+@keyframes tp-long-ready{
+  0%{opacity:0;transform:translate(-50%,-46%) scale(.96)}
+  65%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+}
+@media(prefers-reduced-motion:reduce){
+  .tp-movie__initializing{animation-duration:10s!important}
+  .tp-movie__ready{animation-duration:1.25s!important}
+}
