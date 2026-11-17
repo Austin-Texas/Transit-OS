@@ -1,9 +1,6 @@
-import { useState } from "react";
 import { ArrowLeft, ArrowRight, Camera, Move } from "lucide-react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import Van3DImageStage from "@/components/van/Van3DImageStage";
-import VanPhoto from "@/components/van/VanPhoto";
-import { VAN_IMAGE } from "@/lib/van";
+import FordTransit3D from "@/components/van/FordTransit3D";
 import { cn } from "@/lib/utils";
 
 // Every part of the van opens the module that looks after it.
@@ -16,8 +13,9 @@ const PART_MODULES = {
   cabin: "/camper",
 };
 
-// The home stage: the neon wireframe van you can spin with a finger, plus a
-// photo view, exactly like the reference dashboard layout.
+// The diagnostics stage: the van model, skinned with the owner's own van photo,
+// that you can drag to flip all the way round. Every part is a tap target that
+// opens the module responsible for that system.
 export default function VanStage({
   cabinTemp,
   vehicleName,
@@ -29,7 +27,6 @@ export default function VanStage({
 }) {
   const side = focus?.side;
   const navigate = useNavigate();
-  const [view, setView] = useState("3d");
 
   return (
     <section
@@ -38,49 +35,23 @@ export default function VanStage({
         focus ? "border-ios-pink/50" : "border-white/10"
       )}
     >
-      {view === "3d" ? (
-        <Van3DImageStage
-          status={status}
-          onPick={(key) => {
-            const to = PART_MODULES[key];
-            if (!to) return;
-            navigate({ to });
-          }}
-        />
-      ) : (
-        <VanPhoto
-          uri={status?.van_photo_uri}
-          fallback={VAN_IMAGE}
-          alt="Your camper van"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      )}
+      <FordTransit3D
+        className="absolute inset-0 h-full w-full"
+        focus={focus}
+        warnings={warnings}
+        status={status}
+        onPick={(key) => {
+          const to = PART_MODULES[key];
+          if (!to) return;
+          navigate({ to });
+        }}
+      />
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(78%_68%_at_50%_44%,transparent_42%,rgba(2,6,11,0.6)_100%)]" />
 
       <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-medium text-white/70 ring-1 ring-inset ring-white/10 backdrop-blur">
         <span className="h-1.5 w-1.5 rounded-full bg-ios-teal" />
-        {view === "3d" ? "Live 3D" : "Owner photo"} · Interior {Math.round(cabinTemp)}°F
-      </div>
-
-      <div className="absolute right-3 top-3 z-20 flex items-center gap-0.5 rounded-full bg-black/45 p-0.5 ring-1 ring-inset ring-white/15 backdrop-blur">
-        {[
-          ["3d", "3D"],
-          ["photo", "Photo"],
-        ].map(([id, label]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setView(id)}
-            aria-pressed={view === id}
-            className={cn(
-              "rounded-full px-2.5 py-1 text-[10.5px] font-semibold transition",
-              view === id ? "bg-white/90 text-ink-950" : "text-white/60 hover:text-white"
-            )}
-          >
-            {label}
-          </button>
-        ))}
+        Live 3D · Interior {Math.round(cabinTemp)}°F
       </div>
 
       {focus ? (
@@ -114,12 +85,10 @@ export default function VanStage({
         <p className="text-[9.5px] uppercase leading-snug tracking-[0.18em] text-white/45">{trim}</p>
       </div>
 
-      {view === "3d" ? (
-        <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
-          <Move className="h-3 w-3" strokeWidth={2.2} />
-          Tap a part to open its module
-        </div>
-      ) : null}
+      <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
+        <Move className="h-3 w-3" strokeWidth={2.2} />
+        Drag to flip the van · tap a part to open its module
+      </div>
 
       <Link
         to="/settings"
