@@ -13,7 +13,7 @@ const MOTION_WINDOW_MS = 10 * 60 * 1000;
 
 // Turns the latest van readings and camera motion stamps into the alert
 // conditions the dashboard should be showing right now.
-export function evaluateAlertConditions(status, cameras = [], now = Date.now(), maintenance = []) {
+export function evaluateAlertConditions(status, cameras = [], now = Date.now(), maintenance = [], modules = []) {
   if (!status) return [];
   const conditions = [];
 
@@ -142,6 +142,31 @@ export function evaluateAlertConditions(status, cameras = [], now = Date.now(), 
       severity: "warning",
       title: `${item.name} due for service`,
       detail: `${remainingText(state)}${Number.isFinite(odometer) ? ` · odometer ${formatMiles(odometer)}` : ""}`,
+    });
+  }
+
+  // Installed modules that stopped answering or are limping. Only live hardware
+  // counts: a registry entry that was never commissioned is not a fault.
+  for (const module of modules) {
+    if (!module?.module_id || module.environment !== "live") continue;
+    const offline = module.connection_status === "offline";
+    if (!offline && module.connection_status !== "degraded") continue;
+    const seenAt = module.last_seen ? new Date(module.last_seen) : null;
+    const signal = num(module.rssi);
+    conditions.push({
+      key: `${PREFIX}module:${module.module_id}`,
+      severity: offline ? "critical" : "warning",
+      title: `${module.name ?? module.module_id} ${offline ? "offline" : "degraded"}`,
+      detail: [
+        module.location,
+        module.model,
+        seenAt && Number.isFinite(seenAt.getTime())
+          ? `last seen ${seenAt.toISOString().slice(0, 16).replace("T", " ")} UTC`
+          : "never reported",
+        !offline && signal !== null ? `signal ${round(signal)} dBm` : null,
+      ]
+        .filter(Boolean)
+        .join(" · "),
     });
   }
 

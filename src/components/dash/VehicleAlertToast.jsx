@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, ChevronRight, ShieldAlert, TriangleAlert, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronRight, Cpu, ShieldAlert, TriangleAlert, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const RANK = { critical: 0, warning: 1, info: 2 };
@@ -13,12 +13,13 @@ export default function VehicleAlertToast({ alerts = [], warnings = [], onLocate
   useEffect(() => {
     const merged = [
       ...alerts
-        .filter((alert) => alert.status !== "resolved" && (alert.side === "left" || alert.side === "right"))
+        .filter((alert) => alert.status !== "resolved")
         .map((alert) => ({
           id: alert.id,
           title: alert.title,
           detail: alert.detail,
-          side: alert.side,
+          // A module fault has no side of the van to turn to.
+          side: alert.side === "left" || alert.side === "right" ? alert.side : null,
           zone: "side",
           severity: alert.severity ?? "warning",
         })),
@@ -77,8 +78,12 @@ export default function VehicleAlertToast({ alerts = [], warnings = [], onLocate
               critical ? "border-alert/40 text-alert/90" : "border-warn/40 text-warn/90"
             )}
           >
-            <SideIcon className="h-2.5 w-2.5" strokeWidth={2.6} />
-            {item.side}
+            {item.side ? (
+              <SideIcon className="h-2.5 w-2.5" strokeWidth={2.6} />
+            ) : (
+              <Cpu className="h-2.5 w-2.5" strokeWidth={2.6} />
+            )}
+            {item.side ?? "module"}
           </span>
           <ChevronRight className="h-3.5 w-3.5 shrink-0 text-white/35" strokeWidth={2.2} />
         </button>

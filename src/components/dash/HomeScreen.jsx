@@ -19,6 +19,7 @@ import VehicleCard from "@/components/van/VehicleCard";
 import AlertsPanel from "@/components/van/AlertsPanel";
 import DiagnosticsDialog from "@/components/van/DiagnosticsDialog";
 import VehicleAlertToast from "./VehicleAlertToast";
+import ModulesStatusPanel from "./ModulesStatusPanel";
 
 export default function HomeScreen() {
   const van = useVanDashboard();
@@ -130,6 +131,7 @@ export default function HomeScreen() {
                 onDiagnostics={() => setDiagnosticsOpen(true)}
               />
             </div>
+            <ModulesStatusPanel status={status} modules={van.modules} offline={van.offline} />
             <HardwareLink status={status} offline={van.offline} />
           </div>
         </div>

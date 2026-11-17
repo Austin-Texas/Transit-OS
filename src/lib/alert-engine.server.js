@@ -4,14 +4,22 @@ import { evaluateAlertConditions, ownsAlert } from "@/lib/alert-rules";
 // one open alert per condition, refreshed while it lasts, closed once the
 // reading is back in range. Alerts raised by other sources are left alone.
 export async function syncAlerts(entities) {
-  const [vanPage, cameras, maintenance, openPage] = await Promise.all([
+  const [vanPage, cameras, maintenance, modules, openPage] = await Promise.all([
     entities.VanStatus.filter({}, { sort: "-created_date", limit: 1 }),
     entities.Camera.list("created_date", 20),
     entities.MaintenanceItem.list("created_date", 200),
+    // A caller who may not read the registry still gets every other rule.
+    entities.Module.list("created_date", 100).catch(() => []),
     entities.Alert.filter({ alert_key: { $regex: "^auto:" } }, { sort: "-created_date", limit: 50 }),
   ]);
 
-  const conditions = evaluateAlertConditions(vanPage.items?.[0], cameras, Date.now(), maintenance);
+  const conditions = evaluateAlertConditions(
+    vanPage.items?.[0],
+    cameras,
+    Date.now(),
+    maintenance,
+    modules
+  );
   const open = openPage.items ?? [];
 
   const pending = new Map(open.map((alert) => [alert.alert_key, alert]));

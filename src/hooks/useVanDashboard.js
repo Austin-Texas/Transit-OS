@@ -16,6 +16,7 @@ const DEMO_STATUS = {
 export default function useVanDashboard() {
   const [status, setStatus] = useState(PUBLIC_DEMO ? DEMO_STATUS : null);
   const [alerts, setAlerts] = useState([]);
+  const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(!PUBLIC_DEMO);
   const [offline, setOffline] = useState(false);
 
@@ -24,8 +25,10 @@ export default function useVanDashboard() {
     try {
       const vanPage = await base44.entities.VanStatus.filter({}, { sort: "-created_date", limit: 1 });
       const alertPage = await base44.entities.Alert.filter({ status: "open" }, { sort: "-created_date", limit: 20 });
+      const moduleList = await base44.entities.Module.list("-created_date", 50).catch(() => []);
       setStatus(vanPage.items?.[0] ?? null);
       setAlerts(alertPage.items ?? []);
+      setModules(moduleList ?? []);
       setOffline(false);
     } catch (error) {
       console.error(error);
@@ -96,6 +99,29 @@ export default function useVanDashboard() {
     };
   }, []);
 
+  // A module changing state (offline, degraded, back online) raises or clears
+  // its fault within a second, without waiting for a reload.
+  useEffect(() => {
+    if (PUBLIC_DEMO) return undefined;
+    let timer = null;
+    const unsubscribe = base44.entities.Module.subscribe((event) => {
+      if (event.type === "delete") {
+        setModules((prev) => prev.filter((module) => module.id !== event.data.id));
+      } else {
+        setModules((prev) => [event.data, ...prev.filter((module) => module.id !== event.data.id)]);
+      }
+      if (timer) return;
+      timer = setTimeout(() => {
+        timer = null;
+        sync();
+      }, 1200);
+    });
+    return () => {
+      if (timer) clearTimeout(timer);
+      unsubscribe();
+    };
+  }, [sync]);
+
   // Applies a change everywhere at once and saves it to the van record.
   const update = async (patch) => {
     setStatus((prev) => (prev ? { ...prev, ...patch } : prev));
@@ -128,6 +154,7 @@ export default function useVanDashboard() {
   return {
     status,
     alerts,
+    modules,
     loading,
     offline,
     setMode,
