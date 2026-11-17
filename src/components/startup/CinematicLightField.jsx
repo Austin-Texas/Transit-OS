@@ -35,11 +35,15 @@ export default function CinematicLightField({ stage }) {
     function draw(now) {
       const t = (now - started) / 1000;
       const stageNow = stageRef.current;
+      // Match the storyboard: black for the first 0.5s, then energy grows.
+      const reveal = Math.max(0, Math.min(1, (t - 0.5) / 0.85));
+      const fadeOut = t > 4.45 ? Math.max(0.15, 1 - (t - 4.45) / 1.15) : 1;
       const cx = width / 2;
-      const horizon = height * (stageNow === 4 ? 0.77 : 0.79);
+      const horizon = height * (stageNow === 6 ? 0.77 : 0.79);
       context.clearRect(0, 0, width, height);
       context.save();
       context.globalCompositeOperation = "screen";
+      context.globalAlpha = reveal * fadeOut;
       // Soft atmospheric halo behind the TPMCS mark.
       const halo = context.createRadialGradient(cx, horizon, 0, cx, horizon, width * 0.57);
       halo.addColorStop(0, "rgba(0,218,255,.25)");
@@ -81,7 +85,7 @@ export default function CinematicLightField({ stage }) {
       context.fillStyle=reflection;
       context.fillRect(cx-rx,horizon,rx*2,height-horizon);
       // Initialization stage has a luminous dotted perspective grid.
-      if (stageNow === 4) {
+      if (stageNow === 6) {
         for (let row=0;row<20;row++) {
           const depth=(row+1)/20;
           const y=horizon + Math.pow(depth,1.85)*(height-horizon+35);
