@@ -172,28 +172,10 @@ export default function TwinViewer({ src, alt, className }) {
         className="absolute inset-2 will-change-transform sm:inset-4"
         style={{ transformStyle: "preserve-3d" }}
       >
-        <div
-          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[18px] shadow-[0_34px_70px_-28px_rgba(0,0,0,0.95)] ring-1 ring-white/15"
-          style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
-        >
+        {/* One continuous surface: turning past 90° shows the van's other
+            side instead of a blank panel with an upside-down label. */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[18px] shadow-[0_34px_70px_-28px_rgba(0,0,0,0.95)] ring-1 ring-white/15">
           <Image src={src} alt={alt} fittingType="fill" draggable={false} className="h-full w-full" />
-        </div>
-
-        <div
-          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[18px] bg-[#04070d] ring-1 ring-white/10"
-          style={{
-            transform: "rotateY(180deg)",
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
-          }}
-        >
-          <div className="absolute inset-0 scale-x-[-1] opacity-55">
-            <Image src={src} alt="" fittingType="fill" draggable={false} className="h-full w-full" />
-          </div>
-          <div className="absolute inset-0 bg-ink-950/50" />
-          <span className="absolute inset-0 grid place-items-center text-[10px] font-semibold uppercase tracking-[0.32em] text-white/45">
-            Back view
-          </span>
         </div>
       </div>
 
