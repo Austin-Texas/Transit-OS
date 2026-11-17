@@ -1,364 +1,45 @@
-/* TPMCS approved storyboard: 0–1 symbol, 1–2 logo, 2–3 presents,
-   3–4 vehicle-free product identity, 4–5+ real initialization. */
-.tp-cinema{position:fixed;inset:0;z-index:2147483000;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 88%,#072b5b 0%,#031329 36%,#01050e 78%,#000207 100%);color:#fff;font-family:Inter,system-ui,sans-serif}
-.tp-cinema *{box-sizing:border-box}
-.tp-cinema__grain{position:absolute;inset:0;pointer-events:none;opacity:.18;background-image:radial-gradient(#98cfff44 .6px,transparent .9px);background-size:23px 29px;mix-blend-mode:screen}
-.tp-cinema__atmosphere{position:absolute;inset:-45%;background:conic-gradient(from 140deg at 50% 65%,transparent 0deg,#061d6e65 55deg,transparent 130deg,#6d1fff4d 190deg,transparent 265deg,#00c9ff35 330deg,transparent 360deg);filter:blur(85px);animation:tp-cinema-aurora 15s linear infinite}
-.tp-cinema__floor{position:absolute;inset:60% -15% -28%;transform:perspective(620px) rotateX(66deg);background:radial-gradient(ellipse at 50% 15%,#00a9ff65,transparent 36%),repeating-linear-gradient(90deg,transparent 0 8%,#1476c32c 8.1%,transparent 8.2%),repeating-linear-gradient(0deg,transparent 0 16%,#1574c325 16.1%,transparent 16.3%);mask-image:linear-gradient(transparent,#000 45%,transparent)}
-.tp-cinema__beams{position:absolute;left:50%;top:74%;width:1px;height:1px;pointer-events:none}
-.tp-cinema__beams i{position:absolute;left:0;bottom:0;width:3px;height:52vh;transform-origin:bottom;opacity:.3;background:linear-gradient(to top,#00caffc9,transparent 75%);filter:blur(4px);animation:tp-cinema-beam 3s ease-in-out infinite alternate}
-.tp-cinema__beams i:nth-child(1){transform:rotate(-60deg)}.tp-cinema__beams i:nth-child(2){transform:rotate(-30deg);animation-delay:.3s}.tp-cinema__beams i:nth-child(3){transform:rotate(0);animation-delay:.7s}.tp-cinema__beams i:nth-child(4){transform:rotate(30deg);animation-delay:1s}.tp-cinema__beams i:nth-child(5){transform:rotate(60deg);animation-delay:1.4s}
-.tp-cinema__ring{position:absolute;left:50%;top:78%;width:min(65vw,640px);height:105px;transform:translate(-50%,-50%) perspective(700px) rotateX(54deg);filter:drop-shadow(0 0 28px #00caff);transition:opacity .6s}
-.tp-cinema__ring i{position:absolute;inset:0;border:3px solid #06ddff;border-radius:50%;box-shadow:0 0 20px #00cfff,0 0 75px #008cffaa,inset 0 0 30px #008cff88;animation:tp-cinema-ring 2.3s ease-in-out infinite alternate}
-.tp-cinema__ring i:nth-child(2){inset:15px 9%;border-color:#a5f8ff;animation-delay:.4s}
-.tp-cinema__ring i:nth-child(3){inset:35px 25%;border-color:#6950ff;animation-delay:.8s}
-.tp-cinema__streak{position:absolute;top:57%;left:-30%;width:80%;height:3px;opacity:.75;transform:rotate(-12deg);background:linear-gradient(90deg,transparent,#00bbff,#e4ffff,#0089ff,transparent);box-shadow:0 0 18px #00d9ff,0 0 55px #006fff;animation:tp-cinema-streak 3.3s ease-in-out infinite}
-.tp-cinema__streak--violet{top:67%;transform:rotate(13deg);background:linear-gradient(90deg,transparent,#712dff,#c08aff,#561bff,transparent);box-shadow:0 0 22px #733aff;animation-delay:1.3s}
-.tp-cinema__brand,.tp-cinema__presentation,.tp-cinema__initialize{position:absolute;left:50%;width:min(90vw,850px);transform:translateX(-50%);text-align:center;transition:opacity .52s ease,filter .65s ease,translate .7s ease;will-change:opacity,filter,translate}
-.tp-cinema__brand{top:15%;display:flex;align-items:center;flex-direction:column;gap:14px}
-.tp-cinema__symbol{width:clamp(90px,18vh,180px);height:clamp(110px,25vh,240px);object-fit:contain;filter:drop-shadow(0 0 18px #00bfff80);animation:tp-cinema-emerge 1.05s both}
-.tp-cinema__company{font-size:clamp(25px,4.2vw,52px);font-weight:800;letter-spacing:.28em;margin-left:.28em;text-shadow:0 0 24px #4ebaff7d;opacity:0;transition:opacity .45s}
-.tp-cinema--1 .tp-cinema__company{opacity:1}
-.tp-cinema--2 .tp-cinema__brand,.tp-cinema--3 .tp-cinema__brand,.tp-cinema--4 .tp-cinema__brand{opacity:0;filter:blur(14px);translate:0 -90px;pointer-events:none}
-.tp-cinema__presentation{top:17%;opacity:0;filter:blur(18px);translate:0 50px}
-.tp-cinema--2 .tp-cinema__presentation,.tp-cinema--3 .tp-cinema__presentation{opacity:1;filter:none;translate:0 0}
-.tp-cinema__presented-by{display:flex;align-items:center;justify-content:center;gap:12px;font-size:clamp(16px,2.4vw,29px);font-weight:800;letter-spacing:.32em}
-.tp-cinema__presented-by img{height:clamp(30px,5vh,54px);width:auto;filter:drop-shadow(0 0 10px #00aaff99)}
-.tp-cinema__presents{display:flex;align-items:center;justify-content:center;gap:18px;margin:clamp(14px,3vh,34px) auto 8px;letter-spacing:.55em;font-size:clamp(10px,1.4vw,16px);color:#e2edff}
-.tp-cinema__presents i{display:block;width:clamp(20px,6vw,85px);height:1px;background:linear-gradient(90deg,transparent,#a5d8ff)}
-.tp-cinema__presents i:last-child{transform:rotate(180deg)}
-.tp-cinema__presentation h1,.tp-cinema__initialize h2{margin:10px 0;font-size:clamp(52px,10vw,110px);font-weight:850;font-style:italic;line-height:1.05;letter-spacing:-.065em;text-shadow:0 0 26px #fff5}
-.tp-cinema__presentation h1 span,.tp-cinema__initialize h2 span{color:#00e6ff;text-shadow:0 0 24px #00caff}
-.tp-cinema__presentation p{margin:15px 0;font-size:clamp(10px,1.5vw,17px);letter-spacing:.14em;color:#d9eaff;opacity:0;transition:opacity .45s}
-.tp-cinema--3 .tp-cinema__presentation{top:11%}
-.tp-cinema--3 .tp-cinema__presentation p{opacity:1}
-.tp-cinema--4 .tp-cinema__presentation{opacity:0;filter:blur(15px);translate:0 -80px}
-.tp-cinema__initialize{top:12%;opacity:0;filter:blur(15px);translate:0 55px}
-.tp-cinema--4 .tp-cinema__initialize{opacity:1;filter:none;translate:0 0}
-.tp-cinema__initialize h2{font-size:clamp(46px,8vw,94px);margin:0}
-.tp-cinema__initialize>p{margin:10px 0 clamp(20px,4vh,48px);letter-spacing:.28em;font-size:clamp(12px,1.7vw,19px)}
-.tp-cinema__init-panel{width:min(86vw,600px);margin:0 auto;padding:clamp(15px,2.5vw,27px);border:1px solid #219bce9c;border-radius:18px;text-align:left;background:linear-gradient(125deg,#102e4be8,#07182eea);box-shadow:0 15px 70px #0009,0 0 35px #008bff35,inset 0 1px 0 #a4edff40}
-.tp-cinema__init-label{display:flex;align-items:center;gap:14px;font-size:clamp(13px,2vw,20px)}
-.tp-cinema__gear{font-size:30px;color:#7feaff;animation:tp-cinema-spin 5s linear infinite}
-.tp-cinema__progress-row{display:flex;align-items:center;gap:14px;margin:14px 0}
-.tp-cinema__progress-track{flex:1;height:17px;border-radius:20px;background:#081e35;border:1px solid #2b5776;overflow:hidden}
-.tp-cinema__progress-track>div{height:100%;border-radius:20px;background:linear-gradient(90deg,#04a7ff,#00f5f1);box-shadow:0 0 20px #00eaff;transition:width .35s ease}
-.tp-cinema__progress-row strong{font-size:20px;font-weight:650}
-.tp-cinema__checks{display:grid;grid-template-columns:1fr 1fr;gap:7px 18px;margin-top:10px}
-.tp-cinema__checks>div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #ffffff18;padding:4px 0;font-size:10px;color:#c5dcf0}
-.tp-cinema__checks b{font-weight:600;text-transform:uppercase;color:#a4b8c8}
-.tp-cinema__check--ready{color:#52f4bd!important}.tp-cinema__check--offline,.tp-cinema__check--error{color:#ffb7a3!important}.tp-cinema__check--simulated{color:#6bcfff!important}
-.tp-cinema__init-panel small{display:block;margin-top:13px;color:#a5c7de;font-size:10px;letter-spacing:.14em}
-.tp-cinema__footer{position:absolute;bottom:20px;left:25px;right:25px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:.2em;color:#a2c0d9}
-.tp-cinema__skip{position:absolute;top:18px;right:18px;padding:9px 16px;border-radius:20px;background:#07172bbd;color:#d9eaff;border:1px solid #ffffff30;font-size:11px;cursor:pointer}
-.tp-cinema__skip:hover{border-color:#00dcff;color:#fff}
-@keyframes tp-cinema-emerge{from{opacity:0;transform:translateY(110px) scale(.55) rotateY(-35deg);filter:blur(18px)}to{opacity:1;transform:none;filter:drop-shadow(0 0 18px #00bfff80)}}
-@keyframes tp-cinema-aurora{to{transform:rotate(360deg)}}
-@keyframes tp-cinema-ring{to{opacity:.5;filter:brightness(1.5);transform:scale(1.07)}}
-@keyframes tp-cinema-beam{to{opacity:.8;filter:blur(7px)}}
-@keyframes tp-cinema-streak{from{left:-90%;opacity:0}20%{opacity:.8}to{left:110%;opacity:0}}
-@keyframes tp-cinema-spin{to{transform:rotate(360deg)}}
-@media(max-height:650px){.tp-cinema__brand{top:7%}.tp-cinema__symbol{height:23vh;width:15vh}.tp-cinema__presentation{top:10%}.tp-cinema--3 .tp-cinema__presentation{top:5%}.tp-cinema__presentation h1{font-size:clamp(42px,8vw,75px)}.tp-cinema__initialize{top:5%}.tp-cinema__initialize h2{font-size:clamp(42px,7vw,65px)}.tp-cinema__initialize>p{margin:6px 0 14px}.tp-cinema__init-panel{padding:12px 18px}.tp-cinema__checks>div{padding:2px 0}.tp-cinema__ring{top:84%}}
-@media(max-width:550px){.tp-cinema__checks{grid-template-columns:1fr}.tp-cinema__footer{font-size:8px;letter-spacing:.08em}.tp-cinema__presentation h1{font-size:clamp(48px,13vw,78px)}.tp-cinema__presentation{top:23%}.tp-cinema--3 .tp-cinema__presentation{top:18%}}
-@media(prefers-reduced-motion:reduce){.tp-cinema *{animation:none!important;transition:none!important}}
-
-/* Reference fidelity: company reveal and system initialization panels.
-   Centered composition at 16:9; adaptive at small mobile resolutions. */
-.tp-cinema--1 .tp-cinema__brand{top:50%;transform:translate(-50%,-50%);gap:clamp(8px,2vh,20px)}
-.tp-cinema--1 .tp-cinema__symbol{height:clamp(140px,30vh,250px);width:clamp(120px,25vh,210px);animation:none;filter:drop-shadow(0 0 13px #00caff38)}
-.tp-cinema--1 .tp-cinema__company{opacity:1;font-size:clamp(31px,5vw,62px);font-weight:800;letter-spacing:.24em;margin-left:.24em;text-shadow:0 2px 15px #fff3}
-.tp-cinema--1 .tp-cinema__ring{top:82%;height:85px;width:min(74vw,740px)}
-.tp-cinema--1 .tp-cinema__beams{top:82%}
-.tp-cinema--1 .tp-cinema__streak{opacity:.55}
-.tp-cinema--4 .tp-cinema__initialize{top:50%;transform:translate(-50%,-50%);width:min(90vw,920px)}
-.tp-cinema--4 .tp-cinema__initialize h2{font-size:clamp(50px,8vw,105px);font-style:italic;letter-spacing:-.065em;text-shadow:0 0 20px #fff5}
-.tp-cinema--4 .tp-cinema__initialize>p{font-size:clamp(13px,1.7vw,21px);font-weight:550;letter-spacing:.22em;margin:12px 0 clamp(22px,5vh,58px);color:#f3f7ff}
-.tp-cinema--4 .tp-cinema__init-panel{max-width:650px;width:min(78vw,650px);padding:clamp(17px,2.5vw,30px);background:linear-gradient(115deg,#102d48ed,#051b34eb);border:1px solid #3da8d6b3;border-radius:20px;box-shadow:inset 0 1px 0 #91eaff33,0 12px 50px #0007,0 0 26px #0073e638}
-.tp-cinema--4 .tp-cinema__init-label{font-size:clamp(16px,2vw,23px);gap:16px}
-.tp-cinema--4 .tp-cinema__gear{font-size:clamp(29px,3.8vw,43px)}
-.tp-cinema--4 .tp-cinema__progress-track{height:19px;background:#102a44;border-color:#2a5777}
-.tp-cinema--4 .tp-cinema__progress-track>div{background:linear-gradient(90deg,#09bafa,#0bfff1);box-shadow:0 0 16px #00ffff}
-.tp-cinema--4 .tp-cinema__progress-row{margin:16px 0 8px}
-.tp-cinema--4 .tp-cinema__progress-row strong{font-size:clamp(18px,2.4vw,25px)}
-.tp-cinema--4 .tp-cinema__floor{inset:63% -15% -25%;background:radial-gradient(ellipse at 50% 0%,#0073ff2e,transparent 60%),repeating-radial-gradient(ellipse at 50% 0%,#008cfe00 0 12px,#00baff88 13px,#008cfe00 15px,#008cfe00 32px);transform:perspective(720px) rotateX(66deg);mask-image:linear-gradient(transparent,#000 30%,transparent)}
-.tp-cinema--4 .tp-cinema__ring{opacity:0}
-.tp-cinema--4 .tp-cinema__beams{opacity:.18}
-@media(max-height:650px){
- .tp-cinema--1 .tp-cinema__brand{top:49%}
- .tp-cinema--1 .tp-cinema__symbol{height:26vh;width:20vh}
- .tp-cinema--1 .tp-cinema__company{font-size:clamp(22px,4vw,42px)}
- .tp-cinema--4 .tp-cinema__initialize{top:49%}
- .tp-cinema--4 .tp-cinema__initialize h2{font-size:clamp(38px,7vw,70px)}
- .tp-cinema--4 .tp-cinema__initialize>p{margin:5px 0 12px}
- .tp-cinema--4 .tp-cinema__init-panel{padding:11px 18px}
- .tp-cinema--4 .tp-cinema__checks{gap:2px 12px}
- .tp-cinema--4 .tp-cinema__checks>div{font-size:9px;padding:1px 0}
- .tp-cinema--4 .tp-cinema__init-panel small{margin-top:6px}
-}
-@media(max-width:550px){
- .tp-cinema--1 .tp-cinema__brand{top:46%}
- .tp-cinema--1 .tp-cinema__symbol{height:25vh;width:21vh}
- .tp-cinema--4 .tp-cinema__initialize{top:47%}
- .tp-cinema--4 .tp-cinema__init-panel{width:90vw}
- .tp-cinema--4 .tp-cinema__checks{grid-template-columns:1fr 1fr}
-}
-
-/* Longer, smoother storyboard transitions and progress reveal. */
-.tp-cinema__brand,.tp-cinema__presentation,.tp-cinema__initialize{transition:opacity 1.15s cubic-bezier(.22,1,.36,1),filter 1.15s ease,translate 1.25s cubic-bezier(.22,1,.36,1)}
-.tp-cinema__company,.tp-cinema__presentation p{transition:opacity 1.05s ease}
-.tp-cinema__progress-track>div{transition:width .22s linear;will-change:width}
-.tp-cinema__init-panel{animation:tp-cinema-panel-breathe 3.5s ease-in-out infinite alternate}
-@keyframes tp-cinema-panel-breathe{from{box-shadow:inset 0 1px 0 #91eaff33,0 12px 50px #0007,0 0 22px #0073e630}to{box-shadow:inset 0 1px 0 #91eaff55,0 12px 50px #0007,0 0 43px #00aaff55}}
-@media(prefers-reduced-motion:reduce){.tp-cinema__init-panel{animation:none!important}}
-
-/* Continuous identity choreography: logo does not disappear before presentation arrives. */
-.tp-cinema__brand{z-index:3;transition:opacity 1.5s cubic-bezier(.4,0,.2,1),filter 1.5s ease,translate 1.6s cubic-bezier(.2,.7,.2,1),transform 1.6s cubic-bezier(.2,.7,.2,1)}
-.tp-cinema__presentation{z-index:2;transition:opacity 1.5s cubic-bezier(.4,0,.2,1),filter 1.5s ease,translate 1.6s cubic-bezier(.2,.7,.2,1),top 1.6s cubic-bezier(.2,.7,.2,1)}
-.tp-cinema__ring{transition:top 1.8s ease,opacity 1.5s ease,transform 1.8s ease}
-.tp-cinema__company{transition:opacity 1.15s ease,transform 1.6s ease}
-.tp-cinema--0 .tp-cinema__brand{opacity:1}
-.tp-cinema--1 .tp-cinema__brand{opacity:1;filter:none}
-.tp-cinema--2 .tp-cinema__brand{opacity:.22;filter:blur(6px);translate:0 -15vh;pointer-events:none}
-.tp-cinema--2 .tp-cinema__presentation{opacity:1;filter:none;translate:0 0}
-.tp-cinema--3 .tp-cinema__brand{opacity:0;filter:blur(12px);translate:0 -22vh}
-.tp-cinema--3 .tp-cinema__presentation{opacity:1;filter:none;translate:0 0}
-.tp-cinema--1 .tp-cinema__ring,.tp-cinema--2 .tp-cinema__ring{opacity:1}
-.tp-cinema--2 .tp-cinema__ring{top:83%}
-@media(prefers-reduced-motion:reduce){.tp-cinema__brand,.tp-cinema__presentation,.tp-cinema__ring{transition:none!important}}
-
-/* Slow depth-of-field logo arrival: from distant background toward viewer. */
-.tp-cinema--0 .tp-cinema__symbol{
-  animation:tp-cinema-deep-arrival 2.8s cubic-bezier(.16,.65,.2,1) both!important;
-  transform-origin:50% 50%;
-}
-.tp-cinema--1 .tp-cinema__symbol{
-  animation:none!important;
-  transform:perspective(1000px) translateZ(0) scale(1);
-  filter:drop-shadow(0 0 13px #00caff38);
-}
-@keyframes tp-cinema-deep-arrival{
-  0%{opacity:0;transform:perspective(1100px) translateZ(-850px) scale(.38);filter:blur(24px) brightness(.55)}
-  25%{opacity:.3;transform:perspective(1100px) translateZ(-640px) scale(.52);filter:blur(16px) brightness(.75)}
-  65%{opacity:.86;transform:perspective(1100px) translateZ(-260px) scale(.82);filter:blur(5px) brightness(1.1)}
-  100%{opacity:1;transform:perspective(1100px) translateZ(0) scale(1);filter:drop-shadow(0 0 13px #00caff38)}
-}
-@media(prefers-reduced-motion:reduce){.tp-cinema--0 .tp-cinema__symbol{animation:none!important;transform:none!important}}
-
-/* Rendered cinematic light field replaces the older flat CSS ring. */
-.tp-cinema__light-field{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-.tp-cinema__ring,.tp-cinema__beams{display:none!important}
-.tp-cinema__floor{opacity:.22}
-.tp-cinema__brand,.tp-cinema__presentation,.tp-cinema__initialize{z-index:2}
-.tp-cinema__grain{z-index:1;opacity:.1}
-.tp-cinema__streak{z-index:1;opacity:.25}
-.tp-cinema--1 .tp-cinema__symbol{filter:drop-shadow(0 0 18px #00dfff8c)}
-.tp-cinema--1 .tp-cinema__company{text-shadow:0 0 16px #fff5,0 2px 22px #3d9fff55}
-@media(prefers-reduced-motion:reduce){.tp-cinema__streak{animation:none!important}}
-
-/* Fix first-logo hitch: stage 0 and stage 1 use identical positioning.
-   The approach animation runs ONCE on the element, never resets at stage 1.
-   This also avoids mixing a top/transform jump with a CSS keyframe reset. */
-.tp-cinema--0 .tp-cinema__brand,
-.tp-cinema--1 .tp-cinema__brand{
-  top:50%;
-  transform:translate(-50%,-50%);
-  gap:clamp(8px,2vh,20px);
-}
-.tp-cinema--0 .tp-cinema__symbol,
-.tp-cinema--1 .tp-cinema__symbol{
-  width:clamp(120px,25vh,210px);
-  height:clamp(140px,30vh,250px);
-  animation:tp-cinema-deep-arrival 3.1s cubic-bezier(.22,.6,.24,1) both!important;
-  transform-origin:center;
-  backface-visibility:hidden;
-  will-change:transform,opacity;
-}
-.tp-cinema--0 .tp-cinema__company{opacity:0;transform:translateY(12px)}
-.tp-cinema--1 .tp-cinema__company{opacity:1;transform:translateY(0)}
-.tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{filter:none;translate:0 0;opacity:1}
-.tp-cinema__brand{will-change:opacity,transform}
-.tp-cinema__presentation{will-change:opacity,transform}
-@media(max-height:650px){
- .tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{top:49%}
- .tp-cinema--0 .tp-cinema__symbol,.tp-cinema--1 .tp-cinema__symbol{height:26vh;width:20vh}
-}
-@media(max-width:550px){
- .tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{top:46%}
- .tp-cinema--0 .tp-cinema__symbol,.tp-cinema--1 .tp-cinema__symbol{height:25vh;width:21vh}
-}
-@media(prefers-reduced-motion:reduce){
- .tp-cinema--0 .tp-cinema__symbol,.tp-cinema--1 .tp-cinema__symbol{animation:none!important;transform:none!important}
-}
-
-/* Near-black cinematic studio: retain dimensional cyan/violet illumination. */
-.tp-cinema{
- background:radial-gradient(ellipse at 50% 79%,#031124 0%,#010711 30%,#000207 61%,#000 100%)!important;
-}
-.tp-cinema__atmosphere{
- opacity:.23;
- background:conic-gradient(from 140deg at 50% 65%,transparent 0deg,#00185a55 55deg,transparent 130deg,#4210a955 190deg,transparent 265deg,#0074ac55 330deg,transparent 360deg);
- filter:blur(105px);
-}
-.tp-cinema__floor{opacity:.13}
-.tp-cinema__streak{opacity:.18}
-.tp-cinema__streak--violet{opacity:.12}
-.tp-cinema__grain{opacity:.065}
-.tp-cinema__symbol{filter:drop-shadow(0 0 16px #009dff65)}
-.tp-cinema__light-field{filter:contrast(1.15) saturate(1.16)}
-
-/* Single continuous TPMCS identity shot. No second logo swap/cut.
-   Stage 1 holds the full logo; stages 2–3 move that SAME element to its
-   presentation position while the product title enters beneath it. */
-.tp-cinema__brand{
-  top:50%;
-  transform:translate(-50%,-50%);
-  translate:0 0;
-  transform-origin:center center;
-  transition:transform 1900ms cubic-bezier(.22,.61,.22,1),
-    opacity 1100ms ease,filter 1100ms ease!important;
-}
-.tp-cinema--0 .tp-cinema__brand,
-.tp-cinema--1 .tp-cinema__brand{
-  top:50%;
-  transform:translate(-50%,-50%) scale(1);
-  translate:0 0;
-  opacity:1;
-  filter:none;
-}
-.tp-cinema--2 .tp-cinema__brand,
-.tp-cinema--3 .tp-cinema__brand{
-  top:50%;
-  transform:translate(-50%,-50%) translateY(-30vh) scale(.39);
-  translate:0 0;
-  opacity:1;
-  filter:none;
-  pointer-events:none;
-}
-.tp-cinema--4 .tp-cinema__brand{
-  top:50%;
-  transform:translate(-50%,-50%) translateY(-36vh) scale(.32);
-  translate:0 0;
-  opacity:0;
-  filter:blur(6px);
-}
-.tp-cinema--2 .tp-cinema__symbol,
-.tp-cinema--3 .tp-cinema__symbol,
-.tp-cinema--4 .tp-cinema__symbol{
-  width:clamp(120px,25vh,210px);
-  height:clamp(140px,30vh,250px);
-  animation:tp-cinema-deep-arrival 3.1s cubic-bezier(.22,.6,.24,1) both!important;
-}
-.tp-cinema--2 .tp-cinema__company,
-.tp-cinema--3 .tp-cinema__company{opacity:1;transform:translateY(0)}
-.tp-cinema__presented-by{visibility:hidden!important}
-.tp-cinema__presentation{
-  top:39%!important;
-  translate:0 0!important;
-  transition:opacity 1600ms cubic-bezier(.22,.61,.22,1),
-    filter 1600ms ease!important;
-}
-.tp-cinema--2 .tp-cinema__presentation,
-.tp-cinema--3 .tp-cinema__presentation{
-  opacity:1;filter:none;
-}
-.tp-cinema--4 .tp-cinema__presentation{opacity:0;filter:blur(10px)}
-.tp-cinema__presents{margin-top:0}
-.tp-cinema__atmosphere{animation-duration:25s}
-@media(max-height:650px){
- .tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{top:50%}
- .tp-cinema--2 .tp-cinema__brand,.tp-cinema--3 .tp-cinema__brand{transform:translate(-50%,-50%) translateY(-27vh) scale(.33)}
- .tp-cinema__presentation{top:36%!important}
- .tp-cinema__presentation h1{font-size:clamp(38px,7vw,72px)}
-}
-@media(max-width:550px){
- .tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{top:50%}
- .tp-cinema--2 .tp-cinema__brand,.tp-cinema--3 .tp-cinema__brand{transform:translate(-50%,-50%) translateY(-27vh) scale(.39)}
- .tp-cinema__presentation{top:37%!important}
-}
-@media(prefers-reduced-motion:reduce){
- .tp-cinema__brand,.tp-cinema__presentation{transition:none!important}
-}
-
-/* Film-continuity fix: the logo animation is bound to the element, not a
-   stage selector. Stage changes cannot restart its keyframes or change size. */
-.tp-cinema .tp-cinema__symbol{
-  width:clamp(120px,25vh,210px)!important;
-  height:clamp(140px,30vh,250px)!important;
-  animation:tp-logo-continuous-arrival 3.05s cubic-bezier(.22,.58,.22,1) both!important;
-  transform-origin:center center;
-  backface-visibility:hidden;
-  will-change:transform,opacity;
-  filter:drop-shadow(0 0 14px #00bdff72);
-}
-@keyframes tp-logo-continuous-arrival{
-  0%{opacity:0;transform:translate3d(0,55px,0) scale(.24)}
-  25%{opacity:.5;transform:translate3d(0,38px,0) scale(.43)}
-  65%{opacity:.95;transform:translate3d(0,12px,0) scale(.79)}
-  100%{opacity:1;transform:translate3d(0,0,0) scale(1)}
-}
-/* Lettering joins the moving logo during stage 2, not on the first reveal. */
-.tp-cinema .tp-cinema__company{
-  opacity:0!important;
-  transform:translate3d(0,18px,0)!important;
-  transition:opacity 1250ms ease,transform 1500ms cubic-bezier(.22,.61,.22,1)!important;
-}
-.tp-cinema--2 .tp-cinema__company,
-.tp-cinema--3 .tp-cinema__company{
-  opacity:1!important;
-  transform:translate3d(0,0,0)!important;
-}
-.tp-cinema--4 .tp-cinema__company{opacity:0!important}
-.tp-cinema .tp-cinema__brand{
-  transition:transform 2000ms cubic-bezier(.25,.6,.25,1),opacity 1100ms ease!important;
-  will-change:transform,opacity;
-}
-.tp-cinema--0 .tp-cinema__brand,.tp-cinema--1 .tp-cinema__brand{
-  transform:translate(-50%,-50%) translate3d(0,0,0) scale(1)!important;
-}
-.tp-cinema--2 .tp-cinema__brand,.tp-cinema--3 .tp-cinema__brand{
-  transform:translate(-50%,-50%) translate3d(0,-27vh,0) scale(.42)!important;
-}
-.tp-cinema--4 .tp-cinema__brand{
-  transform:translate(-50%,-50%) translate3d(0,-30vh,0) scale(.38)!important;
-}
-.tp-cinema--2 .tp-cinema__presentation{
-  transition:opacity 1900ms ease!important;
-}
-@media(max-height:650px){
-  .tp-cinema--2 .tp-cinema__brand,.tp-cinema--3 .tp-cinema__brand{
-    transform:translate(-50%,-50%) translate3d(0,-24vh,0) scale(.34)!important;
-  }
-}
-@media(prefers-reduced-motion:reduce){
-  .tp-cinema .tp-cinema__symbol{animation:none!important;transform:none!important;opacity:1}
-}
-
-/* Keep the moving identity safely within the cinematic viewport.
-   Previously -27vh/-30vh plus scaled transform pushed it against browser chrome. */
-.tp-cinema--2 .tp-cinema__brand,
-.tp-cinema--3 .tp-cinema__brand{
-  transform:translate(-50%,-50%) translate3d(0,-15vh,0) scale(.55)!important;
-}
-.tp-cinema--4 .tp-cinema__brand{
-  transform:translate(-50%,-50%) translate3d(0,-19vh,0) scale(.48)!important;
-}
-.tp-cinema__presentation{top:54%!important}
-.tp-cinema--2 .tp-cinema__presentation,
-.tp-cinema--3 .tp-cinema__presentation{top:54%!important}
-.tp-cinema__presentation h1{margin-top:8px}
-@media(max-height:650px){
-  .tp-cinema--2 .tp-cinema__brand,
-  .tp-cinema--3 .tp-cinema__brand{
-    transform:translate(-50%,-50%) translate3d(0,-13vh,0) scale(.49)!important;
-  }
-  .tp-cinema__presentation,.tp-cinema--2 .tp-cinema__presentation,
-  .tp-cinema--3 .tp-cinema__presentation{top:51%!important}
-}
-@media(max-width:550px){
-  .tp-cinema--2 .tp-cinema__brand,
-  .tp-cinema--3 .tp-cinema__brand{
-    transform:translate(-50%,-50%) translate3d(0,-14vh,0) scale(.5)!important;
-  }
-  .tp-cinema__presentation,.tp-cinema--2 .tp-cinema__presentation,
-  .tp-cinema--3 .tp-cinema__presentation{top:52%!important}
-}
+/* TPMCS TransitOS — one uninterrupted six-second cinematic timeline.
+   No legacy stage transforms, duplicate logos, or conflicting !important rules. */
+.tp-movie{position:fixed;inset:0;z-index:2147483000;overflow:hidden;isolation:isolate;background:#000;color:#f8fbff;font-family:Inter,system-ui,sans-serif}
+.tp-movie *{box-sizing:border-box}
+.tp-movie__light-field{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.tp-movie__veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 78%,transparent 0%,#0008 60%,#000e 100%)}
+.tp-movie__flare{position:absolute;z-index:2;top:57%;left:50%;width:min(46vw,550px);height:2px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,#008dff,#dcffff,#008dff,transparent);box-shadow:0 0 18px 4px #008cff,0 0 75px 18px #007bff80;opacity:0;animation:tp-flare 6s ease-in-out both;pointer-events:none}
+.tp-movie__tagline{position:absolute;z-index:3;top:80%;left:0;width:100%;text-align:center;font-size:clamp(8px,1vw,13px);letter-spacing:.36em;color:#b5c4d8;opacity:0;animation:tp-tagline 6s ease both}
+.tp-movie__identity{position:absolute;z-index:3;left:50%;top:45%;width:min(70vw,470px);display:flex;flex-direction:column;align-items:center;gap:10px;transform:translate(-50%,-50%);animation:tp-identity 6s cubic-bezier(.3,.2,.3,1) both;will-change:transform,opacity}
+.tp-movie__identity img{width:clamp(100px,17vh,190px);height:clamp(125px,24vh,230px);object-fit:contain;filter:drop-shadow(0 0 22px #007bff55);opacity:0;animation:tp-symbol 6s cubic-bezier(.25,.6,.25,1) both;will-change:transform,opacity}
+.tp-movie__company{font-size:clamp(25px,3.5vw,49px);font-weight:750;letter-spacing:.24em;padding-left:.24em;opacity:0;animation:tp-company 6s ease both}
+.tp-movie__presents{display:flex;align-items:center;justify-content:center;gap:15px;letter-spacing:.48em;font-size:clamp(10px,1.2vw,16px);margin-top:5px;opacity:0;animation:tp-presents 6s ease both}
+.tp-movie__presents i{height:1px;width:clamp(25px,6vw,80px);background:#4aa9d4}
+.tp-movie__product{position:absolute;z-index:3;top:45%;left:50%;width:min(94vw,1000px);transform:translate(-50%,-50%);text-align:center;opacity:0;animation:tp-product 6s cubic-bezier(.2,.7,.2,1) both}
+.tp-movie__product h1,.tp-movie__ready h2{font-weight:800;font-style:italic;letter-spacing:-.055em;font-size:clamp(54px,10vw,128px);margin:0;text-shadow:0 0 30px #fff5}
+.tp-movie__product h1 span,.tp-movie__ready h2 span,.tp-movie__initializing h2 span{color:#00d9ff;text-shadow:0 0 22px #00aaff88}
+.tp-movie__product p{font-size:clamp(9px,1.25vw,17px);letter-spacing:.16em;color:#c8e3ff;margin:14px 0}
+.tp-movie__initializing{position:absolute;z-index:3;top:50%;left:50%;width:min(84vw,650px);transform:translate(-50%,-50%);opacity:0;animation:tp-initialize 6s ease both}
+.tp-movie__initializing h2{font-size:clamp(20px,3.2vw,38px);font-weight:500;margin:0 0 18px}
+.tp-movie__progress{width:83%;height:19px;display:inline-block;vertical-align:middle;background:#07172b;border:1px solid #2b4763;border-radius:30px;overflow:hidden}
+.tp-movie__progress>div{height:100%;background:linear-gradient(90deg,#1473ff,#00e3ff);border-radius:30px;box-shadow:0 0 15px #00baff;transition:width .15s linear}
+.tp-movie__initializing strong{display:inline-block;vertical-align:middle;margin-left:2%;font-size:clamp(16px,2vw,24px)}
+.tp-movie__tasks{margin-top:23px;display:grid;gap:10px}
+.tp-movie__tasks>div{display:flex;align-items:center;gap:12px;color:#b7c9dd;font-size:clamp(11px,1.25vw,15px)}
+.tp-movie__task-icon{color:#39baff;font-size:20px}
+.tp-movie__tasks small{margin-left:auto;text-transform:uppercase;color:#6dd8ff;font-size:10px}
+.tp-movie__hardware{margin-top:15px;font-size:10px;letter-spacing:.13em;color:#7a9db9}
+.tp-movie__ready{position:absolute;z-index:3;left:50%;top:50%;width:90%;text-align:center;transform:translate(-50%,-50%);opacity:0;animation:tp-ready 6s ease both}
+.tp-movie__check{display:grid;place-items:center;width:74px;height:74px;border:3px solid #00dfff;border-radius:50%;margin:0 auto 20px;color:#c7ffff;font-size:42px;box-shadow:0 0 24px #00aaff8c}
+.tp-movie__ready h2{font-size:clamp(52px,8vw,100px)}
+.tp-movie__ready p{letter-spacing:.45em;font-size:clamp(13px,1.7vw,20px);margin:12px 0}
+.tp-movie__skip{position:absolute;z-index:10;top:16px;right:18px;background:#08101dbb;border:1px solid #27445b;border-radius:20px;color:#b9d5e8;padding:8px 14px;font-size:11px;cursor:pointer}
+.tp-movie__skip:hover{color:#fff;border-color:#00cfff}
+/* Timing tracks follow the storyboard; opacity overlap prevents hard cuts. */
+@keyframes tp-flare{0%,6%{opacity:0}10%,45%{opacity:.8}53%{opacity:.25}80%{opacity:.7}100%{opacity:.2}}
+@keyframes tp-tagline{0%,5%{opacity:0}9%,17%{opacity:.85}24%,100%{opacity:0}}
+@keyframes tp-symbol{0%,18%{opacity:0;transform:translate3d(0,45px,0) scale(.48)}35%{opacity:1;transform:translate3d(0,0,0) scale(1)}60%,100%{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes tp-identity{0%,34%{opacity:1;transform:translate(-50%,-50%) scale(1)}52%{opacity:1;transform:translate(-50%,-50%) scale(.86)}56%{opacity:0;transform:translate(-50%,-55%) scale(.8)}100%{opacity:0;transform:translate(-50%,-55%) scale(.8)}}
+@keyframes tp-company{0%,38%{opacity:0;transform:translateY(12px)}47%,54%{opacity:1;transform:translateY(0)}60%,100%{opacity:0}}
+@keyframes tp-presents{0%,48%{opacity:0;transform:translateY(10px)}55%,59%{opacity:1;transform:translateY(0)}65%,100%{opacity:0}}
+@keyframes tp-product{0%,54%{opacity:0;transform:translate(-50%,-46%) scale(.96)}62%,73%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%,100%{opacity:0;transform:translate(-50%,-53%) scale(1.03)}}
+@keyframes tp-initialize{0%,72%{opacity:0;transform:translate(-50%,-46%)}80%,91%{opacity:1;transform:translate(-50%,-50%)}97%,100%{opacity:0;transform:translate(-50%,-52%)}}
+@keyframes tp-ready{0%,90%{opacity:0;transform:translate(-50%,-46%) scale(.97)}96%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+@media(max-width:600px){.tp-movie__identity{top:44%}.tp-movie__product{top:48%}.tp-movie__initializing{width:88vw}.tp-movie__progress{width:78%}.tp-movie__tasks{gap:7px}.tp-movie__hardware{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.tp-movie__identity,.tp-movie__identity img,.tp-movie__company,.tp-movie__presents,.tp-movie__product,.tp-movie__initializing,.tp-movie__ready,.tp-movie__flare,.tp-movie__tagline{animation-duration:6s!important}}
