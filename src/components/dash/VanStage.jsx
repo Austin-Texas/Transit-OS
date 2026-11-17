@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Camera, Move } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import FordTransit3D from "@/components/van/FordTransit3D";
-import HotspotDialog from "@/components/van/HotspotDialog";
 import HotspotTip from "@/components/van/HotspotTip";
 import VanPhoto from "@/components/van/VanPhoto";
 import { VAN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
+
+// Every part of the van opens the module that looks after it.
+const PART_MODULES = {
+  water_tank: "/water",
+  heat_pad: "/water",
+  battery: "/electrical",
+  engine: "/maintenance",
+  climate: "/climate",
+  cabin: "/camper",
+};
 
 // The home stage: the neon wireframe van you can spin with a finger, plus a
 // photo view, exactly like the reference dashboard layout.
@@ -20,9 +29,9 @@ export default function VanStage({
   onClearFocus,
 }) {
   const side = focus?.side;
+  const navigate = useNavigate();
   const [view, setView] = useState("3d");
   const [tip, setTip] = useState(null);
-  const [hotspot, setHotspot] = useState(null);
 
   return (
     <section
@@ -40,8 +49,10 @@ export default function VanStage({
           onTip={setTip}
           onPick={(key) => {
             if (!key) return;
+            const to = PART_MODULES[key];
+            if (!to) return;
             setTip(null);
-            setHotspot(key);
+            navigate({ to });
           }}
         />
       ) : (
@@ -116,7 +127,7 @@ export default function VanStage({
       {view === "3d" ? (
         <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
           <Move className="h-3 w-3" strokeWidth={2.2} />
-          Swipe to spin · tap parts for readings
+          Swipe to spin · tap a part to open its module
         </div>
       ) : null}
 
@@ -128,8 +139,6 @@ export default function VanStage({
         <Camera className="h-3.5 w-3.5" strokeWidth={2.2} />
         Cameras
       </Link>
-
-      <HotspotDialog hotspot={hotspot} status={status} onClose={() => setHotspot(null)} />
     </section>
   );
 }

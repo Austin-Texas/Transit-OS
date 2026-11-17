@@ -75,6 +75,54 @@ function hotspotTip(key, status) {
     };
   }
 
+  if (key === "engine") {
+    const miles = reading(status?.odometer);
+    const fuel = reading(status?.fuel_percent);
+    return {
+      title: "Engine & drivetrain",
+      status: status?.active_mode === "driving" ? "Running" : "Parked",
+      tone: "ok",
+      rows: [
+        {
+          k: "Odometer",
+          v: miles === null ? "—" : `${Math.round(miles).toLocaleString("en-US")} mi`,
+        },
+        { k: "Fuel", v: fuel === null ? "—" : `${Math.round(fuel)} %` },
+        { k: "Starter", v: show(reading(status?.battery_voltage), 2, "V") },
+        { k: "Mode", v: status?.active_mode ?? "—" },
+      ],
+    };
+  }
+
+  if (key === "climate") {
+    return {
+      title: "Climate",
+      status: status?.climate_mode === "off" ? "Off" : "Running",
+      tone: status?.climate_mode === "off" ? "muted" : "ok",
+      rows: [
+        { k: "Cabin", v: show(reading(status?.climate_temp), 0, "°F") },
+        { k: "Set point", v: show(reading(status?.climate_set), 0, "°F") },
+        { k: "Outside", v: show(reading(status?.exterior_temp), 0, "°F") },
+        { k: "Mode", v: status?.climate_mode ?? "—" },
+      ],
+    };
+  }
+
+  if (key === "cabin") {
+    const humidity = reading(status?.humidity);
+    return {
+      title: "Cabin",
+      status: status?.locks_locked === false ? "Unlocked" : "Secured",
+      tone: status?.locks_locked === false ? "alert" : "ok",
+      rows: [
+        { k: "Interior", v: show(reading(status?.cabin_temp ?? status?.climate_temp), 0, "°F") },
+        { k: "Humidity", v: humidity === null ? "—" : `${Math.round(humidity)} %` },
+        { k: "Lights", v: status?.lights_on === false ? "Off" : "On" },
+        { k: "Locks", v: status?.locks_locked === false ? "Unlocked" : "Locked" },
+      ],
+    };
+  }
+
   const pad = heatPad(status);
   return {
     title: "Heat pad",
@@ -368,6 +416,20 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
     const raycaster = new THREE.Raycaster();
     let hovered = null;
 
+    // Which system a point on the van belongs to. The invisible tap spheres win;
+    // anywhere else on the body resolves from the point itself, so every panel,
+    // wheel and roof fitting is clickable.
+    const zoneFor = (hit) => {
+      if (hit.object.userData.hotspot) return hit.object.userData.hotspot;
+      const local = van.worldToLocal(hit.point.clone());
+      if (local.y < 0.42 && local.x < -1.2) return "heat_pad";
+      if (local.x > 1.75) return "engine";
+      if (local.y > 2.55) return "climate";
+      if (local.x < -1.4) return local.y > 1.4 ? "cabin" : "water_tank";
+      if (local.y < 0.9) return "battery";
+      return "cabin";
+    };
+
     const hitTest = (event) => {
       const rect = renderer.domElement.getBoundingClientRect();
       pointer.set(
@@ -375,19 +437,20 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
         -((event.clientY - rect.top) / rect.height) * 2 + 1
       );
       raycaster.setFromCamera(pointer, camera);
-      const hit = raycaster.intersectObjects(hotspots, false)[0];
-      return hit ? hit.object : null;
+      const hit =
+        raycaster.intersectObjects(hotspots, false)[0] || raycaster.intersectObject(van, true)[0];
+      return hit ? zoneFor(hit) : null;
     };
 
-    const tipFor = (object, event) => {
-      if (!object) return null;
+    const tipFor = (key, event) => {
+      if (!key) return null;
       const rect = renderer.domElement.getBoundingClientRect();
       return {
         // Kept a bubble's width inside the stage, so it never clips at the edge.
         x: Math.min(Math.max(event.clientX - rect.left, 96), Math.max(96, rect.width - 96)),
         // And far enough below the top edge for the bubble to sit above the pin.
         y: Math.max(event.clientY - rect.top, 122),
-        ...hotspotTip(object.userData.hotspot, latest.current.status),
+        ...hotspotTip(key, latest.current.status),
       };
     };
 
@@ -406,13 +469,13 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
 
     const onMove = (event) => {
       if (!dragging) {
-        const object = hitTest(event);
-        if (object !== hovered) {
-          hovered = object;
-          renderer.domElement.style.cursor = object ? "pointer" : "grab";
-          tipRef.current?.(tipFor(object, event));
-        } else if (object) {
-          tipRef.current?.(tipFor(object, event));
+        const key = hitTest(event);
+        if (key !== hovered) {
+          hovered = key;
+          renderer.domElement.style.cursor = key ? "pointer" : "grab";
+          tipRef.current?.(tipFor(key, event));
+        } else if (key) {
+          tipRef.current?.(tipFor(key, event));
         }
         return;
       }
@@ -437,13 +500,13 @@ export default function FordTransit3D({ focus, warnings = [], status, className,
         return;
       }
       if (wasDragging && moved < 8) {
-        // A tap on the heat pad keeps its readout open, even on a phone.
-        const object = hitTest(event);
-        if (object) {
-          tipRef.current?.(tipFor(object, event));
-          pickRef.current?.(object.userData.hotspot);
+        // A tap on any part of the van opens that system.
+        const key = hitTest(event);
+        if (key) {
+          tipRef.current?.(tipFor(key, event));
+          pickRef.current?.(key);
         }
-        hovered = object;
+        hovered = key;
       }
     };
 

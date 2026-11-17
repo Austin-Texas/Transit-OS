@@ -241,6 +241,9 @@ export function buildVanModel() {
   hotspot("heat_pad", [-2.35, 0.14, 0], 0.24);
   hotspot("water_tank", [-2.35, 0.46, 0], 0.42);
   hotspot("battery", [-0.7, 0.62, 0.34], 0.42);
+  hotspot("engine", [2.45, 1.05, 0], 0.62);
+  hotspot("climate", [0.35, 2.86, 0.16], 0.46);
+  hotspot("cabin", [-2.0, 2.05, 0], 0.72);
 
   // Small markers so the tank and battery are findable before the first tap.
   [
