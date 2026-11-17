@@ -44,13 +44,18 @@ export default function ClimateCard({ temp, set, mode = "auto", onAdjust, onChan
           </p>
         </div>
 
-        <ArcGauge value={set} min={50} max={90} size={104} thickness={7} color="#64d2ff">
-          <p className="text-[30px] font-semibold leading-none tracking-tight text-white">
-            {Math.round(temp)}
-            <span className="align-top text-[14px] font-medium text-white/40">°</span>
-          </p>
-          <p className="mt-1.5 text-[11px] font-medium text-white/40">Cabin</p>
-        </ArcGauge>
+        <div className="relative h-[118px] w-[104px] shrink-0 text-center">
+          <div className="absolute left-0 top-[18px]" aria-hidden="true">
+            <ArcGauge value={set} min={50} max={90} size={104} thickness={7} color="#64d2ff" />
+          </div>
+          <div className="absolute inset-x-0 top-[73px] z-10 flex flex-col items-center">
+            <p className="text-[22px] font-semibold leading-none tracking-tight text-white">
+              {Math.round(temp)}
+              <span className="text-[13px] font-medium text-white/40">°</span>
+            </p>
+            <p className="mt-1.5 text-[11px] font-medium text-white/40">Cabin</p>
+          </div>
+        </div>
       </div>
 
       {onChangeMode ? (
