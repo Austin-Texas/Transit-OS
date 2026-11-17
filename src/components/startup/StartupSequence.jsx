@@ -6,8 +6,8 @@ import "./StartupPremium.css";
 
 const INITIAL = Object.fromEntries(STARTUP_CHECKS.map(item => [item.id, "pending"]));
 const TERMINAL = new Set(["ready", "offline", "simulated", "error"]);
-const MOVIE_LENGTH = 9000;
-const MAX_BOOT_WAIT = 15000;
+const MOVIE_LENGTH = 16500;
+const MAX_BOOT_WAIT = 21000;
 const FADE_MS = 1000;
 
 export default function StartupSequence({ onDone }) {
@@ -41,10 +41,10 @@ export default function StartupSequence({ onDone }) {
 
   const stage = elapsed < 750 ? 0 : elapsed < 2250 ? 1 : elapsed < 3750 ? 2
     : elapsed < 4500 ? 3 : elapsed < 5250 ? 4 : elapsed < 6750 ? 5
-    : elapsed < 8250 ? 6 : 7;
+    : elapsed < 15750 ? 6 : 7;
   const complete = STARTUP_CHECKS.every(item => TERMINAL.has(checks[item.id]));
   const readyCount = STARTUP_CHECKS.filter(item => TERMINAL.has(checks[item.id])).length;
-  const visualProgress = Math.min(100, Math.max(0, (elapsed - 6750) / 1500 * 100));
+  const visualProgress = Math.min(100, Math.max(0, (elapsed - 6750) / 9000 * 100));
   const progress = Math.round(Math.min(visualProgress, readyCount / STARTUP_CHECKS.length * 100));
   const timedOut = elapsed >= MAX_BOOT_WAIT;
   useEffect(() => {
