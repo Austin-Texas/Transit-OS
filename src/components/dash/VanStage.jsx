@@ -1,32 +1,13 @@
-import { ArrowLeft, ArrowRight, Camera, Move } from "lucide-react";
-import { Link, useNavigate } from "@tanstack/react-router";
-import FordTransit3D from "@/components/van/FordTransit3D";
+import { ArrowLeft, ArrowRight, Camera } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Image } from "@/components/ui/image";
+import { DIGITAL_TWIN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
-// Every part of the van opens the module that looks after it.
-const PART_MODULES = {
-  water_tank: "/water",
-  heat_pad: "/water",
-  battery: "/electrical",
-  engine: "/maintenance",
-  climate: "/climate",
-  cabin: "/camper",
-};
-
-// The diagnostics stage: the van model, skinned with the owner's own van photo,
-// that you can drag to flip all the way round. Every part is a tap target that
-// opens the module responsible for that system.
-export default function VanStage({
-  cabinTemp,
-  vehicleName,
-  trim,
-  warnings = [],
-  focus,
-  status,
-  onClearFocus,
-}) {
+// The diagnostics stage: the digital twin view of the van, with the system
+// callouts drawn on it. A located fault is flagged in the corner.
+export default function VanStage({ focus, onClearFocus }) {
   const side = focus?.side;
-  const navigate = useNavigate();
 
   return (
     <section
@@ -35,27 +16,15 @@ export default function VanStage({
         focus ? "border-ios-pink/50" : "border-white/10"
       )}
     >
-      <FordTransit3D
+      <Image
+        src={DIGITAL_TWIN_IMAGE}
+        alt="2026 Ford Transit digital twin"
+        fittingType="fill"
         className="absolute inset-0 h-full w-full"
-        focus={focus}
-        warnings={warnings}
-        status={status}
-        onPick={(key) => {
-          const to = PART_MODULES[key];
-          if (!to) return;
-          navigate({ to });
-        }}
       />
 
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(78%_68%_at_50%_44%,transparent_42%,rgba(2,6,11,0.6)_100%)]" />
-
-      <div className="pointer-events-none absolute left-4 top-4 z-10 flex items-center gap-2 rounded-full bg-black/30 px-3 py-1.5 text-[11px] font-medium text-white/70 ring-1 ring-inset ring-white/10 backdrop-blur">
-        <span className="h-1.5 w-1.5 rounded-full bg-ios-teal" />
-        Live 3D · Interior {Math.round(cabinTemp)}°F
-      </div>
-
       {focus ? (
-        <div className="absolute right-3 top-12 z-10 flex max-w-[74%] items-center gap-2 rounded-full border border-alert/60 bg-ink-950/90 px-2.5 py-1 backdrop-blur">
+        <div className="absolute right-3 top-3 z-10 flex max-w-[74%] items-center gap-2 rounded-full border border-alert/60 bg-ink-950/90 px-2.5 py-1 backdrop-blur">
           <span className="inline-flex shrink-0 items-center gap-1 text-[8.5px] font-semibold uppercase tracking-[0.14em] text-alert">
             {side === "left" ? (
               <ArrowLeft className="h-3 w-3" strokeWidth={2.4} />
@@ -74,21 +43,7 @@ export default function VanStage({
             <span className="text-[11px] leading-none">×</span>
           </button>
         </div>
-      ) : warnings.length ? (
-        <span className="absolute right-3 top-12 z-10 inline-flex items-center gap-1.5 rounded-full border border-alert/50 bg-ink-950/85 px-2.5 py-1 text-[8.5px] font-semibold uppercase tracking-[0.14em] text-alert backdrop-blur">
-          {warnings.length} warning{warnings.length > 1 ? "s" : ""}
-        </span>
       ) : null}
-
-      <div className="pointer-events-none absolute bottom-3.5 left-4 z-10 min-w-0 max-w-[68%]">
-        <p className="text-[15px] font-semibold leading-tight tracking-tight text-white">{vehicleName}</p>
-        <p className="text-[9.5px] uppercase leading-snug tracking-[0.18em] text-white/45">{trim}</p>
-      </div>
-
-      <div className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 items-center gap-1.5 rounded-full border border-white/10 bg-ink-950/60 px-2.5 py-1 text-[8.5px] uppercase tracking-[0.14em] text-white/35 backdrop-blur sm:flex">
-        <Move className="h-3 w-3" strokeWidth={2.2} />
-        Drag to flip the van · tap a part to open its module
-      </div>
 
       <Link
         to="/settings"
