@@ -8,7 +8,7 @@ export default function PowerCard({ percent = 0, voltage, solar = 0, load = 0 })
 
   return (
     <Panel id="card-power" title="Power" icon={Zap} accent="text-ios-green">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-[22px] font-semibold leading-none tracking-tight text-white">
             {Number(voltage ?? 0).toFixed(1)}
