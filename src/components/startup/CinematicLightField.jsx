@@ -37,9 +37,9 @@ export default function CinematicLightField({ stage }) {
       const stageNow = stageRef.current;
       // Match the storyboard: black for the first 0.5s, then energy grows.
       const reveal = Math.max(0, Math.min(1, (t - 0.5) / 0.85));
-      const fadeOut = t > 4.45 ? Math.max(0.15, 1 - (t - 4.45) / 1.15) : 1;
+      const fadeOut = stageNow === 6 ? 1 : (t > 4.45 ? Math.max(0.15, 1 - (t - 4.45) / 1.15) : 1);
       const cx = width / 2;
-      const horizon = height * (stageNow === 6 ? 0.77 : 0.79);
+      const horizon = height * (stageNow === 6 ? 0.78 : 0.79);
       context.clearRect(0, 0, width, height);
       context.save();
       context.globalCompositeOperation = "screen";
@@ -67,18 +67,23 @@ export default function CinematicLightField({ stage }) {
         context.stroke();
       }
       // Ring and its floor reflection intentionally removed from every scene.
-      // Initialization stage has a luminous dotted perspective grid.
+      // Living cyan perspective wave beneath the initialization panel.
       if (stageNow === 6) {
-        for (let row=0;row<20;row++) {
-          const depth=(row+1)/20;
-          const y=horizon + Math.pow(depth,1.85)*(height-horizon+35);
-          const spread=width*(.08+depth*.65);
-          for(let col=-27;col<=27;col++){
-            const x=cx+col/27*spread;
-            const intensity=.15+.3*Math.sin(t*1.2+col*.11+row*.16)**2;
+        const rows = 23, columns = 65;
+        for (let row = 0; row < rows; row++) {
+          const depth = (row + 1) / rows;
+          const baseY = horizon + Math.pow(depth, 1.65) * (height - horizon + 32);
+          const spread = width * (.23 + depth * .54);
+          for (let col = 0; col < columns; col++) {
+            const xNorm = (col / (columns - 1)) * 2 - 1;
+            const x = cx + xNorm * spread;
+            const wave = Math.sin(xNorm * 8.5 + t * 1.55 + row * .19) * (7 + depth * 11);
+            const ripple = Math.cos(xNorm * 13 - t * 1.05 + row * .13) * 4;
+            const y = baseY + wave + ripple;
+            const glow = .35 + .42 * Math.pow(Math.sin(xNorm * 5.5 + t * 1.3 + row * .1), 2);
             context.beginPath();
-            context.arc(x,y,Math.max(.5,depth*1.6),0,Math.PI*2);
-            context.fillStyle="rgba(0,166,255,"+intensity+")";
+            context.arc(x, y, .55 + depth * 1.45, 0, Math.PI * 2);
+            context.fillStyle = "rgba(0,183,255," + glow + ")";
             context.fill();
           }
         }
