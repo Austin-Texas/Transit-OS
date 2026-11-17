@@ -19,6 +19,7 @@ import Metric from "@/components/dash/Metric";
 import VanStage from "@/components/dash/VanStage";
 import useVanVoice from "@/hooks/useVanVoice";
 import DiagramViews, { viewFocus } from "@/components/van/DiagramViews";
+import QuickChecks from "@/components/van/QuickChecks";
 import { siteWarnings } from "@/lib/siteWarnings";
 import { clockTime, miles, openAlerts } from "@/lib/van";
 import { cn } from "@/lib/utils";
@@ -102,6 +103,11 @@ function DiagnosticsPage() {
               status={status}
             />
           </div>
+          <QuickChecks
+            active={focus?.viewId ?? "full"}
+            status={status}
+            onToggle={(id) => setFocus(focus?.viewId === id ? null : viewFocus(id))}
+          />
         </ModuleCard>
 
         <ModuleCard title="Drivetrain" icon={Car}>
