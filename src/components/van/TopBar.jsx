@@ -1,13 +1,14 @@
-import { Bluetooth, CloudSun, Home, Settings, Wifi } from "lucide-react";
+import { Bluetooth, Car, CloudSun, Home, Settings, Wifi } from "lucide-react";
 import Clock from "./Clock";
-import BrandMark from "@/components/brand/BrandMark";
 
 export default function TopBar({ onOpenSettings }) {
   return (
     <header className="sticky top-0 z-30 border-b border-neon/15 bg-ink-950/85 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-3 px-3 py-2.5 lg:px-6">
         <div className="flex items-center gap-2.5">
-          <BrandMark variant="neon" />
+          <div className="grid h-11 w-11 place-items-center rounded-xl border border-neon/35 bg-neon/10 shadow-[0_0_22px_-8px_rgba(0,240,255,1)]">
+            <Car className="h-4 w-4 text-neon" strokeWidth={1.6} />
+          </div>
           <div className="leading-tight">
             <p className="text-[22px] font-semibold tracking-tight text-white">
               TransitOS<span className="text-neon">™</span>

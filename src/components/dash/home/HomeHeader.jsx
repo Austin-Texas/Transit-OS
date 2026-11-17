@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Settings, Thermometer } from "lucide-react";
-import BrandMark from "@/components/brand/BrandMark";
+import { Settings, Thermometer, Waypoints } from "lucide-react";
 import Clock from "@/components/van/Clock";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +8,9 @@ export default function HomeHeader({ status, offline }) {
   return (
     <header className="sticky top-0 z-30 px-3 pt-3 sm:px-4">
       <div className="glass mx-auto flex w-full max-w-[1500px] items-center gap-3 rounded-[24px] px-3.5 py-2.5">
-        <BrandMark variant="light" />
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-[14px] bg-gradient-to-br from-ios-blue to-ios-indigo text-white shadow-[0_10px_24px_-12px_rgba(10,132,255,0.9)]">
+          <Waypoints className="h-[18px] w-[18px]" strokeWidth={2} />
+        </div>
 
         <div className="min-w-0 leading-tight">
           <p className="text-[17px] font-semibold tracking-tight text-white">
