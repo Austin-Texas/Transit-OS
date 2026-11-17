@@ -1,15 +1,18 @@
+import { Link } from "@tanstack/react-router";
 import { BatteryMedium } from "lucide-react";
 import VanPhoto from "@/components/van/VanPhoto";
-import { VAN_IMAGE } from "@/lib/van";
+import { TWIN_IMAGE } from "@/lib/van";
 import { cn } from "@/lib/utils";
 
 // The hero vehicle panel: the owner's van, its build, and whether the hub is
-// reachable right now.
+// reachable right now. Tapping the picture opens the 3D vehicle view.
 export default function VanPanel({ status, offline = false, className }) {
   return (
-    <section
+    <Link
+      to="/diagnostics"
+      aria-label="Open the 3D vehicle view"
       className={cn(
-        "glass group relative flex flex-col overflow-hidden rounded-[28px] p-0 transition duration-300 ease-out hover:shadow-[0_36px_84px_-40px_rgba(0,0,0,1)]",
+        "glass group relative flex flex-col overflow-hidden rounded-[28px] p-0 transition duration-300 ease-out hover:shadow-[0_36px_84px_-40px_rgba(0,0,0,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ios-teal/70",
         className
       )}
     >
@@ -17,8 +20,8 @@ export default function VanPanel({ status, offline = false, className }) {
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <VanPhoto
           uri={status.van_photo_uri}
-          fallback={VAN_IMAGE}
-          alt="Your camper van"
+          fallback={TWIN_IMAGE}
+          alt="Digital twin of your camper van"
           className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-[1.02]"
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-[#04060c] via-[#04060c]/35 to-transparent" />
@@ -55,6 +58,6 @@ export default function VanPanel({ status, offline = false, className }) {
           {Number(status.battery_voltage ?? 0).toFixed(1)} V
         </span>
       </div>
-    </section>
+    </Link>
   );
 }
