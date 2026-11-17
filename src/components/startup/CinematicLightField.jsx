@@ -113,5 +113,5 @@ export default function CinematicLightField({ stage }) {
     raf=requestAnimationFrame(draw);
     return () => { cancelAnimationFrame(raf); observer.disconnect(); };
   }, []);
-  return <canvas ref={canvasRef} className="tp-cinema__light-field" aria-hidden="true" />;
+  return <canvas ref={canvasRef} className="tp-movie__light-field" aria-hidden="true" />;
 }
