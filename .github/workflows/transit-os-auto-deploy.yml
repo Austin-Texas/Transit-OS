@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(hostname -s)" = "app-host-01"
+          test "$(hostname -s)" = "tpmcs-app-01"
           docker info >/dev/null
           docker network inspect trade-app_default >/dev/null
       - uses: actions/checkout@v4
